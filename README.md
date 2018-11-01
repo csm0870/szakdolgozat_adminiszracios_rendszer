@@ -1,0 +1,2 @@
+# szakdolgozat_adminiszracios_rendszer
+Szakdolgozat adminsztrációs rendszer.
