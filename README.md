@@ -1,2 +1,2 @@
 # szakdolgozat_adminiszracios_rendszer
-Szakdolgozat adminsztrációs rendszer.
+A rendszer a Széchenyi István Egyetem Informatikai Karának a szakdolgozatokkal kapcsolatos adminisztrációs feladatokat támogatja.
