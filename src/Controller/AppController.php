@@ -58,8 +58,8 @@ class AppController extends Controller
                         ]
                     ],
                     'loginRedirect' => [
-                                        'controller' => 'Projects',
-                                        'action' => 'index'
+                                        'controller' => 'Pages',
+                                        'action' => 'dashboard'
                                         ],
                     'logoutRedirect' => [
                                         'controller' => 'Pages',
@@ -78,6 +78,11 @@ class AppController extends Controller
         
         if ($this->Auth->user("id") == null && $this->request->action != "home" && $this->request->action != "login") {
             return $this->redirect(["controller" => "Pages", "action" => "home"]);
+        }
+        
+        //Layout beállítása, ha a listában lévő controllerek hívják meg
+        if(in_array($this->getRequest()->getParam('controller'), ['Information'])){
+            $this->viewBuilder()->setLayout('logged_in_page');
         }
         
         if(!\Cake\Core\Configure::check('title')){

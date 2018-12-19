@@ -146,7 +146,7 @@ class UsersController extends AppController
     private function _doLogin($group_id = null){
         if ($this->request->is('post')) {
             $user = $this->Auth->identify();
-            if (!empty($user) && $user->group_id == $group_id) {
+            if (!empty($user) && $user['group_id'] == $group_id) {
                 $this->Auth->setUser($user);
                 return $this->redirect($this->Auth->redirectUrl());
             }

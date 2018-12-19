@@ -13,6 +13,14 @@ use App\Controller\AppController;
 class ThesisTopicsController extends AppController
 {
 
+    public function topic(){
+        
+    }
+    
+    public function topicForm(){
+        
+    }
+
     /**
      * Index method
      *
