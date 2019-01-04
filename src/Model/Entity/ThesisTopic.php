@@ -9,25 +9,29 @@ use Cake\ORM\Entity;
  * @property int $id
  * @property string|null $title
  * @property string|null $description
- * @property string|null $starting_semester
  * @property string|null $language
  * @property string|null $cause_of_no_external_consultant
- * @property \Cake\I18n\FrozenTime|null $created
- * @property \Cake\I18n\FrozenTime|null $modeified
  * @property bool|null $accepted_by_internal_consultant
  * @property bool|null $accepted_by_head_of_department
  * @property bool|null $accepted_by_external_consultant
  * @property bool|null $modifiable
  * @property bool|null $deleted
  * @property bool|null $is_thesis
- * @property int|null $external_consultant_id
- * @property int|null $internal_consultant_id
  * @property bool|null $encrytped
- * @property int|null $thesis_type_id
+ * @property bool|null $starting_semester
+ * @property string|null $external_consultant_name
+ * @property string|null $external_consultant_workplace
+ * @property string|null $external_consultant_position
+ * @property int|null $internal_consultant_id
+ * @property int|null $starting_year_id
+ * @property int|null $student_id
+ * @property \Cake\I18n\FrozenTime|null $created
+ * @property \Cake\I18n\FrozenTime|null $modeified
  *
  * @property \App\Model\Entity\ExternalConsultant $external_consultant
  * @property \App\Model\Entity\InternalConsultant $internal_consultant
- * @property \App\Model\Entity\ThesisType $thesis_type
+ * @property \App\Model\Entity\Year $year
+ * @property \App\Model\Entity\Student $student
  * @property \App\Model\Entity\FailedTopicSuggestion[] $failed_topic_suggestions
  * @property \App\Model\Entity\Thesis[] $theses
  */
@@ -46,24 +50,27 @@ class ThesisTopic extends Entity
     protected $_accessible = [
         'title' => true,
         'description' => true,
-        'starting_semester' => true,
         'language' => true,
         'cause_of_no_external_consultant' => true,
-        'created' => true,
-        'modeified' => true,
         'accepted_by_internal_consultant' => true,
         'accepted_by_head_of_department' => true,
         'accepted_by_external_consultant' => true,
         'modifiable' => true,
         'deleted' => true,
         'is_thesis' => true,
-        'external_consultant_id' => true,
-        'internal_consultant_id' => true,
         'encrytped' => true,
-        'thesis_type_id' => true,
-        'external_consultant' => true,
+        'starting_semester' => true,
+        'external_consultant_name' => true,
+        'external_consultant_workplace' => true,
+        'external_consultant_position' => true,
+        'internal_consultant_id' => true,
+        'starting_year_id' => true,
+        'student_id' => true,
+        'created' => true,
+        'modeified' => true,
         'internal_consultant' => true,
-        'thesis_type' => true,
+        'year' => true,
+        'student' => true,
         'failed_topic_suggestions' => true,
         'theses' => true
     ];

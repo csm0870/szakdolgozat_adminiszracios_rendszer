@@ -13,13 +13,11 @@ use Cake\ORM\Entity;
  * @property bool|null $handed_in
  * @property bool|null $accepted
  * @property bool|null $deleted
- * @property int|null $review_id
  * @property int|null $thesis_topic_id
  *
- * @property \App\Model\Entity\Review[] $reviews
  * @property \App\Model\Entity\ThesisTopic $thesis_topic
  * @property \App\Model\Entity\Consultation[] $consultations
- * @property \App\Model\Entity\Student[] $students
+ * @property \App\Model\Entity\Review[] $reviews
  */
 class Thesis extends Entity
 {
@@ -40,11 +38,9 @@ class Thesis extends Entity
         'handed_in' => true,
         'accepted' => true,
         'deleted' => true,
-        'review_id' => true,
         'thesis_topic_id' => true,
-        'reviews' => true,
         'thesis_topic' => true,
         'consultations' => true,
-        'students' => true
+        'reviews' => true
     ];
 }

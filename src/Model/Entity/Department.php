@@ -8,6 +8,7 @@ use Cake\ORM\Entity;
  *
  * @property int $id
  * @property string|null $name
+ * @property string|null $head_of_department
  *
  * @property \App\Model\Entity\InternalConsultant[] $internal_consultants
  */
@@ -25,6 +26,7 @@ class Department extends Entity
      */
     protected $_accessible = [
         'name' => true,
+        'head_of_department' => true,
         'internal_consultants' => true
     ];
 }

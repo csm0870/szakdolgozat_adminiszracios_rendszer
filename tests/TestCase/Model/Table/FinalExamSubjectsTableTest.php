@@ -25,6 +25,7 @@ class FinalExamSubjectsTableTest extends TestCase
      */
     public $fixtures = [
         'app.final_exam_subjects',
+        'app.years',
         'app.students'
     ];
 

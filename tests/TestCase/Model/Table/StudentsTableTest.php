@@ -28,9 +28,9 @@ class StudentsTableTest extends TestCase
         'app.courses',
         'app.course_levels',
         'app.course_types',
-        'app.theses',
         'app.users',
-        'app.final_exam_subjects'
+        'app.final_exam_subjects',
+        'app.thesis_topics'
     ];
 
     /**

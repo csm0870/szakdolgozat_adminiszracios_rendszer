@@ -25,10 +25,9 @@ class ThesesTableTest extends TestCase
      */
     public $fixtures = [
         'app.theses',
-        'app.reviews',
         'app.thesis_topics',
         'app.consultations',
-        'app.students'
+        'app.reviews'
     ];
 
     /**

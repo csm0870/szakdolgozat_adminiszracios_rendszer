@@ -25,8 +25,8 @@ class ReviewersTableTest extends TestCase
      */
     public $fixtures = [
         'app.reviewers',
-        'app.reviews',
-        'app.users'
+        'app.users',
+        'app.reviews'
     ];
 
     /**
@@ -69,6 +69,16 @@ class ReviewersTableTest extends TestCase
      * @return void
      */
     public function testValidationDefault()
+    {
+        $this->markTestIncomplete('Not implemented yet.');
+    }
+
+    /**
+     * Test buildRules method
+     *
+     * @return void
+     */
+    public function testBuildRules()
     {
         $this->markTestIncomplete('Not implemented yet.');
     }

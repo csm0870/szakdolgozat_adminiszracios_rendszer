@@ -38,7 +38,7 @@ class InternalConsultantsTable extends Table
         parent::initialize($config);
 
         $this->setTable('internal_consultants');
-        $this->setDisplayField('id');
+        $this->setDisplayField('name');
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
@@ -63,23 +63,18 @@ class InternalConsultantsTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
-            ->integer('id')
+            ->nonNegativeInteger('id')
             ->allowEmpty('id', 'create');
 
         $validator
-            ->scalar('room_number')
-            ->maxLength('room_number', 255)
-            ->allowEmpty('room_number');
+            ->scalar('name')
+            ->maxLength('name', 50)
+            ->allowEmpty('name');
 
         $validator
-            ->scalar('phone_number')
-            ->maxLength('phone_number', 255)
-            ->allowEmpty('phone_number');
-
-        $validator
-            ->scalar('rank')
-            ->maxLength('rank', 255)
-            ->allowEmpty('rank');
+            ->scalar('position')
+            ->maxLength('position', 50)
+            ->allowEmpty('position');
 
         return $validator;
     }

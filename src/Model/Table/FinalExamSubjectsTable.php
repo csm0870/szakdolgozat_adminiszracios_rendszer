@@ -9,6 +9,7 @@ use Cake\Validation\Validator;
 /**
  * FinalExamSubjects Model
  *
+ * @property \App\Model\Table\YearsTable|\Cake\ORM\Association\BelongsTo $Years
  * @property \App\Model\Table\StudentsTable|\Cake\ORM\Association\BelongsTo $Students
  *
  * @method \App\Model\Entity\FinalExamSubject get($primaryKey, $options = [])
@@ -37,6 +38,9 @@ class FinalExamSubjectsTable extends Table
         $this->setDisplayField('name');
         $this->setPrimaryKey('id');
 
+        $this->belongsTo('Years', [
+            'foreignKey' => 'year_id'
+        ]);
         $this->belongsTo('Students', [
             'foreignKey' => 'student_id'
         ]);
@@ -51,22 +55,21 @@ class FinalExamSubjectsTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
-            ->integer('id')
+            ->nonNegativeInteger('id')
             ->allowEmpty('id', 'create');
 
         $validator
             ->scalar('name')
-            ->maxLength('name', 255)
+            ->maxLength('name', 50)
             ->allowEmpty('name');
-
-        $validator
-            ->scalar('semester')
-            ->maxLength('semester', 255)
-            ->allowEmpty('semester');
 
         $validator
             ->scalar('teachers')
             ->allowEmpty('teachers');
+
+        $validator
+            ->boolean('semester')
+            ->allowEmpty('semester');
 
         return $validator;
     }
@@ -80,6 +83,7 @@ class FinalExamSubjectsTable extends Table
      */
     public function buildRules(RulesChecker $rules)
     {
+        $rules->add($rules->existsIn(['year_id'], 'Years'));
         $rules->add($rules->existsIn(['student_id'], 'Students'));
 
         return $rules;

@@ -9,11 +9,9 @@ use Cake\Validation\Validator;
 /**
  * Theses Model
  *
- * @property \App\Model\Table\ReviewsTable|\Cake\ORM\Association\BelongsTo $Reviews
  * @property \App\Model\Table\ThesisTopicsTable|\Cake\ORM\Association\BelongsTo $ThesisTopics
  * @property \App\Model\Table\ConsultationsTable|\Cake\ORM\Association\HasMany $Consultations
  * @property \App\Model\Table\ReviewsTable|\Cake\ORM\Association\HasMany $Reviews
- * @property \App\Model\Table\StudentsTable|\Cake\ORM\Association\HasMany $Students
  *
  * @method \App\Model\Entity\Thesis get($primaryKey, $options = [])
  * @method \App\Model\Entity\Thesis newEntity($data = null, array $options = [])
@@ -41,9 +39,6 @@ class ThesesTable extends Table
         $this->setDisplayField('id');
         $this->setPrimaryKey('id');
 
-        $this->belongsTo('Reviews', [
-            'foreignKey' => 'review_id'
-        ]);
         $this->belongsTo('ThesisTopics', [
             'foreignKey' => 'thesis_topic_id'
         ]);
@@ -51,9 +46,6 @@ class ThesesTable extends Table
             'foreignKey' => 'thesis_id'
         ]);
         $this->hasMany('Reviews', [
-            'foreignKey' => 'thesis_id'
-        ]);
-        $this->hasMany('Students', [
             'foreignKey' => 'thesis_id'
         ]);
     }
@@ -67,7 +59,7 @@ class ThesesTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
-            ->integer('id')
+            ->nonNegativeInteger('id')
             ->allowEmpty('id', 'create');
 
         $validator
@@ -81,7 +73,6 @@ class ThesesTable extends Table
             ->allowEmpty('supplements');
 
         $validator
-            ->integer('internal_consultant_grade')
             ->allowEmpty('internal_consultant_grade');
 
         $validator
@@ -108,7 +99,6 @@ class ThesesTable extends Table
      */
     public function buildRules(RulesChecker $rules)
     {
-        $rules->add($rules->existsIn(['review_id'], 'Reviews'));
         $rules->add($rules->existsIn(['thesis_topic_id'], 'ThesisTopics'));
 
         return $rules;

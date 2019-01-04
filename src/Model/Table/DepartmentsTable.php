@@ -51,13 +51,18 @@ class DepartmentsTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
-            ->integer('id')
+            ->nonNegativeInteger('id')
             ->allowEmpty('id', 'create');
 
         $validator
             ->scalar('name')
             ->maxLength('name', 255)
             ->allowEmpty('name');
+
+        $validator
+            ->scalar('head_of_department')
+            ->maxLength('head_of_department', 255)
+            ->allowEmpty('head_of_department');
 
         return $validator;
     }

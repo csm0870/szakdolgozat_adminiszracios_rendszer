@@ -81,12 +81,30 @@ class AppController extends Controller
         }
         
         //Layout beállítása, ha a listában lévő controllerek hívják meg
-        if(in_array($this->getRequest()->getParam('controller'), ['Information'])){
+        if(in_array($this->getRequest()->getParam('controller'), ['Information', 'ThesisTopics', 'Students']) || ($this->getRequest()->getParam('controller') == 'Pages' && $this->getRequest()->getParam('action') == 'dashboard')){
             $this->viewBuilder()->setLayout('logged_in_page');
+        }
+        
+        //Ha a belépett oldalon vagyunk, akkor a usert átadjuk a view-nak
+        if($this->viewBuilder()->getLayout() == 'logged_in_page'){
+            $user_id = $this->Auth->user('id');
+            $this->loadModel('Users');
+            $logged_in_user = $this->Users->get($user_id);
+
+            $this->set('logged_in_user', $logged_in_user);
         }
         
         if(!\Cake\Core\Configure::check('title')){
             \Cake\Core\Configure::write('title',__('Szakdolgozat adminisztrációs rendszer'));
+        }
+        
+        if(!\Cake\Core\Configure::check('CakePdf')){
+            \Cake\Core\Configure::write('CakePdf', [
+                'engine' => ['className' => 'CakePdf.WkHtmlToPdf',
+                                //Szerveren ez van, más oprendszer miatt másik kell, illetve más helyen van!!!
+                             //'binary' => CONFIG . 'wkhtmltopdf' . DS . 'bin' . DS .'wkhtmltopdf',
+                            ]
+                ]);
         }
     }
 }

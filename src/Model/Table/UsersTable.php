@@ -11,8 +11,8 @@ use Cake\Validation\Validator;
  *
  * @property \App\Model\Table\GroupsTable|\Cake\ORM\Association\BelongsTo $Groups
  * @property \App\Model\Table\InternalConsultantsTable|\Cake\ORM\Association\HasMany $InternalConsultants
+ * @property \App\Model\Table\ReviewersTable|\Cake\ORM\Association\HasMany $Reviewers
  * @property \App\Model\Table\StudentsTable|\Cake\ORM\Association\HasMany $Students
- * @property \App\Model\Table\ReviewersTable|\Cake\ORM\Association\BelongsToMany $Reviewers
  *
  * @method \App\Model\Entity\User get($primaryKey, $options = [])
  * @method \App\Model\Entity\User newEntity($data = null, array $options = [])
@@ -50,13 +50,11 @@ class UsersTable extends Table
         $this->hasMany('InternalConsultants', [
             'foreignKey' => 'user_id'
         ]);
-        $this->hasMany('Students', [
+        $this->hasMany('Reviewers', [
             'foreignKey' => 'user_id'
         ]);
-        $this->belongsToMany('Reviewers', [
-            'foreignKey' => 'user_id',
-            'targetForeignKey' => 'reviewer_id',
-            'joinTable' => 'users_reviewers'
+        $this->hasMany('Students', [
+            'foreignKey' => 'user_id'
         ]);
     }
 
@@ -69,13 +67,8 @@ class UsersTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
-            ->integer('id')
+            ->nonNegativeInteger('id')
             ->allowEmpty('id', 'create');
-
-        $validator
-            ->scalar('name')
-            ->maxLength('name', 255)
-            ->allowEmpty('name');
 
         $validator
             ->email('email')

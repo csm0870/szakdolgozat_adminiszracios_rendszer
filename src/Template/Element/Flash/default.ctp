@@ -1,10 +1,14 @@
-<?php
-$class = 'message';
-if (!empty($params['class'])) {
-    $class .= ' ' . $params['class'];
-}
-if (!isset($params['escape']) || $params['escape'] !== false) {
-    $message = h($message);
-}
-?>
-<div class="<?= h($class) ?>" onclick="this.classList.add('hidden');"><?= $message ?></div>
+<div class="col-12 flash-default" style="margin: 10px 0">
+    <div class="alert alert-info alert-dismissible">
+        <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+        <p><i class="icon fa fa-info"></i> <?= h($message) ?></p>
+        
+    </div>
+</div>
+<script>
+    $(function(){
+        setTimeout(function(){
+            $('.flash-default').fadeOut(1000);
+        }, 4000);
+    });
+</script>

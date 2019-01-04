@@ -27,8 +27,8 @@ class UsersTableTest extends TestCase
         'app.users',
         'app.groups',
         'app.internal_consultants',
-        'app.students',
-        'app.reviewers'
+        'app.reviewers',
+        'app.students'
     ];
 
     /**

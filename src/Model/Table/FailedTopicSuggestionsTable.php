@@ -51,20 +51,12 @@ class FailedTopicSuggestionsTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
-            ->integer('id')
+            ->nonNegativeInteger('id')
             ->allowEmpty('id', 'create');
 
         $validator
             ->scalar('suggestion')
             ->allowEmpty('suggestion');
-
-        $validator
-            ->boolean('new_topic_by_external_consultant')
-            ->allowEmpty('new_topic_by_external_consultant');
-
-        $validator
-            ->boolean('new_topic_by_head_of_department')
-            ->allowEmpty('new_topic_by_head_of_department');
 
         return $validator;
     }

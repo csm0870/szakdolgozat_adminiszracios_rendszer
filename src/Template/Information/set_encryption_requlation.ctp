@@ -21,6 +21,6 @@
 
 <script>
     $(function(){
-        $('#topic_manager_set_encryption_requlation_menu_item').addClass('active');
+        $('#set_encryption_requlation_menu_item').addClass('active');
     });
 </script>

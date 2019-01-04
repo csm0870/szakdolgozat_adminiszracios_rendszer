@@ -51,22 +51,22 @@ class ExternalConsultantsTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
-            ->integer('id')
+            ->nonNegativeInteger('id')
             ->allowEmpty('id', 'create');
 
         $validator
             ->scalar('name')
-            ->maxLength('name', 255)
+            ->maxLength('name', 50)
             ->allowEmpty('name');
 
         $validator
             ->scalar('workplace')
-            ->maxLength('workplace', 255)
+            ->maxLength('workplace', 50)
             ->allowEmpty('workplace');
 
         $validator
             ->scalar('position')
-            ->maxLength('position', 255)
+            ->maxLength('position', 50)
             ->allowEmpty('position');
 
         return $validator;

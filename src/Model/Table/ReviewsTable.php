@@ -12,7 +12,6 @@ use Cake\Validation\Validator;
  * @property \App\Model\Table\ThesesTable|\Cake\ORM\Association\BelongsTo $Theses
  * @property \App\Model\Table\ReviewersTable|\Cake\ORM\Association\BelongsTo $Reviewers
  * @property \App\Model\Table\QuestionsTable|\Cake\ORM\Association\HasMany $Questions
- * @property \App\Model\Table\ThesesTable|\Cake\ORM\Association\HasMany $Theses
  *
  * @method \App\Model\Entity\Review get($primaryKey, $options = [])
  * @method \App\Model\Entity\Review newEntity($data = null, array $options = [])
@@ -49,9 +48,6 @@ class ReviewsTable extends Table
         $this->hasMany('Questions', [
             'foreignKey' => 'review_id'
         ]);
-        $this->hasMany('Theses', [
-            'foreignKey' => 'review_id'
-        ]);
     }
 
     /**
@@ -63,11 +59,10 @@ class ReviewsTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
-            ->integer('id')
+            ->nonNegativeInteger('id')
             ->allowEmpty('id', 'create');
 
         $validator
-            ->integer('structure_and_style_point')
             ->allowEmpty('structure_and_style_point');
 
         $validator
@@ -75,7 +70,6 @@ class ReviewsTable extends Table
             ->allowEmpty('cause_of_structure_and_style_point');
 
         $validator
-            ->integer('processing_literature_point')
             ->allowEmpty('processing_literature_point');
 
         $validator
@@ -83,7 +77,6 @@ class ReviewsTable extends Table
             ->allowEmpty('cause_of_processing_literature_point');
 
         $validator
-            ->integer('writing_up_the_topic_point')
             ->allowEmpty('writing_up_the_topic_point');
 
         $validator
@@ -91,7 +84,6 @@ class ReviewsTable extends Table
             ->allowEmpty('cause_writing_up_the_topic_point');
 
         $validator
-            ->integer('practical applicability_point')
             ->allowEmpty('practical applicability_point');
 
         $validator
@@ -103,7 +95,6 @@ class ReviewsTable extends Table
             ->allowEmpty('general_comments');
 
         $validator
-            ->integer('grade')
             ->allowEmpty('grade');
 
         $validator

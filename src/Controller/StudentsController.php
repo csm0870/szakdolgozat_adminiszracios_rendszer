@@ -70,32 +70,34 @@ class StudentsController extends AppController
     }
 
     /**
-     * Edit method
+     * Edit metódus hallgatónak
      *
      * @param string|null $id Student id.
      * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function edit($id = null)
+    public function studentEdit($id = null)
     {
-        $student = $this->Students->get($id, [
-            'contain' => []
-        ]);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $student = $this->Students->patchEntity($student, $this->request->getData());
-            if ($this->Students->save($student)) {
-                $this->Flash->success(__('The student has been saved.'));
+        
+        if($this->Auth->user('group_id') == 6){
+        
+            $data = $this->Students->checkStundentData($this->Auth->user('id'));
 
-                return $this->redirect(['action' => 'index']);
+            $student = $this->Students->find('all', ['conditions' => ['id' => $data['student_id']]])->first();
+            if ($this->request->is(['patch', 'post', 'put'])) {
+                $student = $this->Students->patchEntity($student, $this->request->getData());
+                if ($this->Students->save($student)) {
+                    $this->Flash->success(__('The student has been saved.'));
+
+                    return $this->redirect(['action' => 'studentEdit', $student->id]);
+                }
+                $this->Flash->error(__('The student could not be saved. Please, try again.'));
             }
-            $this->Flash->error(__('The student could not be saved. Please, try again.'));
+            $courses = $this->Students->Courses->find('list');
+            $courseLevels = $this->Students->CourseLevels->find('list');
+            $courseTypes = $this->Students->CourseTypes->find('list');
+            $this->set(compact('student', 'courses', 'courseLevels', 'courseTypes'));
         }
-        $courses = $this->Students->Courses->find('list', ['limit' => 200]);
-        $courseLevels = $this->Students->CourseLevels->find('list', ['limit' => 200]);
-        $courseTypes = $this->Students->CourseTypes->find('list', ['limit' => 200]);
-        $theses = $this->Students->Theses->find('list', ['limit' => 200]);
-        $users = $this->Students->Users->find('list', ['limit' => 200]);
-        $this->set(compact('student', 'courses', 'courseLevels', 'courseTypes', 'theses', 'users'));
     }
 
     /**

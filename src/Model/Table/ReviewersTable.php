@@ -9,8 +9,8 @@ use Cake\Validation\Validator;
 /**
  * Reviewers Model
  *
+ * @property \App\Model\Table\UsersTable|\Cake\ORM\Association\BelongsTo $Users
  * @property \App\Model\Table\ReviewsTable|\Cake\ORM\Association\HasMany $Reviews
- * @property \App\Model\Table\UsersTable|\Cake\ORM\Association\BelongsToMany $Users
  *
  * @method \App\Model\Entity\Reviewer get($primaryKey, $options = [])
  * @method \App\Model\Entity\Reviewer newEntity($data = null, array $options = [])
@@ -42,13 +42,11 @@ class ReviewersTable extends Table
 
         $this->addBehavior('Timestamp');
 
+        $this->belongsTo('Users', [
+            'foreignKey' => 'user_id'
+        ]);
         $this->hasMany('Reviews', [
             'foreignKey' => 'reviewer_id'
-        ]);
-        $this->belongsToMany('Users', [
-            'foreignKey' => 'reviewer_id',
-            'targetForeignKey' => 'user_id',
-            'joinTable' => 'users_reviewers'
         ]);
     }
 
@@ -61,17 +59,21 @@ class ReviewersTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
-            ->integer('id')
+            ->nonNegativeInteger('id')
             ->allowEmpty('id', 'create');
 
         $validator
             ->scalar('name')
-            ->maxLength('name', 255)
+            ->maxLength('name', 50)
             ->allowEmpty('name');
 
         $validator
+            ->email('email')
+            ->allowEmpty('email');
+
+        $validator
             ->scalar('workplace')
-            ->maxLength('workplace', 255)
+            ->maxLength('workplace', 50)
             ->allowEmpty('workplace');
 
         $validator
@@ -80,5 +82,20 @@ class ReviewersTable extends Table
             ->allowEmpty('position');
 
         return $validator;
+    }
+
+    /**
+     * Returns a rules checker object that will be used for validating
+     * application integrity.
+     *
+     * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
+     * @return \Cake\ORM\RulesChecker
+     */
+    public function buildRules(RulesChecker $rules)
+    {
+        $rules->add($rules->isUnique(['email']));
+        $rules->add($rules->existsIn(['user_id'], 'Users'));
+
+        return $rules;
     }
 }

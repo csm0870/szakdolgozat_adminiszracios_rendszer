@@ -7,9 +7,8 @@ use Cake\ORM\Entity;
  * InternalConsultant Entity
  *
  * @property int $id
- * @property string|null $room_number
- * @property string|null $phone_number
- * @property string|null $rank
+ * @property string|null $name
+ * @property string|null $position
  * @property \Cake\I18n\FrozenTime|null $created
  * @property \Cake\I18n\FrozenTime|null $modified
  * @property int|null $department_id
@@ -32,9 +31,8 @@ class InternalConsultant extends Entity
      * @var array
      */
     protected $_accessible = [
-        'room_number' => true,
-        'phone_number' => true,
-        'rank' => true,
+        'name' => true,
+        'position' => true,
         'created' => true,
         'modified' => true,
         'department_id' => true,

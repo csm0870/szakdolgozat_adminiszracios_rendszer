@@ -24,8 +24,8 @@
     </head>
     <body>
         <div class="main-content-wrapper">
-            <?= $this->element('logged_in_page_header') ?>
             <div class="main-content">
+                <?= $this->element('logged_in_page_header') ?>
                 <?= $this->fetch('content') ?>
             </div>
         </div>

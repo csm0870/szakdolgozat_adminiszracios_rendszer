@@ -22,7 +22,7 @@ use Cake\ORM\Entity;
  * @property int|null $thesis_id
  * @property int|null $reviewer_id
  *
- * @property \App\Model\Entity\Thesis[] $theses
+ * @property \App\Model\Entity\Thesis $thesis
  * @property \App\Model\Entity\Reviewer $reviewer
  * @property \App\Model\Entity\Question[] $questions
  */
@@ -53,7 +53,7 @@ class Review extends Entity
         'confidentiality_contract_accepted' => true,
         'thesis_id' => true,
         'reviewer_id' => true,
-        'theses' => true,
+        'thesis' => true,
         'reviewer' => true,
         'questions' => true
     ];

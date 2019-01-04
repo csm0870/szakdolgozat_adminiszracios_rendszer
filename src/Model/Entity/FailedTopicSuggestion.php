@@ -8,8 +8,6 @@ use Cake\ORM\Entity;
  *
  * @property int $id
  * @property string|null $suggestion
- * @property bool|null $new_topic_by_external_consultant
- * @property bool|null $new_topic_by_head_of_department
  * @property int|null $thesis_topic_id
  *
  * @property \App\Model\Entity\ThesisTopic $thesis_topic
@@ -28,8 +26,6 @@ class FailedTopicSuggestion extends Entity
      */
     protected $_accessible = [
         'suggestion' => true,
-        'new_topic_by_external_consultant' => true,
-        'new_topic_by_head_of_department' => true,
         'thesis_topic_id' => true,
         'thesis_topic' => true
     ];

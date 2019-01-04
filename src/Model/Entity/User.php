@@ -8,7 +8,6 @@ use Cake\Auth\DefaultPasswordHasher;
  * User Entity
  *
  * @property int $id
- * @property string|null $name
  * @property string|null $email
  * @property string|null $password
  * @property \Cake\I18n\FrozenTime|null $created
@@ -17,8 +16,8 @@ use Cake\Auth\DefaultPasswordHasher;
  *
  * @property \App\Model\Entity\Group $group
  * @property \App\Model\Entity\InternalConsultant[] $internal_consultants
- * @property \App\Model\Entity\Student[] $students
  * @property \App\Model\Entity\Reviewer[] $reviewers
+ * @property \App\Model\Entity\Student[] $students
  */
 class User extends Entity
 {
@@ -33,7 +32,6 @@ class User extends Entity
      * @var array
      */
     protected $_accessible = [
-        'name' => true,
         'email' => true,
         'password' => true,
         'created' => true,
@@ -41,8 +39,8 @@ class User extends Entity
         'group_id' => true,
         'group' => true,
         'internal_consultants' => true,
-        'students' => true,
-        'reviewers' => true
+        'reviewers' => true,
+        'students' => true
     ];
 
     /**

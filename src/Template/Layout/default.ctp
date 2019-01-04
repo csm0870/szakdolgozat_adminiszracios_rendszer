@@ -20,8 +20,8 @@
     </head>
     <body>
         <div class="main-content-wrapper">
-            <?= $this->element('header') ?>
             <div class="main-content">
+                <?= $this->element('header') ?>
                 <?= $this->fetch('content') ?>
             </div>
         </div>

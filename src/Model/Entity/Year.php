@@ -4,19 +4,14 @@ namespace App\Model\Entity;
 use Cake\ORM\Entity;
 
 /**
- * FinalExamSubject Entity
+ * Year Entity
  *
  * @property int $id
- * @property string|null $name
- * @property string|null $teachers
- * @property bool|null $semester
- * @property int|null $year_id
- * @property int|null $student_id
+ * @property string|null $year
  *
- * @property \App\Model\Entity\Year $year
- * @property \App\Model\Entity\Student $student
+ * @property \App\Model\Entity\FinalExamSubject[] $final_exam_subjects
  */
-class FinalExamSubject extends Entity
+class Year extends Entity
 {
 
     /**
@@ -29,12 +24,7 @@ class FinalExamSubject extends Entity
      * @var array
      */
     protected $_accessible = [
-        'name' => true,
-        'teachers' => true,
-        'semester' => true,
-        'year_id' => true,
-        'student_id' => true,
         'year' => true,
-        'student' => true
+        'final_exam_subjects' => true
     ];
 }

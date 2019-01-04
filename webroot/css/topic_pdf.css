@@ -1,0 +1,65 @@
+.topic-form{
+    font-family: Arial;
+    font-size: 16pt;
+}
+
+.topic-form .text-justify{
+    text-align: justify;
+}
+
+.topic-form .header{
+    text-align: center;
+    font-size: 22pt;
+    font-weight: bold;
+    margin-bottom: 40px;
+}
+
+.topic-form table{
+    width: 100%;
+}
+
+.topic-form .data-group .title{
+    text-decoration: underline;
+}
+
+.topic-form .data-group .field{
+    font-style: italic;
+}
+
+.topic-form .data-group.student-data{
+    margin-bottom: 20px;
+}
+
+.topic-form .data-group.thesis-data{
+    margin-bottom: 80px;
+}
+
+.topic-form .data-group.thesis-data .thesis-title{
+    text-align: center;
+    margin: 20px 0;
+    font-weight: bold;
+    font-size: 18pt;
+}
+
+.topic-form .data-group.consultant-data .no-external-consultant{
+    margin-top: 20px;
+}
+
+.topic-form .footer{
+    margin-top: 60px;
+}
+
+.topic-form .footer .signatures{
+    
+}
+
+.topic-form .footer .signatures table td{
+    text-align: center;
+}
+
+.topic-form .footer .signatures .signature{
+    margin-top: 60px;
+    border-top: 2px solid black;
+    width: 300px;
+    display: inline-block;
+}
