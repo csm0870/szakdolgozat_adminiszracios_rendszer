@@ -56,20 +56,54 @@ html,body{
     font-size: 1.5rem;
 }
 
-/* StudentIndex (ThesisTopics) */
+/* Thesis topic indexes */
 
-.student-thesisTopics-index .thesisTopic-list-container{
+.thesisTopics-index .thesisTopic-list-container{
     margin-bottom: 5px;
 }
 
-.student-thesisTopics-index .topics-table .edit-btn{
+/* Thesis topics student index */
+
+.thesisTopics-index.student-thesisTopics-index .topics-table .edit-btn{
     margin-bottom: 8px;
 }
 
-.student-thesisTopics-index .topics-table .finalize-btn{
+.thesisTopics-index.student-thesisTopics-index .topics-table .finalize-btn{
     margin: 0 0 8px 8px;
 }
 
-.student-thesisTopics-index .topics-table .enrcyption-doc-btn{
+.thesisTopics-index.student-thesisTopics-index .topics-table .enrcyption-doc-btn{
     margin-left: 8px;
+}
+
+/* Thesis topics internal consultant index */
+
+.thesisTopics-index.internalConsultant-thesisTopics-index .topics-table .btn-pdf{
+    margin-bottom: 8px;
+}
+
+.thesisTopics-index.internalConsultant-thesisTopics-index .topics-table .btn-delete{
+    margin: 0 0 8px 8px;
+}
+
+.thesisTopics-index.internalConsultant-thesisTopics-index .topics-table .btn-accept{
+    margin-bottom: 8px;
+}
+
+.thesisTopics-index.internalConsultant-thesisTopics-index .topics-table .btn-reject{
+    margin: 0 0 8px 8px;
+}
+
+/* Thesis topics head of department index */
+
+.thesisTopics-index.headOfDepartment-thesisTopics-index .topics-table .btn-pdf{
+    margin-bottom: 8px;
+}
+
+.thesisTopics-index.headOfDepartment-thesisTopics-index .topics-table .btn-accept{
+    margin-bottom: 8px;
+}
+
+.thesisTopics-index.headOfDepartment-thesisTopics-index .topics-table .btn-reject{
+    margin: 0 0 8px 8px;
 }

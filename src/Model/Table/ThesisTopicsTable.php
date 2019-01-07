@@ -139,10 +139,6 @@ class ThesisTopicsTable extends Table
             ->maxLength('external_consultant_position', 50)
             ->allowEmpty('external_consultant_position');
 
-        $validator
-            ->dateTime('modeified')
-            ->allowEmpty('modeified');
-
         return $validator;
     }
 

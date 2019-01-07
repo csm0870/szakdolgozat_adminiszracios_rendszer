@@ -38,9 +38,9 @@ class User extends Entity
         'modified' => true,
         'group_id' => true,
         'group' => true,
-        'internal_consultants' => true,
-        'reviewers' => true,
-        'students' => true
+        'internal_consultant' => true,
+        'reviewer' => true,
+        'student' => true
     ];
 
     /**

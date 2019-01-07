@@ -16,7 +16,7 @@
             </tr>
             <tr>
                 <td><span class="field">Specializáció:</span>&nbsp;<?= $thesisTopic->has('student') ? (empty($thesisTopic->student->specialisation) ? '-' : $thesisTopic->student->specialisation) : ''?></td>
-                <td><span class="field">Tagozat:</span>&nbsp;<?= $thesisTopic->has('student') ? ($thesisTopic->student->has('course_type') ? h($thesisTopic->student->course_type->name) : '') : ''?></td>
+                <td><span class="field">Tagozat:</span>&nbsp;<?= $thesisTopic->has('student') ? ($thesisTopic->student->has('course_type') ? strtolower(h($thesisTopic->student->course_type->name)) : '') : ''?></td>
             </tr>
         </table>
     </div>

@@ -67,7 +67,7 @@ class ThesisTopic extends Entity
         'starting_year_id' => true,
         'student_id' => true,
         'created' => true,
-        'modeified' => true,
+        'modified' => true,
         'internal_consultant' => true,
         'year' => true,
         'student' => true,

@@ -47,13 +47,13 @@ class UsersTable extends Table
         $this->belongsTo('Groups', [
             'foreignKey' => 'group_id'
         ]);
-        $this->hasMany('InternalConsultants', [
+        $this->hasOne('InternalConsultants', [
             'foreignKey' => 'user_id'
         ]);
-        $this->hasMany('Reviewers', [
+        $this->hasOne('Reviewers', [
             'foreignKey' => 'user_id'
         ]);
-        $this->hasMany('Students', [
+        $this->hasOne('Students', [
             'foreignKey' => 'user_id'
         ]);
     }
