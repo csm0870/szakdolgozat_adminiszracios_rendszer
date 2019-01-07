@@ -65,7 +65,7 @@
                                                 }
                                                 
                                                 echo $this->Html->link(__('PDF'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id], ['class' => 'btn btn-info', 'target' => '_blank']);
-                                                if($thesisTopic->encrypted) echo $this->Html->link(__('Titkosítási kérelem'), ['controller' => 'ThesisTopics', 'action' => 'encyptionRegulationPdf', $thesisTopic->id], ['class' => 'btn btn-enrcypted', 'target' => '_blank']);
+                                                if($thesisTopic->encrypted) echo $this->Html->link(__('Titkosítási kérelem'), ['controller' => 'ThesisTopics', 'action' => 'encyptionRegulationDoc', $thesisTopic->id], ['class' => 'btn btn-info enrcyption-doc-btn', 'target' => '_blank']);
                                             ?>
                                         </td>
                                     </tr>

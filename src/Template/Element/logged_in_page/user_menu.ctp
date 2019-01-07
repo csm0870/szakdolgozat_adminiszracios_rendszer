@@ -25,7 +25,7 @@
                         <a class="nav-link" href="<?= $this->Url->build(['controller' => 'Students', 'action' => 'studentEdit']) ?>"><?= __('Hallgatói adatok') ?></a>
                     </li>
                     <li class="nav-item" id="student_thesis_topics_index_menu_item">
-                        <a class="nav-link" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'studentIndex']) ?>"><?= __('Témaengedélyező') ?></a>
+                        <a class="nav-link" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'studentIndex']) ?>"><?= __('Témaengedélyezők') ?></a>
                     </li>
                 <?php }?>
             </ul>

@@ -58,7 +58,7 @@ class ThesisTopic extends Entity
         'modifiable' => true,
         'deleted' => true,
         'is_thesis' => true,
-        'encrytped' => true,
+        'encrypted' => true,
         'starting_semester' => true,
         'external_consultant_name' => true,
         'external_consultant_workplace' => true,

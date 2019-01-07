@@ -32,7 +32,7 @@
             <?= $this->Form->control('starting_year_id', ['class' => 'form-control', 'options' => $years, 'value' => $key, 'label' => ['text' => __('Kezdési tanév')]]) ?>
             <?= $this->Form->control('starting_semester', ['class' => 'form-control', 'type' => 'select', 'options' => [__('Első félév'), __('Második félév')], 'label' => ['text' => __('Kezdési félév')]]) ?>
             <?= $this->Form->control('language', ['class' => 'form-control', 'label' => ['text' => __('Nyelv')]]) ?>
-            <?= $this->Form->control('encrytped', ['hiddenField' => false, 'label' => ['text' => __('Titkos')], 'templates' => ['nestingLabel' => '{{hidden}}<label{{attrs}}>{{text}}</label>&nbsp;{{input}}']]) ?>
+            <?= $this->Form->control('encrypted', ['hiddenField' => false, 'label' => ['text' => __('Titkos')], 'templates' => ['nestingLabel' => '{{hidden}}<label{{attrs}}>{{text}}</label>&nbsp;{{input}}']]) ?>
             <?= $this->Form->control('internal_consultant_id', ['class' => 'form-control', 'label' => ['text' => __('Belső konzulens'), 'options' => $internalConsultants]]) ?>
             <?= $this->Form->control('has_external_consultant', ['id' => 'has_external_consultant', 'class' => 'form-control', 'type' => 'select', 'value' => 1, 'empty' => false, 'options' => [__('Nincs'), __('Van')], 'label' => ['text' => __('Külső konzulens')]]) ?>
             <?= $this->Form->control('external_consultant_name', ['class' => 'form-control', 'label' => ['text' => __('Külső konzulens neve')],

@@ -30,7 +30,7 @@
                 <td><span class="field">Nyelv:</span>&nbsp;<?= h($thesisTopic->language) ?></td>
             </tr>
             <tr>
-                <td><span class="field">Típus:</span>&nbsp;<?= $thesisTopic->encrytped ? 'titkos' : 'nyilvános' ?></td>
+                <td><span class="field">Típus:</span>&nbsp;<?= $thesisTopic->encrypted ? 'titkos' : 'nyilvános' ?></td>
             </tr>
         </table>
         <div class="thesis-title">

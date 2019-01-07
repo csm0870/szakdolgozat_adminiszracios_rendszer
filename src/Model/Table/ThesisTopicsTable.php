@@ -117,8 +117,8 @@ class ThesisTopicsTable extends Table
             ->allowEmpty('is_thesis');
 
         $validator
-            ->boolean('encrytped')
-            ->allowEmpty('encrytped');
+            ->boolean('encrypted')
+            ->allowEmpty('encrypted');
 
         $validator
             ->boolean('starting_semester')
