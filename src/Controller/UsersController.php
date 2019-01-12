@@ -140,6 +140,7 @@ class UsersController extends AppController
     public function logout() {
 		$logout_redirect = $this->Auth->logout();
 		$this->getRequest()->getSession()->destroy();
+                $this->Flash->success(__('Sikeresen kijelentkeztél.'));
 		return $this->redirect($logout_redirect);
     }
     
@@ -148,6 +149,20 @@ class UsersController extends AppController
             $user = $this->Auth->identify();
             if (!empty($user) && $user['group_id'] == $group_id) {
                 $this->Auth->setUser($user);
+                
+                if($group_id == 1) // Admin
+                    return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'admin']);
+                elseif($group_id == 2) // Belső konzulens
+                    return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'internal_consultant']);
+                elseif($group_id == 3) // Tanszékvezető
+                    return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'head_of_department']);
+                elseif($group_id == 4) // Témakezelő
+                    return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'topic_manager']);
+                elseif($group_id == 5) // Szakdolgozatkezelő
+                    return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'thesis_manager']);
+                elseif($group_id == 6) // Hallgató
+                    return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'student']);
+                
                 return $this->redirect($this->Auth->redirectUrl());
             }
             

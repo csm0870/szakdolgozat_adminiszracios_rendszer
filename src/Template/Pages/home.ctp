@@ -4,7 +4,7 @@
             <?= $this->Flash->render() ?>
         </div>
         <div class="row login-types text-center">
-            <?php if(!$admin){ ?>
+            <?php if(!$administrators){ ?>
                 <div class="col-12 col-sm-6 col-lg-4">
                     <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'login', 6], true) ?>">
                         <div class="login-type-container">
@@ -18,7 +18,7 @@
                     <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'login', 2], true) ?>">
                         <div class="login-type-container">
                             <div class="login-type">
-                                <?= __('Belső konzulensi belépés belépés') ?>
+                                <?= __('Belső konzulensi belépés') ?>
                             </div>
                         </div>
                     </a>

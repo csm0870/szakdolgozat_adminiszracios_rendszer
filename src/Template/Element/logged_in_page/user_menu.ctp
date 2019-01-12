@@ -8,8 +8,8 @@
                 </li>
                 <!-- Témakezelő menüpontok-->
                 <?php if($logged_in_user->group_id == 4){ ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"><?= __('Leadott témák') ?></a>
+                    <li class="nav-item" id="topic_manager_thesis_topic_index_menu_item">
+                        <a class="nav-link" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'topicManagerIndex']) ?>"><?= __('Leadott témák') ?></a>
                     </li>
                     <li class="nav-item" id="set_topic_filling_in_period_menu_item">
                         <a class="nav-link" href="<?= $this->Url->build(['controller' => 'Information', 'action' => 'setFillingInPeriod']) ?>"><?= __('Témaengedélyező kérdőív engedélyezése') ?></a>

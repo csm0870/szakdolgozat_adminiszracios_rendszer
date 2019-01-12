@@ -12,7 +12,9 @@
  * @since     0.2.9
  * @license   https://opensource.org/licenses/mit-license.php MIT License
  */
-namespace App\Controller;
+namespace App\Controller\HeadOfDepartment;
+
+use App\Controller\AppController;
 
 use Cake\Core\Configure;
 use Cake\Http\Exception\ForbiddenException;
@@ -28,37 +30,10 @@ use Cake\Event\Event;
  * @link https://book.cakephp.org/3.0/en/controllers/pages-controller.html
  */
 class PagesController extends AppController
-{
-    
-    public function beforeFilter(Event $event) {
-        parent::beforeFilter($event);
-        $this->Auth->allow(['home']);
-    }
-
-    /**
-     * Home
-     * 
-     * @param type $type
-     */
-    public function home($type = null){
-        $administrators = false;
-        if($type == 'administrators') $administrators = true;
-        
-        $this->set(compact('administrators'));
-    }
-    
+{  
     /**
      * Dashboard
      */
     public function dashboard(){
-        //Hallgatói adatellenőrzés
-        if($this->Auth->user('group_id') == 6){
-            $this->loadModel('Students');
-            $data = $this->Students->checkStundentData($this->Auth->user('id'));
-            if($data['success'] === false){
-                $this->Flash->error(__('Adja meg az adatit a továbblépéshez!'));
-                return $this->redirect(['controller' => 'Students', 'action' => 'studentEdit', $data['student_id']]);
-            }
-        }
     }
 }

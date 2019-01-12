@@ -47,6 +47,38 @@ use Cake\Routing\Route\DashedRoute;
 Router::defaultRouteClass(DashedRoute::class);
 Router::extensions(['pdf']);
 
+//Az egyes user típusoknak különböző route prefix
+
+Router::prefix('admin',  function ($routes) {
+	$routes->connect('/', ['controller' => 'Pages', 'action' => 'dashboard']); 
+	$routes->fallbacks(DashedRoute::class);
+});
+
+Router::prefix('internal_consultant',  function ($routes) {
+	$routes->connect('/', ['controller' => 'Projects', 'action' => 'index']); 
+	$routes->fallbacks(DashedRoute::class);
+});
+
+Router::prefix('head_of_department',  function ($routes) {
+	$routes->connect('/', ['controller' => 'Projects', 'action' => 'index']); 
+	$routes->fallbacks(DashedRoute::class);
+});
+
+Router::prefix('topic_manager',  function ($routes) {
+	$routes->connect('/', ['controller' => 'Pages', 'action' => 'dashboard']); 
+	$routes->fallbacks(DashedRoute::class);
+});
+
+Router::prefix('thesis_manager',  function ($routes) {
+	$routes->connect('/', ['controller' => 'Projects', 'action' => 'index']); 
+	$routes->fallbacks(DashedRoute::class);
+});
+
+Router::prefix('student',  function ($routes) {
+	$routes->connect('/', ['controller' => 'Projects', 'action' => 'index']); 
+	$routes->fallbacks(DashedRoute::class);
+});
+
 Router::scope('/', function (RouteBuilder $routes) {
     /**
      * Here, we are connecting '/' (base path) to a controller called 'Pages',
@@ -55,7 +87,7 @@ Router::scope('/', function (RouteBuilder $routes) {
      */
     $routes->connect('/', ['controller' => 'Pages', 'action' => 'home']);
     
-    $routes->connect('/admin', ['controller' => 'Pages', 'action' => 'home', 'admin']);
+    $routes->connect('/administrators', ['controller' => 'Pages', 'action' => 'home', 'administrators']);
 
     /**
      * Connect catchall routes for all controllers.

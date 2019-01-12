@@ -223,7 +223,7 @@ class ThesisTopicsController extends AppController
     }
 
     /**
-     * Delete method
+     * Téma törlése a belső konzulens által (nem tényleges fizikai törlés)
      *
      * @param string|null $id Thesis Topic id.
      * @return \Cake\Http\Response|null Redirects to index.
@@ -266,14 +266,29 @@ class ThesisTopicsController extends AppController
     }
     
     /**
-     * Tanszékvezető témái
+     * Tanszékvezető témalista
      */
     public function headOfDepartmentIndex(){
         if($this->Auth->user('group_id') == 3){
             $this->loadModel('Users');
             $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
-            //Csak a véglegesített és a hozzá tartozó témákat látja
+            //Csak azokat a témákat látja, amelyet a belső konzulens már elfogadott
             $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['accepted_by_internal_consultant IS NOT' => null, 'deleted !=' => true],
+                                                              'contain' => ['Students', 'InternalConsultants'], 'order' => ['ThesisTopics.modified' => 'ASC']]);
+        
+            $this->set(compact('thesisTopics'));
+        }
+    }
+    
+    /**
+     * Témakezelő témalista
+     */
+    public function topicManagerIndex(){
+        if($this->Auth->user('group_id') == 4){
+            $this->loadModel('Users');
+            $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
+            //Csak a véglegesített témákat látja
+            $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['deleted !=' => true],
                                                               'contain' => ['Students', 'InternalConsultants'], 'order' => ['ThesisTopics.modified' => 'ASC']]);
         
             $this->set(compact('thesisTopics'));
@@ -285,7 +300,7 @@ class ThesisTopicsController extends AppController
      * @return type
      */
     public function accept(){
-        $allowed_group_ids = [2, 3];
+        $allowed_group_ids = [2, 3, 4];
         
         if(in_array($this->Auth->user('group_id'), $allowed_group_ids)){
             if($this->getRequest()->is('post')){
@@ -296,9 +311,9 @@ class ThesisTopicsController extends AppController
                     $this->Flash->error(__('Helytelen kérés. Próbálja újra!'));
                     if($this->Auth->user('group_id') == 2) return $this->redirect(['action' => 'internalConsultantIndex']);
                     elseif($this->Auth->user('group_id') == 3) return $this->redirect(['action' => 'headOfDepartmentIndex']);
+                    elseif($this->Auth->user('group_id') == 4) return $this->redirect(['action' => 'topicManagerIndex']);
+                    else return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard']);
                 }
-                
-                
                 
                 $this->loadModel('Users');
                 $options = [];
@@ -306,14 +321,12 @@ class ThesisTopicsController extends AppController
                 
                 $user = $this->Users->get($this->Auth->user('id'), $options);
                 
-                $conditions = ['id' => $thesisTopic_id];
+                $conditions = ['id' => $thesisTopic_id, 'modifiable' => false];
                 
                 //A kérés alanyának megfelelően a megfelelő feltételeket összeszedjük
                 if($this->Auth->user('group_id') == 2){
                     //Belso konzulens a saját témája
                     $conditions['internal_consultant_id'] = $user->has('internal_consultant') ? $user->internal_consultant->id : null;
-                    //Véglegesített
-                    $conditions['modifiable'] = false;
                     //Belső konzulens még nem döntött
                     $conditions['accepted_by_internal_consultant IS'] = null;
                     //Tanszékvezető konzulens még nem döntött
@@ -321,12 +334,17 @@ class ThesisTopicsController extends AppController
                     //Külső konzulens még nem döntött
                     $conditions['accepted_by_external_consultant IS'] = null;
                 }elseif($this->Auth->user('group_id') == 3){
-                    //Véglegesített
-                    $conditions['modifiable'] = false;
-                    //Belső konzulens már döntött
-                    $conditions['accepted_by_internal_consultant IS NOT'] = null;
+                    //Ha a belső konzulens elfogadta
+                    $conditions['accepted_by_internal_consultant'] = true;
                     //Tanszékvezető konzulens még nem döntött
                     $conditions['accepted_by_head_of_department IS'] = null;
+                    //Külső konzulens még nem döntött
+                    $conditions['accepted_by_external_consultant IS'] = null;
+                }elseif($this->Auth->user('group_id') == 4){
+                    //Ha a belső konzulens elfogadta
+                    $conditions['accepted_by_internal_consultant'] = true;
+                    //Tanszékvezető elfogadta
+                    $conditions['accepted_by_head_of_department'] = true;
                     //Külső konzulens még nem döntött
                     $conditions['accepted_by_external_consultant IS'] = null;
                 }
@@ -334,12 +352,12 @@ class ThesisTopicsController extends AppController
                 $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => $conditions])->first();
 
                 if(empty($thesisTopic)){
-                    $this->Flash->error(__('Ezt a témát nem fogadhatja el. Már vagy döntést hozott, vagy nem Önhöz tartozik, vagy még nem véglegesített téma.'));
-                    return $this->redirect(['action' => 'internalConsultantIndex']);
+                    $this->Flash->error(__('Ezt a témát nem fogadhatja el. Már vagy döntést hozott, vagy nem Önhöz tartozik, vagy még nem véglegesített, vagy már el lett utasítva a téma!'));
+                    if($this->Auth->user('group_id') == 2) return $this->redirect(['action' => 'internalConsultantIndex']);
+                    elseif($this->Auth->user('group_id') == 3) return $this->redirect(['action' => 'headOfDepartmentIndex']);
+                    elseif($this->Auth->user('group_id') == 4) return $this->redirect(['action' => 'topicManagerIndex']);
+                    else return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard']);
                 }
-
-                
-                
                 
                 if($this->Auth->user('group_id') == 2){
                     $thesisTopic->accepted_by_internal_consultant = $accepted;
@@ -350,9 +368,9 @@ class ThesisTopicsController extends AppController
                     $thesisTopic->accepted_by_head_of_department = $accepted;
                     //Többi resetelése
                     $thesisTopic->accepted_by_external_consultant = null;
+                }elseif($this->Auth->user('group_id') == 4){
+                    $thesisTopic->accepted_by_external_consultant = $accepted;
                 }
-                
-                
 
                 if($this->ThesisTopics->save($thesisTopic)){
                     $this->Flash->success(__('Mentés sikeres!!'));
@@ -363,6 +381,8 @@ class ThesisTopicsController extends AppController
         }
         if($this->Auth->user('group_id') == 2) return $this->redirect(['action' => 'internalConsultantIndex']);
         elseif($this->Auth->user('group_id') == 3) return $this->redirect(['action' => 'headOfDepartmentIndex']);
+        elseif($this->Auth->user('group_id') == 4) return $this->redirect(['action' => 'topicManagerIndex']);
+        else return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard']);
     }
     
     /**

@@ -23,6 +23,24 @@ html,body{
 .header{
     border-bottom: 2px solid #00cc66;
     padding-bottom: 5px;
+    position: relative;
+}
+
+.header .logout-container{
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.5;
+    padding-right: 5px;
+}
+
+.header .logout-container:hover{
+    opacity: 1;
+}
+
+.header .logout-container a{
+    color: red;
 }
 
 .header .title-container{
@@ -105,5 +123,19 @@ html,body{
 }
 
 .thesisTopics-index.headOfDepartment-thesisTopics-index .topics-table .btn-reject{
+    margin: 0 0 8px 8px;
+}
+
+/* Thesis topics topic manager index */
+
+.thesisTopics-index.topicManager-thesisTopics-index .topics-table .btn-pdf{
+    margin-bottom: 8px;
+}
+
+.thesisTopics-index.topicManager-thesisTopics-index .topics-table .btn-accept{
+    margin-bottom: 8px;
+}
+
+.thesisTopics-index.topicManager-thesisTopics-index .topics-table .btn-reject{
     margin: 0 0 8px 8px;
 }
