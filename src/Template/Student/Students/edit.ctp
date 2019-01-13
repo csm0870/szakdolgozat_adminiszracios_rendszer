@@ -16,7 +16,7 @@
                 echo $this->Form->control('address', ['class' => 'form-control', 'label' => ['text' => __('Cím')]]);
                 echo $this->Form->control('neptun', ['class' => 'form-control', 'label' => ['text' => __('Neptun kód')]]);
                 echo $this->Form->control('email', ['class' => 'form-control', 'label' => ['text' => __('Email cím')]]);
-                echo $this->Form->control('phone_number', ['class' => 'form-control', 'label' => ['text' => __('Telefonszám')]]);
+                echo $this->Form->control('phone_number', ['class' => 'form-control', 'label' => ['text' => __('Telefonszám')], 'placeholder' => __('+36701234567 formátumban.')]);
                 echo $this->Form->control('specialisation', ['class' => 'form-control', 'label' => ['text' => __('Specializáció')]]);
                 echo $this->Form->control('course_id', ['options' => $courses, 'class' => 'form-control', 'label' => ['text' => __('Szak')]]);
                 echo $this->Form->control('course_level_id', ['options' => $courseLevels, 'class' => 'form-control', 'label' => ['text' => __('Képzés szintje')]]);

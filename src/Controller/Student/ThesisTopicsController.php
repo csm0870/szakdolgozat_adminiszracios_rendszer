@@ -110,9 +110,11 @@ class ThesisTopicsController extends AppController
                 $this->Flash->error(__('Hiba történt. Próbálja újra!'));
             }
 
-            $years = $this->ThesisTopics->Years->find('list', ['order' => ['year' => 'ASC']]);
+            $this->loadModel('Years');
+            $years = $this->Years->find('list', ['order' => ['year' => 'ASC']]);
             $internalConsultants = $this->ThesisTopics->InternalConsultants->find('list');
-            $this->set(compact('thesisTopic', 'internalConsultants', 'years'));
+            $languages = $this->ThesisTopics->Languages->find('list');
+            $this->set(compact('thesisTopic', 'internalConsultants', 'years', 'languages'));
         }
 
         $this->set(compact('can_fill_in_topic'));
@@ -164,9 +166,11 @@ class ThesisTopicsController extends AppController
             $this->Flash->error(__('Hiba történt. Próbálja újra!'));
         }
 
-        $years = $this->ThesisTopics->Years->find('list', ['order' => ['year' => 'ASC']]);
+        $this->loadModel('Years');
+        $years = $this->Years->find('list', ['order' => ['year' => 'ASC']]);
         $internalConsultants = $this->ThesisTopics->InternalConsultants->find('list');
-        $this->set(compact('thesisTopic', 'internalConsultants', 'years'));
+        $languages = $this->ThesisTopics->Languages->find('list');
+        $this->set(compact('thesisTopic', 'internalConsultants', 'years', 'languages'));
     }
     
     /**
@@ -212,7 +216,9 @@ class ThesisTopicsController extends AppController
             return $this->redirect(['controller' => 'Students', 'action' => 'edit', $data['student_id']]);
         }
         
-        $thesisTopic = $this->ThesisTopics->get($id, ['contain' => ['Students' => ['Courses', 'CourseLevels', 'CourseTypes'], 'InternalConsultants' => ['Departments'], 'Years']]);
+        $thesisTopic = $this->ThesisTopics->get($id, ['contain' => ['Students' => ['Courses', 'CourseLevels', 'CourseTypes'],
+                                                                    'InternalConsultants' => ['Departments', 'InternalConsultantPositions'],
+                                                                    'StartingYears', 'ExpectedEndingYears', 'Languages']]);
         
         $this->viewBuilder()->setLayout('default');
         $this->viewBuilder()->setClassName('CakePdf.Pdf');
@@ -221,128 +227,14 @@ class ThesisTopicsController extends AppController
             'pdfConfig' => [
                 'title' => "feladatkiiro_lap-" . date("Y-m-d-H-i-s"),
                 'margin' => [
-                    'bottom' => 14,
-                    'left' => 14,
-                    'right' => 14,
-                    'top' => 14
+                    'bottom' => 12,
+                    'left' => 12,
+                    'right' => 12,
+                    'top' => 12
                 ]
             ]
         ]);
 
         $this->set(compact('thesisTopic'));
-    }
-    
-    /**
-     * Word dokumentum (docx) generálás phpWord-del
-     * 
-     * @param type $id Téma ID-ja
-     * @return type
-     * @throws \Cake\Core\Exception\Exception
-     */
-    public function encyptionRegulationDoc($id = null){
-        //Hallgatói adatellenőrzés
-        $this->loadModel('Students');
-        $data = $this->Students->checkStundentData($this->Auth->user('id'));
-        if($data['success'] === false){
-            $this->Flash->error(__('Adja meg az adatit a továbblépéshez!'));
-            return $this->redirect(['controller' => 'Students', 'action' => 'edit', $data['student_id']]);
-        }
-        
-        $thesisTopic = $this->ThesisTopics->get($id, ['contain' => ['Students'], 'conditions' => ['encrypted' => true]]);
-        
-        if(empty($thesisTopic)) throw new \Cake\Core\Exception\Exception(__('A téma nem titkos, ezért nem kérhető hozzá titkosítási kérelem.'));
-    
-        $phpWord = new \PhpOffice\PhpWord\PhpWord();
-        
-        //Alapbeállítások
-        $phpWord->setDefaultFontName('Arial');
-        $phpWord->setDefaultFontSize(12);
-        $phpWord->setDefaultParagraphStyle(['spacing' => 1, 'spaceBefore' => 0, 'spaceAfter' => 0]);
-        
-        //Szöveg stílusok
-        $redTextFont = 'redText';
-        $phpWord->addFontStyle($redTextFont, ['color' => '800000']);
-        $signatureFont = 'Signature';
-        $phpWord->addFontStyle($signatureFont, ['size' => 10]);
-        
-        //Bekezdés stílusok
-        $normalPara = 'NormalParagraph';
-        $phpWord->addParagraphStyle($normalPara, ['spacing' => 120, 'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
-        
-        //Címsorok
-        $headingOne = 1;
-        $phpWord->addTitleStyle($headingOne, ['bold' => true, 'size' => 16, 'name' => 'Arial'],
-                                ['spaceBefore' => \PhpOffice\PhpWord\Shared\Converter::pointToTwip(12) /* Twip mértékegységben*/, 'spaceAfter' => \PhpOffice\PhpWord\Shared\Converter::pointToTwip(6), 'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
-        
-        
-        //Dokumentum készítése
-        
-        //Szekció
-        $section = $phpWord->addSection(['marginTop' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.7),
-                                         'marginBottom' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.7),
-                                         'marginLeft' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.7),
-                                         'marginRight' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.7),
-                                         'orientation' => 'portrait', 'footerHeight' => 1.25, 'headerHeight' => 1.25]);
-        
-        //Cím
-        $section->addTitle('Titkosítási kérelem', $headingOne);
-        
-        $section->addTextBreak(1);
-        
-        //Első bekezdés
-        $textrun = $section->addTextRun($normalPara);
-        
-        $textrun->addText('Alulírott ');
-        $textrun->addText('[cég/társaság/intézmény (cím)]', $redTextFont);
-        $textrun->addText(' kérem, hogy ');
-        
-        if($thesisTopic->has('student')){
-            $textrun->addText($thesisTopic->student->name);
-        }else{
-            $textrun->addText("[hallgató neve]", $redTextFont);
-        }
-        
-        $textrun->addText(' ' . $thesisTopic->title . ' ');
-        $textrun->addText(' című diplomamunkájának ');
-        $textrun->addText("[maximum 5]", $redTextFont);
-        $textrun->addText(' évre történő titkosítását, mert a benne szereplő adatok és információk a cég tulajdonát képezik, ipari, üzleti titoknak minősülnek, és csak belső felhasználásra engedélyezettek.');
-    
-        $section->addTextBreak(3);
-        $section->addText('[angolul]', $redTextFont, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
-        $section->addTextBreak(3);
-        $section->addText('[németül]', $redTextFont, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
-        $section->addTextBreak(11);
-        $section->addText('[hely] [dátum]', $redTextFont);
-        $section->addTextBreak(1);
-        
-        //Táblázat
-        $table = $section->addTable(['alignment' => \PhpOffice\PhpWord\SimpleType\JcTable::START,
-                                     'cellMarginTop' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.1),
-                                     'cellMarginRight' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.1),
-                                     'cellMarginBottom' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.1),
-                                     'cellMarginRight' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.1),
-                                     'indent' => new \PhpOffice\PhpWord\ComplexType\TblWidth(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.1))]);
-        
-        $table->addRow(null, ['cantSplit' => false]);
-        $table->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7.97), ['valign' => 'top', ])->addText('P.H.', null, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
-        $table->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7.97), ['valign' => 'top', ])->addText('____________________________', null, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
-        $table->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.29), ['valign' => 'top']);
-        
-        $table->addRow(null, ['cantSplit' => false]);
-        $table->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7.97), ['valign' => 'top', ]);
-        $table->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7.97), ['valign' => 'top', ])->addText('aláírás', null, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
-        $table->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.29), ['valign' => 'top']);
-        
-        //Fájl "letöltése"
-        $filename =  'titkositasi_kerelem.docx';
-        
-        header("Content-Type: application/vnd.openxmlformats-officedocument.wordprocessing‌​ml.document");
-        header('Content-Disposition: attachment; filename='.$filename);
-
-        $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter( $phpWord, "Word2007" );
-        $objWriter->save("php://output");
-
-        //Kilépés, nehogy a cakephp további dolgokat végezzen, mert akkor a fájl nem menne ki
-        exit();
     }
 }

@@ -7,7 +7,7 @@
 <script>
     $(function(){
         setTimeout(function(){
-            $('.flash-error').fadeOut(1000);
+            $('.flash-error').slideUp(1000);
         }, 4000);
     });
 </script>

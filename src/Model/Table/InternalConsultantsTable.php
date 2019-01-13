@@ -10,6 +10,7 @@ use Cake\Validation\Validator;
  * InternalConsultants Model
  *
  * @property \App\Model\Table\DepartmentsTable|\Cake\ORM\Association\BelongsTo $Departments
+ * @property |\Cake\ORM\Association\BelongsTo $InternalConsultantPositions
  * @property \App\Model\Table\UsersTable|\Cake\ORM\Association\BelongsTo $Users
  * @property \App\Model\Table\ThesisTopicsTable|\Cake\ORM\Association\HasMany $ThesisTopics
  *
@@ -46,6 +47,9 @@ class InternalConsultantsTable extends Table
         $this->belongsTo('Departments', [
             'foreignKey' => 'department_id'
         ]);
+        $this->belongsTo('InternalConsultantPositions', [
+            'foreignKey' => 'internal_consultant_position_id'
+        ]);
         $this->belongsTo('Users', [
             'foreignKey' => 'user_id'
         ]);
@@ -71,11 +75,6 @@ class InternalConsultantsTable extends Table
             ->maxLength('name', 50)
             ->allowEmpty('name');
 
-        $validator
-            ->scalar('position')
-            ->maxLength('position', 50)
-            ->allowEmpty('position');
-
         return $validator;
     }
 
@@ -89,6 +88,7 @@ class InternalConsultantsTable extends Table
     public function buildRules(RulesChecker $rules)
     {
         $rules->add($rules->existsIn(['department_id'], 'Departments'));
+        $rules->add($rules->existsIn(['internal_consultant_position_id'], 'InternalConsultantPositions'));
         $rules->add($rules->existsIn(['user_id'], 'Users'));
 
         return $rules;

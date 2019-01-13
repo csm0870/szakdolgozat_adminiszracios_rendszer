@@ -9,8 +9,10 @@ use Cake\Validation\Validator;
 /**
  * ThesisTopics Model
  *
+ * @property |\Cake\ORM\Association\BelongsTo $Years
+ * @property |\Cake\ORM\Association\BelongsTo $Years
  * @property \App\Model\Table\InternalConsultantsTable|\Cake\ORM\Association\BelongsTo $InternalConsultants
- * @property \App\Model\Table\YearsTable|\Cake\ORM\Association\BelongsTo $Years
+ * @property \App\Model\Table\LanguagesTable|\Cake\ORM\Association\BelongsTo $Languages
  * @property \App\Model\Table\StudentsTable|\Cake\ORM\Association\BelongsTo $Students
  * @property \App\Model\Table\FailedTopicSuggestionsTable|\Cake\ORM\Association\HasMany $FailedTopicSuggestions
  * @property \App\Model\Table\ThesesTable|\Cake\ORM\Association\HasMany $Theses
@@ -45,11 +47,19 @@ class ThesisTopicsTable extends Table
 
         $this->addBehavior('Timestamp');
 
+        $this->belongsTo('StartingYears', [
+            'foreignKey' => 'starting_year_id',
+            'className' => 'Years'
+        ]);
+        $this->belongsTo('ExpectedEndingYears', [
+            'foreignKey' => 'expected_ending_year_id',
+            'className' => 'Years'
+        ]);
         $this->belongsTo('InternalConsultants', [
             'foreignKey' => 'internal_consultant_id'
         ]);
-        $this->belongsTo('Years', [
-            'foreignKey' => 'starting_year_id'
+        $this->belongsTo('Languages', [
+            'foreignKey' => 'language_id'
         ]);
         $this->belongsTo('Students', [
             'foreignKey' => 'student_id'
@@ -82,11 +92,6 @@ class ThesisTopicsTable extends Table
         $validator
             ->scalar('description')
             ->allowEmpty('description');
-
-        $validator
-            ->scalar('language')
-            ->maxLength('language', 30)
-            ->allowEmpty('language');
 
         $validator
             ->scalar('cause_of_no_external_consultant')
@@ -125,6 +130,10 @@ class ThesisTopicsTable extends Table
             ->allowEmpty('starting_semester');
 
         $validator
+            ->boolean('expected_ending_semester')
+            ->allowEmpty('expected_ending_semester');
+
+        $validator
             ->scalar('external_consultant_name')
             ->maxLength('external_consultant_name', 50)
             ->allowEmpty('external_consultant_name');
@@ -139,6 +148,21 @@ class ThesisTopicsTable extends Table
             ->maxLength('external_consultant_position', 50)
             ->allowEmpty('external_consultant_position');
 
+        $validator
+            ->scalar('external_consultant_email')
+            ->maxLength('external_consultant_email', 60)
+            ->allowEmpty('external_consultant_email');
+
+        $validator
+            ->scalar('external_consultant_phone_number')
+            ->maxLength('external_consultant_phone_number', 60)
+            ->allowEmpty('external_consultant_phone_number');
+
+        $validator
+            ->scalar('external_consultant_address')
+            ->maxLength('external_consultant_address', 80)
+            ->allowEmpty('external_consultant_address');
+
         return $validator;
     }
 
@@ -151,8 +175,10 @@ class ThesisTopicsTable extends Table
      */
     public function buildRules(RulesChecker $rules)
     {
+        $rules->add($rules->existsIn(['starting_year_id'], 'StartingYears'));
+        $rules->add($rules->existsIn(['expected_ending_year_id'], 'ExpectedEndingYears'));
         $rules->add($rules->existsIn(['internal_consultant_id'], 'InternalConsultants'));
-        $rules->add($rules->existsIn(['starting_year_id'], 'Years'));
+        $rules->add($rules->existsIn(['language_id'], 'Languages'));
         $rules->add($rules->existsIn(['student_id'], 'Students'));
 
         return $rules;

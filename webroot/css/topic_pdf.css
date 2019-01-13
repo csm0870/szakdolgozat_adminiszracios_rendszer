@@ -1,6 +1,11 @@
+@font-face {
+  font-family: Calibri;
+  src: url('../font/Calibri.ttf');
+}
+
 .topic-form{
-    font-family: Arial;
-    font-size: 16pt;
+    font-family: Calibri;
+    font-size: 12pt;
 }
 
 .topic-form .text-justify{
@@ -9,9 +14,10 @@
 
 .topic-form .header{
     text-align: center;
-    font-size: 22pt;
+    font-size: 20pt;
     font-weight: bold;
-    margin-bottom: 40px;
+    margin-bottom: 25px;
+    text-transform: uppercase;
 }
 
 .topic-form table{
@@ -23,7 +29,8 @@
 }
 
 .topic-form .data-group .field{
-    font-style: italic;
+    padding-left: 6px;
+    display: inline-block;
 }
 
 .topic-form .data-group.student-data{
@@ -31,22 +38,23 @@
 }
 
 .topic-form .data-group.thesis-data{
-    margin-bottom: 80px;
+    margin-bottom: 20px;
 }
 
-.topic-form .data-group.thesis-data .thesis-title{
-    text-align: center;
-    margin: 20px 0;
-    font-weight: bold;
-    font-size: 18pt;
+.topic-form .thesis-description{
+    padding-left: 30px;
 }
 
-.topic-form .data-group.consultant-data .no-external-consultant{
-    margin-top: 20px;
+.topic-form .data-group.consultant-data .internal-consultant{
+    margin-bottom: 20px;
+}
+
+.topic-form .no-external-consultant .description{
+    padding-left: 10px;
 }
 
 .topic-form .footer{
-    margin-top: 60px;
+    margin-top: 25px;
 }
 
 .topic-form .footer .signatures{
@@ -59,7 +67,7 @@
 
 .topic-form .footer .signatures .signature{
     margin-top: 60px;
-    border-top: 2px solid black;
-    width: 300px;
+    border-top: 1px solid black;
+    width: 210px;
     display: inline-block;
 }

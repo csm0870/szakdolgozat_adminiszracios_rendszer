@@ -54,7 +54,7 @@
                                         </td>
                                         <td class="text-center">
                                             <?php
-                                                echo $this->Html->link(__('PDF'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id], ['class' => 'btn btn-info btn-pdf', 'target' => '_blank']);
+                                                echo $this->Html->link(__('PDF'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info btn-pdf', 'target' => '_blank']);
                                                 
                                                 //Ha van külső konzulens, akkor elfogadhatja annak aláírását
                                                 if($thesisTopic->cause_of_no_external_consultant === null && $thesisTopic->accepted_by_external_consultant === null){

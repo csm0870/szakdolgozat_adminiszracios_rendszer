@@ -12,379 +12,6 @@ use App\Controller\AppController;
  */
 class ThesisTopicsController extends AppController
 {
-
-    /**
-     * Hallgatói témalista
-     * 
-     * @return type
-     */
-    public function studentIndex(){
-        if($this->Auth->user('group_id') == 6){
-            //Hallgatói adatellenőrzés
-            $this->loadModel('Students');
-            $data = $this->Students->checkStundentData($this->Auth->user('id'));
-            if($data['success'] === false){
-                $this->Flash->error(__('Adja meg az adatit a továbblépéshez!'));
-                return $this->redirect(['controller' => 'Students', 'action' => 'studentEdit', $data['student_id']]);
-            }
-            
-            $can_fill_in_topic = false;
-            $this->loadModel('Information');
-            $info = $this->Information->find('all')->first();
-
-            //Kitöltési időszak ellenőrzése
-            if(!empty($info) && !empty($info->filling_in_topic_form_begin_date) && !empty($info->filling_in_topic_form_end_date)){
-                $today = date('Y-m-d');
-
-                $start_date = $info->filling_in_topic_form_begin_date->i18nFormat('yyyy-MM-dd');
-                $end_date = $info->filling_in_topic_form_end_date->i18nFormat('yyyy-MM-dd');
-
-                if($today >= $start_date && $today <= $end_date){
-                    $can_fill_in_topic = true;
-                }
-            }
-            
-            $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['student_id' => $data['student_id'], 'deleted !=' => true], 'order' => ['created' => 'ASC']]);
-            
-            $can_add_topic = $this->ThesisTopics->Students->canAddTopic($data['student_id']);
-                        
-            $this->set(compact('can_fill_in_topic', 'can_add_topic', 'thesisTopics'));
-        }
-    }
-    
-    /**
-     * Hallgatói hozzáadás
-     *
-     * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
-     */
-    public function studentAdd(){
-        
-        if($this->Auth->user('group_id') == 6){
-            //Hallgatói adatellenőrzés
-            $this->loadModel('Students');
-            $data = $this->Students->checkStundentData($this->Auth->user('id'));
-            if($data['success'] === false){
-                $this->Flash->error(__('Adja meg az adatit a továbblépéshez!'));
-                return $this->redirect(['controller' => 'Students', 'action' => 'studentEdit', $data['student_id']]);
-            }
-            
-            if(!$this->ThesisTopics->Students->canAddTopic($data['student_id'])){
-                $this->Flash->error(__('Nem adhat hozzá új témát!'));
-                return $this->redirect(['action' => 'studentIndex']);
-            }
-            
-            $can_fill_in_topic = false;
-            $this->loadModel('Information');
-            $info = $this->Information->find('all')->first();
-
-            if(!empty($info) && !empty($info->filling_in_topic_form_begin_date) && !empty($info->filling_in_topic_form_end_date)){
-                $today = date('Y-m-d');
-
-                $start_date = $info->filling_in_topic_form_begin_date->i18nFormat('yyyy-MM-dd');
-                $end_date = $info->filling_in_topic_form_end_date->i18nFormat('yyyy-MM-dd');
-
-                if($today >= $start_date && $today <= $end_date){
-                    $can_fill_in_topic = true;
-                }
-            }
-
-            if($can_fill_in_topic === true){
-                $thesisTopic = $this->ThesisTopics->newEntity();
-                if ($this->request->is('post')) {
-                    $thesisTopic = $this->ThesisTopics->patchEntity($thesisTopic, $this->request->getData());
-                    $thesisTopic->modifiable = true;
-                    $thesisTopic->student_id = $data['student_id'];
-                    $has_external_consultant = $this->getRequest()->getData('has_external_consultant');
-
-                    //Külső konzulensi mezők beállítása
-                    if(empty($has_external_consultant) || $has_external_consultant != 1){
-                        $thesisTopic->external_consultant_name = null;
-                        $thesisTopic->external_consultant_position = null;
-                        $thesisTopic->external_consultant_workplace = null;
-                    }else{
-                        $thesisTopic->cause_of_no_external_consultant = null;
-                    }
-
-                    if ($this->ThesisTopics->save($thesisTopic)) {
-                        $this->Flash->success(__('Mentés sikeres.'));
-
-                        return $this->redirect(['action' => 'studentIndex']);
-                    }
-                    
-                    $this->Flash->error(__('Hiba történt. Próbálja újra!'));
-                }
-
-                $years = $this->ThesisTopics->Years->find('list', ['order' => ['year' => 'ASC']]);
-                $internalConsultants = $this->ThesisTopics->InternalConsultants->find('list');
-                $this->set(compact('thesisTopic', 'internalConsultants', 'years'));
-            }
-        
-            $this->set(compact('can_fill_in_topic'));
-        }
-    }
-
-    /**
-     * Hallgatói szerkesztés
-     *
-     * @param string|null $id Thesis Topic id.
-     * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function studentEdit($id = null){
-        if($this->Auth->user('group_id') == 6){
-            //Hallgatói adatellenőrzés
-            $this->loadModel('Students');
-            $data = $this->Students->checkStundentData($this->Auth->user('id'));
-            if($data['success'] === false){
-                $this->Flash->error(__('Adja meg az adatit a továbblépéshez!'));
-                return $this->redirect(['controller' => 'Students', 'action' => 'studentEdit', $data['student_id']]);
-            }
-            
-            $thesisTopic = $this->ThesisTopics->get($id);
-            
-            if(!$thesisTopic->modifiable){
-                $this->Flash->error(__('A téma nem módosítható!!'));
-                return $this->redirect(['action' => 'studentIndex']);
-            }
-            
-            if ($this->request->is(['patch', 'post', 'put'])) {
-                $thesisTopic = $this->ThesisTopics->patchEntity($thesisTopic, $this->request->getData());
-                $thesisTopic->student_id = $data['student_id'];
-                $has_external_consultant = $this->getRequest()->getData('has_external_consultant');
-
-                //Külső konzulensi mezők beállítása
-                if(empty($has_external_consultant) || $has_external_consultant != 1){
-                    $thesisTopic->external_consultant_name = null;
-                    $thesisTopic->external_consultant_position = null;
-                    $thesisTopic->external_consultant_workplace = null;
-                }else{
-                    $thesisTopic->cause_of_no_external_consultant = null;
-                }
-
-                if ($this->ThesisTopics->save($thesisTopic)) {
-                    $this->Flash->success(__('Mentés sikeres.'));
-
-                    return $this->redirect(['action' => 'studentIndex']);
-                }
-
-                $this->Flash->error(__('Hiba történt. Próbálja újra!'));
-            }
-
-            $years = $this->ThesisTopics->Years->find('list', ['order' => ['year' => 'ASC']]);
-            $internalConsultants = $this->ThesisTopics->InternalConsultants->find('list');
-            $this->set(compact('thesisTopic', 'internalConsultants', 'years'));
-        }
-    }
-    
-    /**
-     * Hallgatói véglegesítés
-     * 
-     * @param type $id Téma ID-ja
-     * @return type
-     */
-    public function studentFinalize($id = null){
-        if($this->Auth->user('group_id') == 6){
-            //Hallgatói adatellenőrzés
-            $this->loadModel('Students');
-            $data = $this->Students->checkStundentData($this->Auth->user('id'));
-            if($data['success'] === false){
-                $this->Flash->error(__('Adja meg az adatit a továbblépéshez!'));
-                return $this->redirect(['controller' => 'Students', 'action' => 'studentEdit', $data['student_id']]);
-            }
-            
-            $thesisTopic = $this->ThesisTopics->get($id);
-            $thesisTopic->modifiable = false;
-            //Az elfogadások resetelése, ha vannak
-            $thesisTopic->accepted_by_internal_consultant = null;
-            $thesisTopic->accepted_by_head_of_department = null;
-            $thesisTopic->accepted_by_external_consultant = null;
-
-            if ($this->ThesisTopics->save($thesisTopic)) $this->Flash->success(__('Véglegesítve'));
-            else $this->Flash->error(__('Hiba történt. Próbálja újra!'));
-
-            return $this->redirect(['action' => 'studentIndex']);
-        }
-    }
-    
-    /**
-     * Belső konzulenshez tartozó témák listája
-     */
-    public function internalConsultantIndex(){
-        if($this->Auth->user('group_id') == 2){
-            $this->loadModel('Users');
-            $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
-            //Csak a véglegesített és a hozzá tartozó témákat látja
-            $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['internal_consultant_id' => ($user->has('internal_consultant') ? $user->internal_consultant->id : null),
-                                                                               'modifiable' => false, 'deleted !=' => true],
-                                                              'contain' => ['Students'], 'order' => ['ThesisTopics.modified' => 'ASC']]);
-        
-            $this->set(compact('thesisTopics'));
-        }
-    }
-
-    /**
-     * Téma törlése a belső konzulens által (nem tényleges fizikai törlés)
-     *
-     * @param string|null $id Thesis Topic id.
-     * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function deleteByInternalConsultant($id = null){
-        $this->request->allowMethod(['post', 'delete']);
-        if($this->Auth->user('group_id') == 2){
-            $thesisTopic = $this->ThesisTopics->get($id);
-            
-            $can_be_deleted = false;
-                                                
-            //Akkor törölheti, ha már nincs bírálati folyamatban
-            if($thesisTopic->cause_of_no_external_consultant === null && $thesisTopic->accepted_by_external_consultant !== null){
-                $can_be_deleted = true;
-            }elseif($thesisTopic->accepted_by_head_of_department !== null){
-                if($thesisTopic->accepted_by_head_of_department === false){
-                    $can_be_deleted = true;
-                }elseif($thesisTopic->cause_of_no_external_consultant !== null){
-                    $can_be_deleted = true;
-                }
-            }elseif($thesisTopic->accepted_by_internal_consultant === false){
-                $can_be_deleted = true;
-            }
-            
-            if(!$can_be_deleted){
-                $this->Flash->error(__('A téma nem törölhető. Az bírálata még folyamatban van.'));
-                return $this->redirect(['action' => 'internalConsultantIndex']);
-            }
-            
-            $thesisTopic->deleted = true;
-            if ($this->ThesisTopics->save($thesisTopic)) {
-                $this->Flash->success(__('The thesis topic has been deleted.'));
-            } else {
-                $this->Flash->error(__('The thesis topic could not be deleted. Please, try again.'));
-            }
-        }
-        
-        return $this->redirect(['action' => 'internalConsultantIndex']);
-    }
-    
-    /**
-     * Tanszékvezető témalista
-     */
-    public function headOfDepartmentIndex(){
-        if($this->Auth->user('group_id') == 3){
-            $this->loadModel('Users');
-            $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
-            //Csak azokat a témákat látja, amelyet a belső konzulens már elfogadott
-            $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['accepted_by_internal_consultant IS NOT' => null, 'deleted !=' => true],
-                                                              'contain' => ['Students', 'InternalConsultants'], 'order' => ['ThesisTopics.modified' => 'ASC']]);
-        
-            $this->set(compact('thesisTopics'));
-        }
-    }
-    
-    /**
-     * Témakezelő témalista
-     */
-    public function topicManagerIndex(){
-        if($this->Auth->user('group_id') == 4){
-            $this->loadModel('Users');
-            $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
-            //Csak a véglegesített témákat látja
-            $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['deleted !=' => true],
-                                                              'contain' => ['Students', 'InternalConsultants'], 'order' => ['ThesisTopics.modified' => 'ASC']]);
-        
-            $this->set(compact('thesisTopics'));
-        }
-    }
-    
-    /**
-     * Táma elfogadása vagy elutasítása
-     * @return type
-     */
-    public function accept(){
-        $allowed_group_ids = [2, 3, 4];
-        
-        if(in_array($this->Auth->user('group_id'), $allowed_group_ids)){
-            if($this->getRequest()->is('post')){
-                $thesisTopic_id = $this->getRequest()->getData('thesis_topic_id');
-                $accepted = $this->getRequest()->getData('accepted');
-                
-                if(isset($accepted) && !in_array($accepted, [0, 1])){
-                    $this->Flash->error(__('Helytelen kérés. Próbálja újra!'));
-                    if($this->Auth->user('group_id') == 2) return $this->redirect(['action' => 'internalConsultantIndex']);
-                    elseif($this->Auth->user('group_id') == 3) return $this->redirect(['action' => 'headOfDepartmentIndex']);
-                    elseif($this->Auth->user('group_id') == 4) return $this->redirect(['action' => 'topicManagerIndex']);
-                    else return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard']);
-                }
-                
-                $this->loadModel('Users');
-                $options = [];
-                if($this->Auth->user('group_id') == 2) $options = ['contain' => ['InternalConsultants']];
-                
-                $user = $this->Users->get($this->Auth->user('id'), $options);
-                
-                $conditions = ['id' => $thesisTopic_id, 'modifiable' => false];
-                
-                //A kérés alanyának megfelelően a megfelelő feltételeket összeszedjük
-                if($this->Auth->user('group_id') == 2){
-                    //Belso konzulens a saját témája
-                    $conditions['internal_consultant_id'] = $user->has('internal_consultant') ? $user->internal_consultant->id : null;
-                    //Belső konzulens még nem döntött
-                    $conditions['accepted_by_internal_consultant IS'] = null;
-                    //Tanszékvezető konzulens még nem döntött
-                    $conditions['accepted_by_head_of_department IS'] = null;
-                    //Külső konzulens még nem döntött
-                    $conditions['accepted_by_external_consultant IS'] = null;
-                }elseif($this->Auth->user('group_id') == 3){
-                    //Ha a belső konzulens elfogadta
-                    $conditions['accepted_by_internal_consultant'] = true;
-                    //Tanszékvezető konzulens még nem döntött
-                    $conditions['accepted_by_head_of_department IS'] = null;
-                    //Külső konzulens még nem döntött
-                    $conditions['accepted_by_external_consultant IS'] = null;
-                }elseif($this->Auth->user('group_id') == 4){
-                    //Ha a belső konzulens elfogadta
-                    $conditions['accepted_by_internal_consultant'] = true;
-                    //Tanszékvezető elfogadta
-                    $conditions['accepted_by_head_of_department'] = true;
-                    //Külső konzulens még nem döntött
-                    $conditions['accepted_by_external_consultant IS'] = null;
-                }
-
-                $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => $conditions])->first();
-
-                if(empty($thesisTopic)){
-                    $this->Flash->error(__('Ezt a témát nem fogadhatja el. Már vagy döntést hozott, vagy nem Önhöz tartozik, vagy még nem véglegesített, vagy már el lett utasítva a téma!'));
-                    if($this->Auth->user('group_id') == 2) return $this->redirect(['action' => 'internalConsultantIndex']);
-                    elseif($this->Auth->user('group_id') == 3) return $this->redirect(['action' => 'headOfDepartmentIndex']);
-                    elseif($this->Auth->user('group_id') == 4) return $this->redirect(['action' => 'topicManagerIndex']);
-                    else return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard']);
-                }
-                
-                if($this->Auth->user('group_id') == 2){
-                    $thesisTopic->accepted_by_internal_consultant = $accepted;
-                    //Többi resetelése
-                    $thesisTopic->accepted_by_head_of_department = null;
-                    $thesisTopic->accepted_by_external_consultant = null;
-                }elseif($this->Auth->user('group_id') == 3){
-                    $thesisTopic->accepted_by_head_of_department = $accepted;
-                    //Többi resetelése
-                    $thesisTopic->accepted_by_external_consultant = null;
-                }elseif($this->Auth->user('group_id') == 4){
-                    $thesisTopic->accepted_by_external_consultant = $accepted;
-                }
-
-                if($this->ThesisTopics->save($thesisTopic)){
-                    $this->Flash->success(__('Mentés sikeres!!'));
-                }else{
-                    $this->Flash->error(__('Hiba történt. Próbálja újra!'));
-                }
-            }
-        }
-        if($this->Auth->user('group_id') == 2) return $this->redirect(['action' => 'internalConsultantIndex']);
-        elseif($this->Auth->user('group_id') == 3) return $this->redirect(['action' => 'headOfDepartmentIndex']);
-        elseif($this->Auth->user('group_id') == 4) return $this->redirect(['action' => 'topicManagerIndex']);
-        else return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard']);
-    }
-    
     /**
      * Pdf generálás CakdePdf pluginnal
      * 
@@ -402,7 +29,9 @@ class ThesisTopicsController extends AppController
             }
         }
         
-        $thesisTopic = $this->ThesisTopics->get($id, ['contain' => ['Students' => ['Courses', 'CourseLevels', 'CourseTypes'], 'InternalConsultants' => ['Departments'], 'Years']]);
+        $thesisTopic = $this->ThesisTopics->get($id, ['contain' => ['Students' => ['Courses', 'CourseLevels', 'CourseTypes'],
+                                                                    'InternalConsultants' => ['Departments', 'InternalConsultantPositions'],
+                                                                    'StartingYears', 'ExpectedEndingYears', 'Languages']]);
         
         $this->viewBuilder()->setLayout('default');
         $this->viewBuilder()->setClassName('CakePdf.Pdf');
@@ -411,10 +40,10 @@ class ThesisTopicsController extends AppController
             'pdfConfig' => [
                 'title' => "feladatkiiro_lap-" . date("Y-m-d-H-i-s"),
                 'margin' => [
-                    'bottom' => 14,
-                    'left' => 14,
-                    'right' => 14,
-                    'top' => 14
+                    'bottom' => 12,
+                    'left' => 12,
+                    'right' => 12,
+                    'top' => 12
                 ]
             ]
         ]);
@@ -440,90 +69,201 @@ class ThesisTopicsController extends AppController
             }
         }
         
-        $thesisTopic = $this->ThesisTopics->get($id, ['contain' => ['Students'], 'conditions' => ['encrypted' => true]]);
+        $thesisTopic = $this->ThesisTopics->get($id, ['contain' => ['Students' => ['Courses', 'CourseTypes'], 'Languages'], 'conditions' => ['encrypted' => true]]);
         
         if(empty($thesisTopic)) throw new \Cake\Core\Exception\Exception(__('A téma nem titkos, ezért nem kérhető hozzá titkosítási kérelem.'));
     
+        $hun_months = ["január", "február", "március", "április", "május", "június",
+                       "július", "augusztus", "szeptember", "október", "november", "december"];
+        
         $phpWord = new \PhpOffice\PhpWord\PhpWord();
         
         //Alapbeállítások
-        $phpWord->setDefaultFontName('Arial');
-        $phpWord->setDefaultFontSize(12);
-        $phpWord->setDefaultParagraphStyle(['spacing' => 1, 'spaceBefore' => 0, 'spaceAfter' => 0]);
+        $phpWord->setDefaultFontName('Calibri');
+        $phpWord->setDefaultFontSize(10);
+        $phpWord->setDefaultParagraphStyle(['spacing' => 1, 'spaceBefore' => 0, 'spaceAfter' => 0, 'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
         
         //Szöveg stílusok
-        $redTextFont = 'redText';
+        $redTextFont = 'RedText';
         $phpWord->addFontStyle($redTextFont, ['color' => '800000']);
-        $signatureFont = 'Signature';
-        $phpWord->addFontStyle($signatureFont, ['size' => 10]);
+        $subTitleFont = 'SubTitleFont';
+        $phpWord->addFontStyle($subTitleFont, ['size' => 14, 'bold' => true]);
         
         //Bekezdés stílusok
-        $normalPara = 'NormalParagraph';
-        $phpWord->addParagraphStyle($normalPara, ['spacing' => 120, 'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
+        $subTitlePara = 'SubTitleParagraph';
+        $phpWord->addParagraphStyle($subTitlePara, ['spacing' => 120, 'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER,
+                                                    'spaceAfter' => \PhpOffice\PhpWord\Shared\Converter::pointToTwip(6)]);
         
         //Címsorok
         $headingOne = 1;
-        $phpWord->addTitleStyle($headingOne, ['bold' => true, 'size' => 16, 'name' => 'Arial'],
-                                ['spaceBefore' => \PhpOffice\PhpWord\Shared\Converter::pointToTwip(12) /* Twip mértékegységben*/, 'spaceAfter' => \PhpOffice\PhpWord\Shared\Converter::pointToTwip(6), 'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+        $phpWord->addTitleStyle($headingOne, ['bold' => true, 'size' => 16],
+                                             ['spaceBefore' => \PhpOffice\PhpWord\Shared\Converter::pointToTwip(12),
+                                              'spaceAfter' => \PhpOffice\PhpWord\Shared\Converter::pointToTwip(3),
+                                              'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
         
         
         //Dokumentum készítése
         
         //Szekció
-        $section = $phpWord->addSection(['marginTop' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.7),
-                                         'marginBottom' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.7),
-                                         'marginLeft' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.7),
-                                         'marginRight' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.7),
+        $section = $phpWord->addSection(['marginTop' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.27),
+                                         'marginBottom' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.27),
+                                         'marginLeft' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.27),
+                                         'marginRight' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.27),
                                          'orientation' => 'portrait', 'footerHeight' => 1.25, 'headerHeight' => 1.25]);
         
+        //Első oldal
+        
         //Cím
-        $section->addTitle('Titkosítási kérelem', $headingOne);
+        $section->addTitle(($thesisTopic->is_thesis == 0 ? 'Diplomamunka' : 'Szakdolgozat') . ' téma titkos kezelésének kezdeményezése', $headingOne);
         
         $section->addTextBreak(1);
         
-        //Első bekezdés
-        $textrun = $section->addTextRun($normalPara);
-        
-        $textrun->addText('Alulírott ');
-        $textrun->addText('[cég/társaság/intézmény (cím)]', $redTextFont);
-        $textrun->addText(' kérem, hogy ');
-        
-        if($thesisTopic->has('student')){
-            $textrun->addText($thesisTopic->student->name);
-        }else{
-            $textrun->addText("[hallgató neve]", $redTextFont);
-        }
-        
-        $textrun->addText(' ' . $thesisTopic->title . ' ');
-        $textrun->addText(' című diplomamunkájának ');
-        $textrun->addText("[maximum 5]", $redTextFont);
-        $textrun->addText(' évre történő titkosítását, mert a benne szereplő adatok és információk a cég tulajdonát képezik, ipari, üzleti titoknak minősülnek, és csak belső felhasználásra engedélyezettek.');
-    
+        //Adatok
+        $section->addText('Adatok', $subTitleFont, $subTitlePara);
+        $section->addTextBreak(1);
+        //Hallgató adatai
+        $section->addText('Hallgató adatai', ['underline' => \PhpOffice\PhpWord\Style\Font::UNDERLINE_SINGLE]); //Tab-nál kettős idézőjel!!!!!
+        $section->addText('   Név: ' . ($thesisTopic->has('student') ? $thesisTopic->student->name : '') .  "\tNeptun-kód: " . ($thesisTopic->has('student') ? $thesisTopic->student->neptun : ''), null, ['tabs' => [new \PhpOffice\PhpWord\Style\Tab('left', \PhpOffice\PhpWord\Shared\Converter::cmToTwip(11))]]);
+        $section->addText('   Szak: ' . ($thesisTopic->has('student') ? ($thesisTopic->student->has('course') ? $thesisTopic->student->course->name : '') : '' ));
+        $section->addTextBreak(1);
+        $section->addText('   Tagozat: ' . ($thesisTopic->has('student') ? ($thesisTopic->student->has('course_type') ? $thesisTopic->student->course_type->name : '') : '' ));
+        $section->addTextBreak(1);
+        //Szakdolgozat adatai
+        $section->addText('A ' . ($thesisTopic->is_thesis == 0 ? 'diplomamunka' : 'szakdolgozat') . ' adatai', ['underline' => \PhpOffice\PhpWord\Style\Font::UNDERLINE_SINGLE]);
+        $section->addText('   Cím: ' . $thesisTopic->title);
+        $section->addText('   Nyelv: ' . ($thesisTopic->has('language') ? $thesisTopic->language->name : ''));
+        $section->addTextBreak(1);
+        //Cég adatai
+        $section->addText('Partner-intézmény (cég, gazdasági társaság, intézmény) adatai', ['underline' => \PhpOffice\PhpWord\Style\Font::UNDERLINE_SINGLE]);
+        $section->addText('   Név:');
+        $section->addText('   Cím:');
+        $section->addText('   Képviselő:');
         $section->addTextBreak(3);
-        $section->addText('[angolul]', $redTextFont, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
-        $section->addTextBreak(3);
-        $section->addText('[németül]', $redTextFont, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
-        $section->addTextBreak(11);
-        $section->addText('[hely] [dátum]', $redTextFont);
+        //Kezdeményezés
+        $section->addText('Kezdeményezés', $subTitleFont, $subTitlePara);
+        $section->addTextBreak(1);
+        //Kezdeményezés szövege
+        $textrun1 = $section->addTextRun();
+        $textrun1->addText(($thesisTopic->is_thesis == 0 ? 'Diplomamunka' : 'Szakdolgozat') . ' kidolgozása során ');
+        $textrun1->addText('[cégünk/társaságunk/intézményünk]', $redTextFont);
+        $textrun1->addText(' a fent említett Hallgató számára bizalmas információkba való betekintést is enged, és ezek egy része a készülő dolgozatba is belekerül. Ezek ipari, üzleti titoknak minősülnek, ezért bizalmas kezelésüket garantálni kell.');
+        $section->addTextBreak(1);
+        $section->addText('[További rövid indoklás: .....]', $redTextFont);
+        $section->addTextBreak(1);
+        $textrun2 = $section->addTextRun();
+        $textrun2->addText('A titkosítás időtartama ');
+        $textrun2->addText('[max. 5]', $redTextFont);
+        $textrun2->addText(' év.');
+        $section->addTextBreak(1);
+        $section->addText('Kezdeményezem, hogy az elkészült dolgozatot a Széchenyi Egyetem Gépészmérnöki, Informatikai és Villamosmérnöki Kara kezelje a kari Záróvizsga Szabályzatnak megfelelően titkos dokumentumként.');
+        $section->addTextBreak(4);
+        
+        $section->addText('Győr, ' . date('Y') . '. ' . $hun_months[intval(date('n')) - 1] . ' ' . date('j') . '.');
         $section->addTextBreak(1);
         
-        //Táblázat
-        $table = $section->addTable(['alignment' => \PhpOffice\PhpWord\SimpleType\JcTable::START,
+        //Táblázat (aláíráshoz)
+        $table1 = $section->addTable(['alignment' => \PhpOffice\PhpWord\SimpleType\JcTable::START,
                                      'cellMarginTop' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.1),
                                      'cellMarginRight' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.1),
                                      'cellMarginBottom' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.1),
                                      'cellMarginRight' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.1),
                                      'indent' => new \PhpOffice\PhpWord\ComplexType\TblWidth(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.1))]);
         
-        $table->addRow(null, ['cantSplit' => false]);
-        $table->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7.97), ['valign' => 'top', ])->addText('P.H.', null, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
-        $table->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7.97), ['valign' => 'top', ])->addText('____________________________', null, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
-        $table->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.29), ['valign' => 'top']);
+        $table1->addRow(null, ['cantSplit' => false]);
+        $table1->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7.97), ['valign' => 'top'])->addText('P.H.', ['size' => 12], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+        $table1->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7.75), ['valign' => 'top'])->addText('____________________________', ['size' => 12], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+        $table1->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.29), ['valign' => 'top']);
         
-        $table->addRow(null, ['cantSplit' => false]);
-        $table->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7.97), ['valign' => 'top', ]);
-        $table->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7.97), ['valign' => 'top', ])->addText('aláírás', null, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
-        $table->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.29), ['valign' => 'top']);
+        $table1->addRow(null, ['cantSplit' => false]);
+        $table1->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7.97), ['valign' => 'top']);
+        $table1->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7.75), ['valign' => 'top'])->addText('cégszerű aláírás', null, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+        $table1->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.29), ['valign' => 'top']);
+        
+        $section->addPageBreak();
+        
+        //Második oldal
+        
+        //Jóváhagyás
+        $section->addText('Jóváhagyás', $subTitleFont, $subTitlePara);
+        $section->addTextBreak(1);
+        $section->addText('A Széchenyi István Egyetem Gépészmérnöki, Informatikai és Villamosmérnöki Kara és a ' . ($thesisTopic->is_thesis == 0 ? 'diplomamunka' : 'szakdolgozat') .  ' témájában illetékes tanszék nevében nyilatkozunk arról, hogy a fenti „Adatok” részben meghatározott ' . ($thesisTopic->is_thesis == 0 ? 'diplomamunka' : 'szakdolgozat') . ' a Kar Záróvizsga Szabályzatának megfelelően titkosan kezeljük. (A Szabályzat idevágó részét lentebb idézzük.)');
+        $section->addTextBreak(1);
+        $textrun3 = $section->addTextRun();
+        $textrun3->addText('A titkosítási időszak vége: ');
+        $textrun3->addText('[év. hónap nap.]', $redTextFont);
+        $section->addTextBreak(1);
+        $section->addText('Győr, ' . date('Y') . '. ' . $hun_months[intval(date('n')) - 1] . ' ' . date('j') . '.');
+        $section->addTextBreak(1);
+        
+        //Táblázat (aláíráshoz)
+        $table2 = $section->addTable(['alignment' => \PhpOffice\PhpWord\SimpleType\JcTable::START,
+                                     'cellMarginTop' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.1),
+                                     'cellMarginRight' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.1),
+                                     'cellMarginBottom' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.1),
+                                     'cellMarginRight' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.1),
+                                     'indent' => new \PhpOffice\PhpWord\ComplexType\TblWidth(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.1))]);
+        
+        $table2->addRow(null, ['cantSplit' => false]);
+        $table2->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(8.5), ['valign' => 'top'])->addText('____________________________', ['size' => 12], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+        $table2->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.5), ['valign' => 'top'])->addText('P.H.', ['size' => 12], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+        $table2->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7.2), ['valign' => 'top'])->addText('____________________________', ['size' => 12], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+        $table2->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.41), ['valign' => 'top']);
+        
+        $table2->addRow(null, ['cantSplit' => false]);
+        $table2->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(8.5), ['valign' => 'top'])->addText('dékán', null, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+        $table2->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.5), ['valign' => 'top']);
+        $table2->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7.2), ['valign' => 'top'])->addText('tanszékvezető', null, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+        $table2->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.41), ['valign' => 'top']);
+        
+        $section->addTextBreak(1);
+        //Tudomásul vétel
+        $section->addText('Tudomásul vétel', $subTitleFont, $subTitlePara);
+        $section->addTextBreak(1);
+        $section->addText('Alulírott hallgató tudomásul veszem, hogy ' . ($thesisTopic->is_thesis == 0 ? 'diplomamunkám' : 'szakdolgozatom') .  ' kidolgozása során olyan információkhoz (gyakorlati tapasztalat, know-how, gyártástechnikai, szállítási és szolgáltatásokkal kapcsolatos információ, marketing, ügyfelekre vonatkozó és személyzeti adat) jutok, melyeket bizalmasan kell kezelnem. Vállalom, hogy a munka során megismert adatokat, tényeket, információkat csak azután adhatom át belső konzulensemnek és csak azután adhatom le dolgozatomat, miután a Partner-intézmény erre feljogosított képviselője írásban engedélyt ad. A titkosságot a fenti dátumig megőrzöm.');
+        $section->addTextBreak(1);
+        $section->addText('Győr, ' . date('Y') . '. ' . $hun_months[intval(date('n')) - 1] . ' ' . date('j') . '.');
+        $section->addTextBreak(1);
+        
+        //Táblázat (aláíráshoz)
+        $table3 = $section->addTable(['alignment' => \PhpOffice\PhpWord\SimpleType\JcTable::START,
+                                     'cellMarginTop' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.1),
+                                     'cellMarginRight' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.1),
+                                     'cellMarginBottom' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.1),
+                                     'cellMarginRight' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.1),
+                                     'indent' => new \PhpOffice\PhpWord\ComplexType\TblWidth(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.1))]);
+        
+        $table3->addRow(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.84), ['cantSplit' => false]);
+        $table3->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7.78), ['valign' => 'top'])->addText('P.H.', ['size' => 12], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+        $table3->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7.94), ['valign' => 'top'])->addText('____________________________', ['size' => 12], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+        $table3->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.29), ['valign' => 'top']);
+        
+        $table3->addRow(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.84), ['cantSplit' => false]);
+        $table3->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7.78), ['valign' => 'top']);
+        $table3->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7.94), ['valign' => 'top'])->addText($thesisTopic->has('student') ? $thesisTopic->student->name : '', null, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+        $table3->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.29), ['valign' => 'top']);
+        
+        $section->addTextBreak(2);
+        //Kivonat a kari Záróvizsga Szabályzatból
+        $section->addText('Kivonat a kari Záróvizsga Szabályzatból', $subTitleFont, $subTitlePara);
+        
+        
+        //Szabálytat beszúrása
+        $this->loadModel('Information');
+        $info = $this->Information->find('all')->first();
+        
+        if(!empty($info) && !empty($info->encryption_requlation)){
+            $section->addTextBreak(1);
+            
+            //A "\n"-eket nem ismeri fel a phpWord
+            //Így megmaradnak a soremelések (az addText és bekezdést ad hozzá, vagyis egy soremelés van a végén)
+            $textlines = explode("\n", $info->encryption_requlation);
+            for ($i = 0; $i < sizeof($textlines); $i++) {
+                $section->addText($textlines[$i]);
+            }
+        }else{
+            $section->addTextBreak(2);
+            $section->addText('[ide kell beidézni az elfogadott részeket a titkosításról]', $redTextFont);
+        }
         
         //Fájl "letöltése"
         $filename =  'titkositasi_kerelem.docx';

@@ -50,7 +50,7 @@
                                         </td>
                                         <td class="text-center">
                                             <?php
-                                                echo $this->Html->link(__('PDF'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id], ['class' => 'btn btn-info btn-pdf', 'target' => '_blank']);
+                                                echo $this->Html->link(__('PDF'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info btn-pdf', 'target' => '_blank']);
                                                 
                                                 if($thesisTopic->accepted_by_head_of_department === null){
                                                     echo '<br/>';

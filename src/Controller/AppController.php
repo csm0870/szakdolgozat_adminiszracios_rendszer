@@ -49,7 +49,8 @@ class AppController extends Controller
         $this->loadComponent('Auth',
                     ['loginAction' => [
                                         'controller' => 'Users',
-                                        'action' => 'login'
+                                        'action' => 'login',
+                                        'prefix' => false
                                     ],
                     'authError' => __('Be kell lépned, ahhoz, hogy ezt az oldalt lásd!'),
                     'authenticate' => [
@@ -63,7 +64,8 @@ class AppController extends Controller
                                         ],
                     'logoutRedirect' => [
                                         'controller' => 'Pages',
-                                        'action' => 'home'],
+                                        'action' => 'home',
+                                        'prefix' => false],
                     'storage' => 'Session']);
 
         /*
@@ -77,7 +79,7 @@ class AppController extends Controller
         parent::beforeFilter($event);
         
         if ($this->Auth->user("id") == null && $this->request->action != "home" && $this->request->action != "login") {
-            return $this->redirect(["controller" => "Pages", "action" => "home"]);
+            return $this->redirect(["controller" => "Pages", "action" => "home", 'prefix' => false]);
         }
         
         //Layout beállítása, ha a listában lévő controllerek hívják meg

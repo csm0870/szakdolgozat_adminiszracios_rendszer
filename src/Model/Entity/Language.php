@@ -4,21 +4,14 @@ namespace App\Model\Entity;
 use Cake\ORM\Entity;
 
 /**
- * InternalConsultant Entity
+ * Language Entity
  *
  * @property int $id
  * @property string|null $name
- * @property \Cake\I18n\FrozenTime|null $created
- * @property \Cake\I18n\FrozenTime|null $modified
- * @property int|null $department_id
- * @property int|null $internal_consultant_position_id
- * @property int|null $user_id
  *
- * @property \App\Model\Entity\Department $department
- * @property \App\Model\Entity\User $user
  * @property \App\Model\Entity\ThesisTopic[] $thesis_topics
  */
-class InternalConsultant extends Entity
+class Language extends Entity
 {
 
     /**
@@ -32,13 +25,6 @@ class InternalConsultant extends Entity
      */
     protected $_accessible = [
         'name' => true,
-        'created' => true,
-        'modified' => true,
-        'department_id' => true,
-        'internal_consultant_position_id' => true,
-        'user_id' => true,
-        'department' => true,
-        'user' => true,
         'thesis_topics' => true
     ];
 }

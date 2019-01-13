@@ -55,17 +55,17 @@
                                                 if($thesisTopic->modifiable == true){
                                                     //Ha kitöltési időszak van, csak akkor lehet véglegesíteni
                                                     if(!empty($can_fill_in_topic) && $can_fill_in_topic === true){
-                                                        echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'studentEdit', $thesisTopic->id], ['class' => 'btn btn-primary edit-btn']);
-                                                        echo $this->Html->link(__('Véglegesítés'), ['controller' => 'ThesisTopics', 'action' => 'studentFinalize', $thesisTopic->id], ['class' => 'btn btn-success finalize-btn']);
+                                                        echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary edit-btn']);
+                                                        echo $this->Html->link(__('Véglegesítés'), ['controller' => 'ThesisTopics', 'action' => 'finalize', $thesisTopic->id], ['class' => 'btn btn-success finalize-btn']);
                                                     }else{
-                                                        echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'studentEdit', $thesisTopic->id], ['class' => 'btn btn-primary edit-btn']);
+                                                        echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary edit-btn']);
                                                     }
                                                     
                                                     echo '<br/>';
                                                 }
                                                 
-                                                echo $this->Html->link(__('PDF'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id], ['class' => 'btn btn-info', 'target' => '_blank']);
-                                                if($thesisTopic->encrypted) echo $this->Html->link(__('Titkosítási kérelem'), ['controller' => 'ThesisTopics', 'action' => 'encyptionRegulationDoc', $thesisTopic->id], ['class' => 'btn btn-info enrcyption-doc-btn', 'target' => '_blank']);
+                                                echo $this->Html->link(__('PDF'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info', 'target' => '_blank']);
+                                                if($thesisTopic->encrypted) echo $this->Html->link(__('Titkosítási kérelem'), ['controller' => 'ThesisTopics', 'action' => 'encyptionRegulationDoc', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info enrcyption-doc-btn', 'target' => '_blank']);
                                             ?>
                                         </td>
                                     </tr>

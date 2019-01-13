@@ -40,6 +40,17 @@ class YearsTable extends Table
         $this->hasMany('FinalExamSubjects', [
             'foreignKey' => 'year_id'
         ]);
+        $this->hasMany('StartingThesisTopics', [
+            'foreignKey' => 'starting_year_id',
+            'class' => 'ThesisTopics'
+        ]);
+        $this->hasMany('EndingThesisTopic', [
+            'foreignKey' => 'accepted_ending_year_id',
+            'class' => 'ThesisTopics'
+        ]);
+        $this->hasMany('FinalExamSubjects', [
+            'foreignKey' => 'year_id'
+        ]);
     }
 
     /**
