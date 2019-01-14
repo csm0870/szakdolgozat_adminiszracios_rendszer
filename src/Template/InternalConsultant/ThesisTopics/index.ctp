@@ -20,58 +20,17 @@
                                         <td><?= h($thesisTopic->title) ?></td>
                                         <td><?= $thesisTopic->has('student') ? (h($thesisTopic->student->name) . (empty($thesisTopic->student->neptun) ? '' : ('<br/>(' . h($thesisTopic->student->neptun) . ')'))) : '' ?></td>
                                         <td>
-                                            <?php
-                                                //Ha van külső konzulens, és már kiderült, hogy elfogadta-e vagy sem
-                                                if($thesisTopic->cause_of_no_external_consultant === null && $thesisTopic->accepted_by_external_consultant !== null){
-                                                    if($thesisTopic->accepted_by_external_consultant == true){
-                                                        echo __('Elfogadva');
-                                                    }else{
-                                                        echo __('Elutasítva') . ' (' . __('külső konzulens') . ')';
-                                                    }
-                                                }elseif($thesisTopic->accepted_by_head_of_department !== null){//Ha már a tanszékvezető döntött
-                                                    if($thesisTopic->accepted_by_head_of_department == true){
-                                                        //Ha van külső konzulens
-                                                        if($thesisTopic->cause_of_no_external_consultant === null){
-                                                            echo __('Külső konzulensi aláírás ellenőrzésére vár');
-                                                        }else{
-                                                            echo __('Elfogadva');
-                                                        }
-                                                    }else{
-                                                        echo __('Elutasítva') . ' (' . __('tanszékvezető') . ')';
-                                                    }
-                                                }elseif($thesisTopic->accepted_by_internal_consultant !== null){//Ha már a tanszékvezető döntött
-                                                    if($thesisTopic->accepted_by_internal_consultant == true){
-                                                        echo __('Tanszékvezetői döntésre vár');
-                                                    }else{
-                                                        echo __('Elutasítva'). ' (' . __('belső konzulens') . ')';
-                                                    }
-                                                }else{
-                                                    echo __('Belső konzulensi döntésre vár');
-                                                }
-                                            ?>
+                                            <?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '' ?>
                                         </td>
                                         <td class="text-center">
                                             <?php
                                                 echo $this->Html->link(__('PDF'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info btn-pdf', 'target' => '_blank']);
                                                 
-                                                $can_be_deleted = false;
-                                                
                                                 //Akkor törölheti, ha már nincs bírálati folyamatban
-                                                if($thesisTopic->cause_of_no_external_consultant === null && $thesisTopic->accepted_by_external_consultant !== null){
-                                                    $can_be_deleted = true;
-                                                }elseif($thesisTopic->accepted_by_head_of_department !== null){
-                                                    if($thesisTopic->accepted_by_head_of_department === false){
-                                                        $can_be_deleted = true;
-                                                    }elseif($thesisTopic->cause_of_no_external_consultant !== null){
-                                                        $can_be_deleted = true;
-                                                    }
-                                                }elseif($thesisTopic->accepted_by_internal_consultant === false){
-                                                    $can_be_deleted = true;
-                                                }
+                                                if(in_array($thesisTopic->thesis_topic_status_id, [3, 5, 7, 8])) echo $this->Form->postLink(__('Törlés'), ['action' => 'deleteByInternalConsultant', $thesisTopic->id], ['confirm' => __('Biztosan törlöd?'), 'class' => 'btn btn-danger btn-delete']);
                                                 
-                                                if($can_be_deleted) echo $this->Form->postLink(__('Törlés'), ['action' => 'deleteByInternalConsultant', $thesisTopic->id], ['confirm' => __('Biztosan törlöd?'), 'class' => 'btn btn-danger btn-delete']);
-                                                
-                                                if($thesisTopic->accepted_by_internal_consultant === null){
+                                                //Belső konzulensi döntésre vár
+                                                if($thesisTopic->thesis_topic_status_id == 2){
                                                     echo '<br/>';
                                                     echo $this->Form->create(null, ['style' => 'display: inline-block', 'url' => ['action' => 'accept']]);
                                                     echo $this->Form->button(__('Elfogadás'), ['type' => 'submit', 'class' => 'btn btn-success btn-accept']);

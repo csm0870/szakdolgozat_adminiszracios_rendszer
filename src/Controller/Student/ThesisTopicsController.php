@@ -43,7 +43,9 @@ class ThesisTopicsController extends AppController
             }
         }
 
-        $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['student_id' => $data['student_id'], 'deleted !=' => true], 'order' => ['created' => 'ASC']]);
+        $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['student_id' => $data['student_id'], 'deleted !=' => true],
+                                                          'order' => ['created' => 'DESC'],
+                                                          'contain' => ['ThesisTopicStatuses']]);
 
         $can_add_topic = $this->ThesisTopics->Students->canAddTopic($data['student_id']);
 
@@ -72,7 +74,8 @@ class ThesisTopicsController extends AppController
         $can_fill_in_topic = false;
         $this->loadModel('Information');
         $info = $this->Information->find('all')->first();
-
+        
+        //Leadhatósági időszak ellenőrzése
         if(!empty($info) && !empty($info->filling_in_topic_form_begin_date) && !empty($info->filling_in_topic_form_end_date)){
             $today = date('Y-m-d');
 
@@ -97,9 +100,15 @@ class ThesisTopicsController extends AppController
                     $thesisTopic->external_consultant_name = null;
                     $thesisTopic->external_consultant_position = null;
                     $thesisTopic->external_consultant_workplace = null;
+                    $thesisTopic->external_consultant_email = null;
+                    $thesisTopic->external_consultant_phone_number = null;
+                    $thesisTopic->external_consultant_address = null;
                 }else{
                     $thesisTopic->cause_of_no_external_consultant = null;
                 }
+                
+                //Véglegesítésre vár
+                $thesisTopic->thesis_topic_status_id = 1;
 
                 if ($this->ThesisTopics->save($thesisTopic)) {
                     $this->Flash->success(__('Mentés sikeres.'));
@@ -153,9 +162,15 @@ class ThesisTopicsController extends AppController
                 $thesisTopic->external_consultant_name = null;
                 $thesisTopic->external_consultant_position = null;
                 $thesisTopic->external_consultant_workplace = null;
+                $thesisTopic->external_consultant_email = null;
+                $thesisTopic->external_consultant_phone_number = null;
+                $thesisTopic->external_consultant_address = null;
             }else{
                 $thesisTopic->cause_of_no_external_consultant = null;
             }
+            
+            //Véglegesítésre vár
+            $thesisTopic->thesis_topic_status_id = 1;
 
             if ($this->ThesisTopics->save($thesisTopic)) {
                 $this->Flash->success(__('Mentés sikeres.'));
@@ -190,51 +205,12 @@ class ThesisTopicsController extends AppController
 
         $thesisTopic = $this->ThesisTopics->get($id);
         $thesisTopic->modifiable = false;
-        //Az elfogadások resetelése, ha vannak
-        $thesisTopic->accepted_by_internal_consultant = null;
-        $thesisTopic->accepted_by_head_of_department = null;
-        $thesisTopic->accepted_by_external_consultant = null;
+        //Belső konzulensi döntésre vár
+        $thesisTopic->thesis_topic_status_id = 2;
 
         if ($this->ThesisTopics->save($thesisTopic)) $this->Flash->success(__('Véglegesítve'));
         else $this->Flash->error(__('Hiba történt. Próbálja újra!'));
 
         return $this->redirect(['action' => 'index']);
-    }
-    
-    /**
-     * Pdf generálás CakdePdf pluginnal
-     * 
-     * @param type $id Téma ID-ja
-     * @return type
-     */
-    public function exportPdf($id = null){
-        //Hallgatói adatellenőrzés
-        $this->loadModel('Students');
-        $data = $this->Students->checkStundentData($this->Auth->user('id'));
-        if($data['success'] === false){
-            $this->Flash->error(__('Adja meg az adatit a továbblépéshez!'));
-            return $this->redirect(['controller' => 'Students', 'action' => 'edit', $data['student_id']]);
-        }
-        
-        $thesisTopic = $this->ThesisTopics->get($id, ['contain' => ['Students' => ['Courses', 'CourseLevels', 'CourseTypes'],
-                                                                    'InternalConsultants' => ['Departments', 'InternalConsultantPositions'],
-                                                                    'StartingYears', 'ExpectedEndingYears', 'Languages']]);
-        
-        $this->viewBuilder()->setLayout('default');
-        $this->viewBuilder()->setClassName('CakePdf.Pdf');
-
-        $this->viewBuilder()->options([
-            'pdfConfig' => [
-                'title' => "feladatkiiro_lap-" . date("Y-m-d-H-i-s"),
-                'margin' => [
-                    'bottom' => 12,
-                    'left' => 12,
-                    'right' => 12,
-                    'top' => 12
-                ]
-            ]
-        ]);
-
-        $this->set(compact('thesisTopic'));
     }
 }

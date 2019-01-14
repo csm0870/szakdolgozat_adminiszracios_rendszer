@@ -18,45 +18,15 @@
                                     <tr>
                                         <td><?= h($thesisTopic->title) ?></td>
                                         <td>
-                                            <?php
-                                                //Ha van külső konzulens, és már kiderült, hogy elfogadta-e vagy sem
-                                                if($thesisTopic->cause_of_no_external_consultant === null && $thesisTopic->accepted_by_external_consultant !== null){
-                                                    if($thesisTopic->accepted_by_external_consultant == true){
-                                                        echo __('Elfogadva');
-                                                    }else{
-                                                        echo __('Elutasítva') . ' (' . __('külső konzulens') . ')';
-                                                    }
-                                                }elseif($thesisTopic->accepted_by_head_of_department !== null){//Ha már a tanszékvezető döntött
-                                                    if($thesisTopic->accepted_by_head_of_department == true){
-                                                        //Ha van külső konzulens
-                                                        if($thesisTopic->cause_of_no_external_consultant === null){
-                                                            echo __('Külső konzulensi aláírás ellenőrzésére vár');
-                                                        }else{
-                                                            echo __('Elfogadva');
-                                                        }
-                                                    }else{
-                                                        echo __('Elutasítva') . ' (' . __('tanszékvezető') . ')';
-                                                    }
-                                                }elseif($thesisTopic->accepted_by_internal_consultant !== null){//Ha már a tanszékvezető döntött
-                                                    if($thesisTopic->accepted_by_internal_consultant == true){
-                                                        echo __('Tanszékvezetői döntésre vár');
-                                                    }else{
-                                                        echo __('Elutasítva'). ' (' . __('belső konzulens') . ')';
-                                                    }
-                                                }elseif($thesisTopic->modifiable == false){
-                                                    echo __('Belső konzulensi döntésre vár');
-                                                }else{
-                                                    echo __('Véglegesítésre vár');
-                                                }
-                                            ?>
+                                            <?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '' ?>
                                         </td>
                                         <td class="text-center">
                                             <?php
-                                                if($thesisTopic->modifiable == true){
+                                                if($thesisTopic->modifiable == true && $thesisTopic->thesis_topic_status_id == 1){
                                                     //Ha kitöltési időszak van, csak akkor lehet véglegesíteni
                                                     if(!empty($can_fill_in_topic) && $can_fill_in_topic === true){
                                                         echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary edit-btn']);
-                                                        echo $this->Html->link(__('Véglegesítés'), ['controller' => 'ThesisTopics', 'action' => 'finalize', $thesisTopic->id], ['class' => 'btn btn-success finalize-btn']);
+                                                        echo $this->Html->link(__('Véglegesítés'), ['controller' => 'ThesisTopics', 'action' => 'finalize', $thesisTopic->id], ['class' => 'btn btn-success finalize-btn', 'confirm' => __('Bitosan véglegesíted?')]);
                                                     }else{
                                                         echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary edit-btn']);
                                                     }
@@ -92,12 +62,5 @@
 <script>
     $(function(){
         $('#thesis_topics_index_menu_item').addClass('active');
-        
-        /**
-         * Véglegesítés megerősítése
-         */
-        $('.finalize-btn').on('click', function(e){
-            if(!confirm('<?= __('Bitosan véglegesíted?') ?>')) return false;
-        });
     });
 </script>

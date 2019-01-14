@@ -86,4 +86,24 @@ class StudentsTableTest extends TestCase
     {
         $this->markTestIncomplete('Not implemented yet.');
     }
+
+    /**
+     * Test checkStundentData method
+     *
+     * @return void
+     */
+    public function testCheckStundentData()
+    {
+        $this->markTestIncomplete('Not implemented yet.');
+    }
+
+    /**
+     * Test canAddTopic method
+     *
+     * @return void
+     */
+    public function testCanAddTopic()
+    {
+        $this->markTestIncomplete('Not implemented yet.');
+    }
 }

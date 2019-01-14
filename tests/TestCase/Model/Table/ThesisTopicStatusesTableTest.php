@@ -1,22 +1,22 @@
 <?php
 namespace App\Test\TestCase\Model\Table;
 
-use App\Model\Table\ThesisTopicsTable;
+use App\Model\Table\ThesisTopicStatusesTable;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 
 /**
- * App\Model\Table\ThesisTopicsTable Test Case
+ * App\Model\Table\ThesisTopicStatusesTable Test Case
  */
-class ThesisTopicsTableTest extends TestCase
+class ThesisTopicStatusesTableTest extends TestCase
 {
 
     /**
      * Test subject
      *
-     * @var \App\Model\Table\ThesisTopicsTable
+     * @var \App\Model\Table\ThesisTopicStatusesTable
      */
-    public $ThesisTopics;
+    public $ThesisTopicStatuses;
 
     /**
      * Fixtures
@@ -24,14 +24,8 @@ class ThesisTopicsTableTest extends TestCase
      * @var array
      */
     public $fixtures = [
-        'app.thesis_topics',
-        'app.starting_years',
-        'app.expected_ending_years',
-        'app.internal_consultants',
-        'app.languages',
-        'app.students',
-        'app.failed_topic_suggestions',
-        'app.theses'
+        'app.thesis_topic_statuses',
+        'app.thesis_topics'
     ];
 
     /**
@@ -42,8 +36,8 @@ class ThesisTopicsTableTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $config = TableRegistry::getTableLocator()->exists('ThesisTopics') ? [] : ['className' => ThesisTopicsTable::class];
-        $this->ThesisTopics = TableRegistry::getTableLocator()->get('ThesisTopics', $config);
+        $config = TableRegistry::getTableLocator()->exists('ThesisTopicStatuses') ? [] : ['className' => ThesisTopicStatusesTable::class];
+        $this->ThesisTopicStatuses = TableRegistry::getTableLocator()->get('ThesisTopicStatuses', $config);
     }
 
     /**
@@ -53,7 +47,7 @@ class ThesisTopicsTableTest extends TestCase
      */
     public function tearDown()
     {
-        unset($this->ThesisTopics);
+        unset($this->ThesisTopicStatuses);
 
         parent::tearDown();
     }
@@ -74,16 +68,6 @@ class ThesisTopicsTableTest extends TestCase
      * @return void
      */
     public function testValidationDefault()
-    {
-        $this->markTestIncomplete('Not implemented yet.');
-    }
-
-    /**
-     * Test buildRules method
-     *
-     * @return void
-     */
-    public function testBuildRules()
     {
         $this->markTestIncomplete('Not implemented yet.');
     }

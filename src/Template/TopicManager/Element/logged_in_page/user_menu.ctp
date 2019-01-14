@@ -16,7 +16,7 @@
                     <a class="nav-link" href="<?= $this->Url->build(['controller' => 'Information', 'action' => 'setEncryptionRequlation']) ?>"><?= __('Titoktartási kérelem szabályzata') ?></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#"><?= __('Kimutatások') ?></a>
+                    <a class="nav-link" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'statistics']) ?>"><?= __('Téma kimutatások') ?></a>
                 </li>
             </ul>
         </div>

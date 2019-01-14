@@ -20,8 +20,8 @@ class ThesisTopicsController extends AppController
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         //Csak a véglegesített és a hozzá tartozó témákat látja
         $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['internal_consultant_id' => ($user->has('internal_consultant') ? $user->internal_consultant->id : null),
-                                                                           'modifiable' => false, 'deleted !=' => true],
-                                                          'contain' => ['Students'], 'order' => ['ThesisTopics.modified' => 'ASC']]);
+                                                                           'modifiable' => false, 'deleted !=' => true, 'thesis_topic_status_id !=' => 1 /* Már biztosan véglegesített*/],
+                                                          'contain' => ['Students', 'ThesisTopicStatuses'], 'order' => ['ThesisTopics.modified' => 'DESC']]);
 
         $this->set(compact('thesisTopics'));
     }
@@ -37,22 +37,8 @@ class ThesisTopicsController extends AppController
         $this->request->allowMethod(['post', 'delete']);
         $thesisTopic = $this->ThesisTopics->get($id);
 
-        $can_be_deleted = false;
-
         //Akkor törölheti, ha már nincs bírálati folyamatban
-        if($thesisTopic->cause_of_no_external_consultant === null && $thesisTopic->accepted_by_external_consultant !== null){
-            $can_be_deleted = true;
-        }elseif($thesisTopic->accepted_by_head_of_department !== null){
-            if($thesisTopic->accepted_by_head_of_department === false){
-                $can_be_deleted = true;
-            }elseif($thesisTopic->cause_of_no_external_consultant !== null){
-                $can_be_deleted = true;
-            }
-        }elseif($thesisTopic->accepted_by_internal_consultant === false){
-            $can_be_deleted = true;
-        }
-
-        if(!$can_be_deleted){
+        if(in_array($thesisTopic->thesis_topic_status_id, [3, 5, 7, 8])){
             $this->Flash->error(__('A téma nem törölhető. Az bírálata még folyamatban van.'));
             return $this->redirect(['action' => 'index']);
         }
@@ -87,9 +73,7 @@ class ThesisTopicsController extends AppController
 
             $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['id' => $thesisTopic_id, 'modifiable' => false,
                                                                               'internal_consultant_id' => $user->has('internal_consultant') ? $user->internal_consultant->id : null, //Belso konzulens a saját témája
-                                                                              'accepted_by_internal_consultant IS' => null, //Belső konzulens még nem döntött
-                                                                              'accepted_by_head_of_department IS' => null, //Tanszékvezető konzulens még nem döntött
-                                                                              'accepted_by_external_consultant IS' => null //Külső konzulens még nem döntött
+                                                                              'thesis_topic_status_id' => 2 //Belső konzulensi döntésre vár
                                                                               ]])->first();
 
             if(empty($thesisTopic)){
@@ -97,10 +81,7 @@ class ThesisTopicsController extends AppController
                 return $this->redirect(['action' => 'index']);
             }
             
-            $thesisTopic->accepted_by_internal_consultant = $accepted;
-            //Többi resetelése
-            $thesisTopic->accepted_by_head_of_department = null;
-            $thesisTopic->accepted_by_external_consultant = null;
+            $thesisTopic->thesis_topic_status_id = $accepted == 0 ? 3 : 4;
 
             if($this->ThesisTopics->save($thesisTopic)){
                 $this->Flash->success(__('Mentés sikeres!!'));

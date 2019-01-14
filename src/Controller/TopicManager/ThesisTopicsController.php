@@ -20,7 +20,7 @@ class ThesisTopicsController extends AppController
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         //Csak a véglegesített témákat látja
         $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['deleted !=' => true, 'modifiable' => false],
-                                                          'contain' => ['Students', 'InternalConsultants'], 'order' => ['ThesisTopics.modified' => 'ASC']]);
+                                                          'contain' => ['Students', 'InternalConsultants', 'ThesisTopicStatuses'], 'order' => ['ThesisTopics.modified' => 'DESC']]);
 
         $this->set(compact('thesisTopics'));
     }
@@ -41,18 +41,17 @@ class ThesisTopicsController extends AppController
 
             $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['id' => $thesisTopic_id,
                                                                               'modifiable' => false,
-                                                                              'cause_of_no_external_consultant IS NOT' => null, //Van külső konzulens
-                                                                              'accepted_by_internal_consultant' => true, //Ha a belső konzulens elfogadta
-                                                                              'accepted_by_head_of_department' => true, //Tanszékvezető elfogadta
-                                                                              'accepted_by_external_consultant IS' => null //Külső konzulens még nem döntött
+                                                                              'cause_of_no_external_consultant IS' => null, //Van külső konzulens
+                                                                              'thesis_topic_status_id' => 6 //Külső konzulensi aláírás ellenőrzésre vár
                                                                               ]])->first();
 
             if(empty($thesisTopic)){
                 $this->Flash->error(__('Ezt a témát nem fogadhatja el. Már vagy döntést hozott, vagy nem Önhöz tartozik, vagy még nem véglegesített, vagy már el lett utasítva a téma!'));
                 return $this->redirect(['action' => 'index']);
             }
-
-            $thesisTopic->accepted_by_external_consultant = $accepted;
+            
+            //Elfogadás vagy elutasítás
+            $thesisTopic->thesis_topic_status_id = $accepted == 0 ? 7 : 8;
 
             if($this->ThesisTopics->save($thesisTopic)){
                 $this->Flash->success(__('Mentés sikeres!!'));
@@ -62,5 +61,81 @@ class ThesisTopicsController extends AppController
         }
             
         return $this->redirect(['action' => 'index']);
+    }
+    
+    public function statistics($year_id = null, $semester = 0){
+        
+        $this->loadModel('Years');
+        $year = $this->Years->find('all', ['conditions' => ['id' => $year_id]])->first();
+        
+        //Ha paraméterben megadott év nem ad  vissza évet, akkor az aktuális évet lekérjük
+        if(empty($year)) $year = $this->Years->find('all', ['conditions' => ['year LIKE' => date('Y')]])->first();
+        
+        //Ha az aktuális év nem létezik, akkor az elsőt az adatbázisból
+        if(empty($year)) $year = $this->Years->find('all')->first();
+        
+        if(empty($year)){
+            $this->Flash->error(__('Nincs tanév az adatbázisban!'));
+        }
+        
+        //Félév ellenőrzése
+        $semester = in_array($semester, [0, 1]) ? $semester : 0;
+        
+        //Címkék
+        $this->loadModel('Courses');
+        $labels_for_courses_ = $this->Courses->find('list');
+        $this->loadModel('CourseTypes');
+        $labels_for_course_types_ = $this->CourseTypes->find('list');
+        $this->loadModel('CourseLevels');
+        $labels_for_course_levels_ = $this->CourseLevels->find('list');
+        
+        //Címkék sima tömbbe a diagramhoz
+        $labels_for_courses = [];
+        $labels_for_course_types = [];
+        $labels_for_course_levels = [];
+        
+        //Diagramm adatok
+        $data_for_courses = [];
+        $data_for_course_types = [];
+        $data_for_course_levels = [];
+        
+        //Képzésekhez tartozó témák számlálása
+        foreach($labels_for_courses_ as $course_id => $course){
+            $query = $this->ThesisTopics->find();
+            $data_for_courses[] = $query->where(['ThesisTopics.starting_year_id' => $year->id,
+                                                 'ThesisTopics.starting_semester' => $semester,
+                                                 'thesis_topic_status_id' => 8 /* Elfogadott*/])
+                                        ->matching('Students', function ($q) use($course_id) { return $q->where(['Students.course_id' => $course_id]);})
+                                        ->count();
+            $labels_for_courses[] = $course;
+        }
+        
+        //Képzési típusokhoz tartozó témák számlálása
+        foreach($labels_for_course_types_ as $course_type_id => $course_type){
+            $query = $this->ThesisTopics->find();
+            $data_for_course_types[] = $query->where(['ThesisTopics.starting_year_id' => $year->id,
+                                                      'ThesisTopics.starting_semester' => $semester,
+                                                      'ThesisTopics.thesis_topic_status_id' => 8 /* Elfogadott*/])
+                                             ->matching('Students', function ($q) use($course_type_id) { return $q->where(['Students.course_type_id' => $course_type_id]);})
+                                             ->count();
+                                             
+            $labels_for_course_types[] = $course_type;              
+        }
+        
+        //Képzési szintekhez tartozó témák számlálása
+        foreach($labels_for_course_levels_ as $course_level_id => $course_level){
+            $query = $this->ThesisTopics->find();
+            $data_for_course_levels[] = $query->where(['ThesisTopics.starting_year_id' => $year->id,
+                                                       'ThesisTopics.starting_semester' => $semester,
+                                                       'thesis_topic_status_id' => 8 /* Elfogadott*/])
+                                               ->matching('Students', function ($q) use($course_level_id) { return $q->where(['Students.course_level_id' => $course_level_id]);})
+                                               ->count();
+            
+            $labels_for_course_levels[] = $course_level;
+        }
+        
+        $this->set(compact('labels_for_courses', 'labels_for_course_types', 'labels_for_course_levels',
+                           'data_for_courses', 'data_for_course_types', 'data_for_course_levels'));
+        
     }
 }

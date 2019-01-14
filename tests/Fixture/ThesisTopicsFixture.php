@@ -40,15 +40,18 @@ class ThesisTopicsFixture extends TestFixture
         'external_consultant_address' => ['type' => 'string', 'length' => 80, 'null' => true, 'default' => null, 'collate' => 'utf8_general_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
         'internal_consultant_id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         'language_id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
+        'first_thesis_subject_completed' => ['type' => 'boolean', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
         'student_id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         'created' => ['type' => 'datetime', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
         'modified' => ['type' => 'datetime', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
+        'thesis_topic_status_id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         '_indexes' => [
             'FK_degree_thesis_data_internal_constultants_idx' => ['type' => 'index', 'columns' => ['internal_consultant_id'], 'length' => []],
             'FK_thesis_topics_years_idx' => ['type' => 'index', 'columns' => ['starting_year_id'], 'length' => []],
             'FK_thesis_topics_students_idx' => ['type' => 'index', 'columns' => ['student_id'], 'length' => []],
             'FK_thesis_topics_ending_year_idx' => ['type' => 'index', 'columns' => ['expected_ending_year_id'], 'length' => []],
             'FK_thesis_topics_languages_idx' => ['type' => 'index', 'columns' => ['language_id'], 'length' => []],
+            'FK_thesis_topics_thesis_topic_statuses_idx' => ['type' => 'index', 'columns' => ['thesis_topic_status_id'], 'length' => []],
         ],
         '_constraints' => [
             'primary' => ['type' => 'primary', 'columns' => ['id'], 'length' => []],
@@ -57,6 +60,7 @@ class ThesisTopicsFixture extends TestFixture
             'FK_thesis_topics_languages' => ['type' => 'foreign', 'columns' => ['language_id'], 'references' => ['languages', 'id'], 'update' => 'cascade', 'delete' => 'setNull', 'length' => []],
             'FK_thesis_topics_starting_year' => ['type' => 'foreign', 'columns' => ['starting_year_id'], 'references' => ['years', 'id'], 'update' => 'cascade', 'delete' => 'setNull', 'length' => []],
             'FK_thesis_topics_students' => ['type' => 'foreign', 'columns' => ['student_id'], 'references' => ['students', 'id'], 'update' => 'cascade', 'delete' => 'cascade', 'length' => []],
+            'FK_thesis_topics_thesis_topic_statuses' => ['type' => 'foreign', 'columns' => ['thesis_topic_status_id'], 'references' => ['thesis_topic_statuses', 'id'], 'update' => 'cascade', 'delete' => 'setNull', 'length' => []],
         ],
         '_options' => [
             'engine' => 'InnoDB',
@@ -97,9 +101,11 @@ class ThesisTopicsFixture extends TestFixture
                 'external_consultant_address' => 'Lorem ipsum dolor sit amet',
                 'internal_consultant_id' => 1,
                 'language_id' => 1,
+                'first_thesis_subject_completed' => 1,
                 'student_id' => 1,
-                'created' => '2019-01-13 13:14:23',
-                'modified' => '2019-01-13 13:14:23'
+                'created' => '2019-01-14 13:20:48',
+                'modified' => '2019-01-14 13:20:48',
+                'thesis_topic_status_id' => 1
             ],
         ];
         parent::init();

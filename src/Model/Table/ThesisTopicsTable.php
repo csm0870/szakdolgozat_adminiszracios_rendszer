@@ -14,6 +14,7 @@ use Cake\Validation\Validator;
  * @property \App\Model\Table\InternalConsultantsTable|\Cake\ORM\Association\BelongsTo $InternalConsultants
  * @property \App\Model\Table\LanguagesTable|\Cake\ORM\Association\BelongsTo $Languages
  * @property \App\Model\Table\StudentsTable|\Cake\ORM\Association\BelongsTo $Students
+ * @property |\Cake\ORM\Association\BelongsTo $ThesisTopicStatuses
  * @property \App\Model\Table\FailedTopicSuggestionsTable|\Cake\ORM\Association\HasMany $FailedTopicSuggestions
  * @property \App\Model\Table\ThesesTable|\Cake\ORM\Association\HasMany $Theses
  *
@@ -63,6 +64,9 @@ class ThesisTopicsTable extends Table
         ]);
         $this->belongsTo('Students', [
             'foreignKey' => 'student_id'
+        ]);
+        $this->belongsTo('ThesisTopicStatuses', [
+            'foreignKey' => 'thesis_topic_status_id'
         ]);
         $this->hasMany('FailedTopicSuggestions', [
             'foreignKey' => 'thesis_topic_id'
@@ -163,6 +167,10 @@ class ThesisTopicsTable extends Table
             ->maxLength('external_consultant_address', 80)
             ->allowEmpty('external_consultant_address');
 
+        $validator
+            ->boolean('first_thesis_subject_completed')
+            ->allowEmpty('first_thesis_subject_completed');
+
         return $validator;
     }
 
@@ -180,6 +188,7 @@ class ThesisTopicsTable extends Table
         $rules->add($rules->existsIn(['internal_consultant_id'], 'InternalConsultants'));
         $rules->add($rules->existsIn(['language_id'], 'Languages'));
         $rules->add($rules->existsIn(['student_id'], 'Students'));
+        $rules->add($rules->existsIn(['thesis_topic_status_id'], 'ThesisTopicStatuses'));
 
         return $rules;
     }

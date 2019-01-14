@@ -29,12 +29,14 @@ use Cake\ORM\Entity;
  * @property string|null $external_consultant_address
  * @property int|null $internal_consultant_id
  * @property int|null $language_id
+ * @property bool|null $first_thesis_subject_completed
  * @property int|null $student_id
  * @property \Cake\I18n\FrozenTime|null $created
  * @property \Cake\I18n\FrozenTime|null $modified
+ * @property int|null $thesis_topic_status_id
  *
- * @property \App\Model\Entity\StartingYear $starting_year
- * @property \App\Model\Entity\AcceptedEndingYear $accepted_ending_year
+ * @property \App\Model\Entity\Year $starting_year
+ * @property \App\Model\Entity\Year $expected_ending_year
  * @property \App\Model\Entity\InternalConsultant $internal_consultant
  * @property \App\Model\Entity\Language $language
  * @property \App\Model\Entity\Student $student
@@ -76,12 +78,15 @@ class ThesisTopic extends Entity
         'external_consultant_address' => true,
         'internal_consultant_id' => true,
         'language_id' => true,
+        'first_thesis_subject_completed' => true,
         'student_id' => true,
         'created' => true,
         'modified' => true,
+        'thesis_topic_status_id' => true,
         'starting_year' => true,
-        'accepted_ending_year' => true,
+        'expected_ending_year' => true,
         'internal_consultant' => true,
+        'thesis_topic_status' => true,
         'language' => true,
         'student' => true,
         'failed_topic_suggestions' => true,

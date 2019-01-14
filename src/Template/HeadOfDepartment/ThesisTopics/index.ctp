@@ -22,37 +22,14 @@
                                         <td><?= $thesisTopic->has('internal_consultant') ? h($thesisTopic->internal_consultant->name) : '' ?></td>
                                         <td><?= $thesisTopic->has('student') ? (h($thesisTopic->student->name) . (empty($thesisTopic->student->neptun) ? '' : ('<br/>(' . h($thesisTopic->student->neptun) . ')'))) : '' ?></td>
                                         <td>
-                                            <?php
-                                                //Ha van külső konzulens, és már kiderült, hogy elfogadta-e vagy sem
-                                                if($thesisTopic->cause_of_no_external_consultant === null && $thesisTopic->accepted_by_external_consultant !== null){
-                                                    if($thesisTopic->accepted_by_external_consultant == true){
-                                                        echo __('Elfogadva');
-                                                    }else{
-                                                        echo __('Elutasítva') . ' (' . __('külső konzulens') . ')';
-                                                    }
-                                                }elseif($thesisTopic->accepted_by_head_of_department !== null){//Ha már a tanszékvezető döntött
-                                                    if($thesisTopic->accepted_by_head_of_department == true){
-                                                        //Ha van külső konzulens
-                                                        if($thesisTopic->cause_of_no_external_consultant === null){
-                                                            echo __('Külső konzulensi aláírás ellenőrzésére vár');
-                                                        }else{
-                                                            echo __('Elfogadva');
-                                                        }
-                                                    }else{
-                                                        echo __('Elutasítva') . ' (' . __('tanszékvezető') . ')';
-                                                    }
-                                                }elseif($thesisTopic->accepted_by_internal_consultant !== null){//Ha már a tanszékvezető döntött
-                                                    if($thesisTopic->accepted_by_internal_consultant == true){
-                                                        echo __('Tanszékvezetői döntésre vár');
-                                                    }
-                                                }
-                                            ?>
+                                            <?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '' ?>
                                         </td>
                                         <td class="text-center">
                                             <?php
                                                 echo $this->Html->link(__('PDF'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info btn-pdf', 'target' => '_blank']);
                                                 
-                                                if($thesisTopic->accepted_by_head_of_department === null){
+                                                //Tanaszékvezetői döntésre vár
+                                                if($thesisTopic->thesis_topic_status_id == 4){
                                                     echo '<br/>';
                                                     echo $this->Form->create(null, ['style' => 'display: inline-block', 'url' => ['action' => 'accept']]);
                                                     echo $this->Form->button(__('Elfogadás'), ['type' => 'submit', 'class' => 'btn btn-success btn-accept']);

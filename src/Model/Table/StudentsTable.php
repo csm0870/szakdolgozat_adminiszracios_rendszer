@@ -108,10 +108,6 @@ class StudentsTable extends Table
             ->maxLength('specialisation', 40)
             ->allowEmpty('specialisation');
 
-        $validator
-            ->boolean('first_thesis_subject_completed')
-            ->allowEmpty('first_thesis_subject_completed');
-
         return $validator;
     }
 
@@ -134,7 +130,7 @@ class StudentsTable extends Table
         return $rules;
     }
     
-    /**
+        /**
      * Hallgató adatinak ellenőrzése. Ha még nincs hozzárendelve rekord, vagy ha valamely kötelező adata hiányzik, akkor false-t ad vissza.
      * Ha nincs hozzárendelve rekord, akkor létrehozza.
      * 
@@ -177,24 +173,12 @@ class StudentsTable extends Table
             
         $can_add_topic = true;
         foreach($thesisTopics as $thesisTopic){
-            //Ha van külső konzulens, és már kiderült, hogy elfogadta-e vagy sem
-            if($thesisTopic->cause_of_no_external_consultant === null && $thesisTopic->accepted_by_external_consultant !== null){
-                if($thesisTopic->accepted_by_external_consultant == true){
-                    $can_add_topic = false;
-                }
-            }elseif($thesisTopic->accepted_by_head_of_department !== null){//Ha már a tanszékvezető döntött
-                if($thesisTopic->accepted_by_head_of_department == true){
-                    $can_add_topic = false;
-                }
-            }elseif($thesisTopic->accepted_by_internal_consultant !== null){//Ha már a tanszékvezető döntött
-                if($thesisTopic->accepted_by_internal_consultant == true){
-                    $can_add_topic = false;
-                }
-            }else{
+            
+            //Ha már van elfogadási folyamatban témája, vagy van elfogadott témája, vagy van, ami véglegesítésre vár
+            if(in_array($thesisTopic->thesis_topic_status_id, [1, 2, 4, 6, 8])){
                 $can_add_topic = false;
+                break;
             }
-            //Ha legalább egy olyan téma van, amely vagy folyamatban van, vagy már el van fogadva
-            if($can_add_topic === false) break;
         }
         
         return $can_add_topic;
