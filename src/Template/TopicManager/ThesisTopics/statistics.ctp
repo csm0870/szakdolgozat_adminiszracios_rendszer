@@ -1,6 +1,6 @@
 <!-- Chart.js -->
 <?= $this->Html->script('Chart.min.js') ?>
-<div class="container thesisTopic-statistics">
+<div class="container thesisTopic-statistics topicManager">
     <div class="row">
         <div class="col-12 text-center page-title">
             <h4><?= __('Téma kimutatások') ?></h4>
@@ -18,6 +18,7 @@
     </div>
 </div>
 <script>
+    $('#thesis_topic_statistics').addClass('active');
     
     /*
      * RGBA színtöbböt generál, fix 0.2-es áttetszőséggel
@@ -58,9 +59,27 @@
                     scales: {
                         yAxes: [{
                             ticks: {
-                                beginAtZero:true
-                            },
+                                beginAtZero:true,
+                                stepSize : 1
+                            }
+                        }],
+                        xAxes : [{
+                            barPercentage : (1 - 1/labels_for_courses.length) //Minél kevesebb elem van annál vékonyabb a bar a 100%hoz képest
                         }]				
+                    },
+                    legend: {
+                        display : true,
+                        labels : {
+                            fontSize : 20
+                        }
+                    },
+                    tooltips : {
+                         callbacks: {
+                            label: function(tooltipItem, data) {
+                                return;
+                            }
+                        },
+                        titleMarginBottom : 0,
                     }
                 }
         });
@@ -87,9 +106,27 @@
                     scales: {
                         yAxes: [{
                             ticks: {
-                                beginAtZero:true
-                            },
+                                beginAtZero:true,
+                                stepSize : 1
+                            }
+                        }],
+                        xAxes : [{
+                            barPercentage : (1 - 1/labels_for_course_types.length) //Minél kevesebb elem van annál vékonyabb a bar a 100%hoz képest
                         }]				
+                    },
+                    legend: {
+                        display : true,
+                        labels : {
+                            fontSize : 20
+                        }
+                    },
+                    tooltips : {
+                         callbacks: {
+                            label: function(tooltipItem, data) {
+                                return;
+                            }
+                        },
+                        titleMarginBottom : 0,
                     }
                 }
         });
@@ -106,19 +143,37 @@
                 data: {
                 labels: labels_for_course_levels,
                 datasets: [{
-                        label: '<?= __('Képzés szintek') ?>',
-                        data: data_for_course_levels,
-                        backgroundColor: backgroundColors,
-                        borderWidth: 1
-                    }]
+                            label: '<?= __('Képzés szintek') ?>',
+                            data: data_for_course_levels,
+                            backgroundColor: backgroundColors,
+                            borderWidth: 1
+                        }]
                 },
                 options: {
                     scales: {
                         yAxes: [{
                             ticks: {
-                                beginAtZero:true
-                            },
-                        }]				
+                                beginAtZero:true,
+                                stepSize : 1
+                            }
+                        }],
+                        xAxes : [{
+                            barPercentage : (1 - 1/labels_for_course_levels.length) //Minél kevesebb elem van annál vékonyabb a bar a 100%hoz képest
+                        }]
+                    },
+                    legend: {
+                        display : true,
+                        labels : {
+                            fontSize : 20
+                        }
+                    },
+                    tooltips : {
+                         callbacks: {
+                            label: function(tooltipItem, data) {
+                                return;
+                            }
+                        },
+                        titleMarginBottom : 0,
                     }
                 }
         });

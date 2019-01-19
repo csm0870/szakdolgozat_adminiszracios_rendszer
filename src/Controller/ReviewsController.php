@@ -21,7 +21,7 @@ class ReviewsController extends AppController
     public function index()
     {
         $this->paginate = [
-            'contain' => ['Reviewers']
+            'contain' => ['ThesisTopics', 'Reviewers']
         ];
         $reviews = $this->paginate($this->Reviews);
 
@@ -38,7 +38,7 @@ class ReviewsController extends AppController
     public function view($id = null)
     {
         $review = $this->Reviews->get($id, [
-            'contain' => ['Reviewers', 'Theses', 'Questions']
+            'contain' => ['ThesisTopics', 'Reviewers', 'Questions']
         ]);
 
         $this->set('review', $review);
@@ -61,8 +61,9 @@ class ReviewsController extends AppController
             }
             $this->Flash->error(__('The review could not be saved. Please, try again.'));
         }
+        $thesisTopics = $this->Reviews->ThesisTopics->find('list', ['limit' => 200]);
         $reviewers = $this->Reviews->Reviewers->find('list', ['limit' => 200]);
-        $this->set(compact('review', 'reviewers'));
+        $this->set(compact('review', 'thesisTopics', 'reviewers'));
     }
 
     /**
@@ -86,8 +87,9 @@ class ReviewsController extends AppController
             }
             $this->Flash->error(__('The review could not be saved. Please, try again.'));
         }
+        $thesisTopics = $this->Reviews->ThesisTopics->find('list', ['limit' => 200]);
         $reviewers = $this->Reviews->Reviewers->find('list', ['limit' => 200]);
-        $this->set(compact('review', 'reviewers'));
+        $this->set(compact('review', 'thesisTopics', 'reviewers'));
     }
 
     /**

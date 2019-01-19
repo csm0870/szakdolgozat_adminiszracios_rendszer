@@ -18,6 +18,10 @@ html, body{
     padding-bottom: 10px;
 }
 
+.circle-btn{
+    border-radius: 50%;
+}
+
 /* Header */
 
 .header{
@@ -76,7 +80,7 @@ html, body{
 
 /* Thesis topic indexes */
 
-.thesisTopics-index .thesisTopic-list-container{
+.thesisTopics-index-body{
     margin-bottom: 5px;
 }
 
@@ -138,4 +142,32 @@ html, body{
 
 .thesisTopics-index.topicManager-thesisTopics-index .topics-table .btn-reject{
     margin: 0 0 8px 8px;
+}
+
+/* ThesisTopic exports (topic manager)*/
+
+.thesisTopic-exports .timeInput{
+    padding-bottom: 10px;
+}
+
+/* Consultations (internal consultant) */
+
+.internalConsultant-consultations-index .add-new-consultation{
+    text-decoration: none;
+    color: black;
+    display: inline-block;
+    padding: 3px;
+    border: 0.5px solid green;
+    margin-top: 5px;
+}
+
+.internalConsultant-consultations-index .add-btn{
+    background-color: chartreuse;
+    display: inline-block;
+}
+
+.internalConsultant-consultations-index .add-btn img{
+    width: 20px;
+    height: 20px;
+    margin: 15px;
 }

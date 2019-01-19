@@ -30,16 +30,16 @@ class ReviewsFixture extends TestFixture
         'grade' => ['type' => 'tinyinteger', 'length' => 3, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
         'confidentiality_contract' => ['type' => 'string', 'length' => 255, 'null' => true, 'default' => null, 'collate' => 'utf8_general_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
         'confidentiality_contract_accepted' => ['type' => 'boolean', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
-        'thesis_id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
+        'thesis_topic_id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         'reviewer_id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         '_indexes' => [
             'FK_reviews_reviewers_idx' => ['type' => 'index', 'columns' => ['reviewer_id'], 'length' => []],
-            'FK_reviews_theses_idx' => ['type' => 'index', 'columns' => ['thesis_id'], 'length' => []],
+            'FK_reviews_thesis_topics_idx' => ['type' => 'index', 'columns' => ['thesis_topic_id'], 'length' => []],
         ],
         '_constraints' => [
             'primary' => ['type' => 'primary', 'columns' => ['id'], 'length' => []],
             'FK_reviews_reviewers' => ['type' => 'foreign', 'columns' => ['reviewer_id'], 'references' => ['reviewers', 'id'], 'update' => 'cascade', 'delete' => 'setNull', 'length' => []],
-            'FK_reviews_theses' => ['type' => 'foreign', 'columns' => ['thesis_id'], 'references' => ['theses', 'id'], 'update' => 'cascade', 'delete' => 'cascade', 'length' => []],
+            'FK_reviews_thesis_topics' => ['type' => 'foreign', 'columns' => ['thesis_topic_id'], 'references' => ['thesis_topics', 'id'], 'update' => 'cascade', 'delete' => 'cascade', 'length' => []],
         ],
         '_options' => [
             'engine' => 'InnoDB',
@@ -70,7 +70,7 @@ class ReviewsFixture extends TestFixture
                 'grade' => 1,
                 'confidentiality_contract' => 'Lorem ipsum dolor sit amet',
                 'confidentiality_contract_accepted' => 1,
-                'thesis_id' => 1,
+                'thesis_topic_id' => 1,
                 'reviewer_id' => 1
             ],
         ];

@@ -5,7 +5,7 @@
         </div>
         <?= $this->Flash->render() ?>
         <div class="col-12">
-            <div class="row thesisTopic-list-container">
+            <div class="row thesisTopics-index-body">
                     <div class="col-12">
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover topics-table">

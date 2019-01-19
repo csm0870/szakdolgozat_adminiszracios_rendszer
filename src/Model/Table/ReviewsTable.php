@@ -9,7 +9,7 @@ use Cake\Validation\Validator;
 /**
  * Reviews Model
  *
- * @property \App\Model\Table\ThesesTable|\Cake\ORM\Association\BelongsTo $Theses
+ * @property |\Cake\ORM\Association\BelongsTo $ThesisTopics
  * @property \App\Model\Table\ReviewersTable|\Cake\ORM\Association\BelongsTo $Reviewers
  * @property \App\Model\Table\QuestionsTable|\Cake\ORM\Association\HasMany $Questions
  *
@@ -39,8 +39,8 @@ class ReviewsTable extends Table
         $this->setDisplayField('id');
         $this->setPrimaryKey('id');
 
-        $this->belongsTo('Theses', [
-            'foreignKey' => 'thesis_id'
+        $this->belongsTo('ThesisTopics', [
+            'foreignKey' => 'thesis_topic_id'
         ]);
         $this->belongsTo('Reviewers', [
             'foreignKey' => 'reviewer_id'
@@ -118,7 +118,7 @@ class ReviewsTable extends Table
      */
     public function buildRules(RulesChecker $rules)
     {
-        $rules->add($rules->existsIn(['thesis_id'], 'Theses'));
+        $rules->add($rules->existsIn(['thesis_topic_id'], 'ThesisTopics'));
         $rules->add($rules->existsIn(['reviewer_id'], 'Reviewers'));
 
         return $rules;

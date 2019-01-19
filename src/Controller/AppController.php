@@ -83,7 +83,7 @@ class AppController extends Controller
         }
         
         //Layout beállítása, ha a listában lévő controllerek hívják meg
-        if(in_array($this->getRequest()->getParam('controller'), ['Information', 'ThesisTopics', 'Students']) || ($this->getRequest()->getParam('controller') == 'Pages' && $this->getRequest()->getParam('action') == 'dashboard')){
+        if(in_array($this->getRequest()->getParam('controller'), ['Information', 'ThesisTopics', 'Students', 'Consultations', 'ConsultationOaccasions']) || ($this->getRequest()->getParam('controller') == 'Pages' && $this->getRequest()->getParam('action') == 'dashboard')){
             $this->viewBuilder()->setLayout('logged_in_page');
         }
         
@@ -103,8 +103,7 @@ class AppController extends Controller
         if(!\Cake\Core\Configure::check('CakePdf')){
             \Cake\Core\Configure::write('CakePdf', [
                 'engine' => ['className' => 'CakePdf.WkHtmlToPdf',
-                                //Szerveren ez van, más oprendszer miatt másik kell, illetve más helyen van!!!
-                             //'binary' => CONFIG . 'wkhtmltopdf' . DS . 'bin' . DS .'wkhtmltopdf',
+                             //'binary' => CONFIG . 'wkhtmltopdf' . DS . 'bin' . DS .'wkhtmltopdf', //ngix-re
                             ]
                 ]);
         }

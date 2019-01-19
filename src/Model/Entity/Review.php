@@ -19,7 +19,7 @@ use Cake\ORM\Entity;
  * @property int|null $grade
  * @property string|null $confidentiality_contract
  * @property bool|null $confidentiality_contract_accepted
- * @property int|null $thesis_id
+ * @property int|null $thesis_topic_id
  * @property int|null $reviewer_id
  *
  * @property \App\Model\Entity\Thesis $thesis
@@ -51,7 +51,7 @@ class Review extends Entity
         'grade' => true,
         'confidentiality_contract' => true,
         'confidentiality_contract_accepted' => true,
-        'thesis_id' => true,
+        'thesis_topic_id' => true,
         'reviewer_id' => true,
         'thesis' => true,
         'reviewer' => true,

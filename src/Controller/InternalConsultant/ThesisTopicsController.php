@@ -54,6 +54,27 @@ class ThesisTopicsController extends AppController
     }
     
     /**
+     * Téma részletek
+     * 
+     * @param type $id
+     */
+    public function details($id = null){
+        $this->loadModel('Users');
+        $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
+        
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id, 'internal_consultant_id' => $user->has('internal_consultant') ? $user->internal_consultant->id : '',
+                                                                          'thesis_topic_status_id' => 8], //Belső konzulenshez tartozik és elfogadott
+                                                         'contain' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels']]])->first();
+    
+        if(empty($thesisTopic)){
+            $this->Flash->error(__('A téma részletei nem elérhetők. Vagy nem létezik, vagy nem Ön a belső konzulense.'));
+            return $this->redirect(['action' => 'index']);
+        }
+        
+        $this->set(compact('thesisTopic'));
+    }
+    
+    /**
      * Táma elfogadása vagy elutasítása
      * @return type
      */

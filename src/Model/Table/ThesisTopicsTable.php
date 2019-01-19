@@ -14,9 +14,10 @@ use Cake\Validation\Validator;
  * @property \App\Model\Table\InternalConsultantsTable|\Cake\ORM\Association\BelongsTo $InternalConsultants
  * @property \App\Model\Table\LanguagesTable|\Cake\ORM\Association\BelongsTo $Languages
  * @property \App\Model\Table\StudentsTable|\Cake\ORM\Association\BelongsTo $Students
- * @property |\Cake\ORM\Association\BelongsTo $ThesisTopicStatuses
+ * @property \App\Model\Table\ThesisTopicStatusesTable|\Cake\ORM\Association\BelongsTo $ThesisTopicStatuses
+ * @property |\Cake\ORM\Association\HasMany $Consultations
  * @property \App\Model\Table\FailedTopicSuggestionsTable|\Cake\ORM\Association\HasMany $FailedTopicSuggestions
- * @property \App\Model\Table\ThesesTable|\Cake\ORM\Association\HasMany $Theses
+ * @property |\Cake\ORM\Association\HasMany $Reviews
  *
  * @method \App\Model\Entity\ThesisTopic get($primaryKey, $options = [])
  * @method \App\Model\Entity\ThesisTopic newEntity($data = null, array $options = [])
@@ -68,10 +69,13 @@ class ThesisTopicsTable extends Table
         $this->belongsTo('ThesisTopicStatuses', [
             'foreignKey' => 'thesis_topic_status_id'
         ]);
+        $this->hasMany('Consultations', [
+            'foreignKey' => 'thesis_topic_id'
+        ]);
         $this->hasMany('FailedTopicSuggestions', [
             'foreignKey' => 'thesis_topic_id'
         ]);
-        $this->hasMany('Theses', [
+        $this->hasMany('Reviews', [
             'foreignKey' => 'thesis_topic_id'
         ]);
     }
@@ -100,18 +104,6 @@ class ThesisTopicsTable extends Table
         $validator
             ->scalar('cause_of_no_external_consultant')
             ->allowEmpty('cause_of_no_external_consultant');
-
-        $validator
-            ->boolean('accepted_by_internal_consultant')
-            ->allowEmpty('accepted_by_internal_consultant');
-
-        $validator
-            ->boolean('accepted_by_head_of_department')
-            ->allowEmpty('accepted_by_head_of_department');
-
-        $validator
-            ->boolean('accepted_by_external_consultant')
-            ->allowEmpty('accepted_by_external_consultant');
 
         $validator
             ->boolean('modifiable')
@@ -170,6 +162,27 @@ class ThesisTopicsTable extends Table
         $validator
             ->boolean('first_thesis_subject_completed')
             ->allowEmpty('first_thesis_subject_completed');
+
+        $validator
+            ->scalar('thesis_pdf')
+            ->maxLength('thesis_pdf', 255)
+            ->allowEmpty('thesis_pdf');
+
+        $validator
+            ->scalar('thesis_supplements')
+            ->maxLength('thesis_supplements', 255)
+            ->allowEmpty('thesis_supplements');
+
+        $validator
+            ->allowEmpty('internal_consultant_grade');
+
+        $validator
+            ->boolean('thesis_handed_in')
+            ->allowEmpty('thesis_handed_in');
+
+        $validator
+            ->boolean('thesis_accepted')
+            ->allowEmpty('thesis_accepted');
 
         return $validator;
     }

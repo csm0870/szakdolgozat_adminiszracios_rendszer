@@ -1,5 +1,5 @@
 <?php
-namespace App\Controller;
+namespace App\Controller\InternalConsultant;
 
 use App\Controller\AppController;
 
@@ -18,13 +18,21 @@ class ConsultationsController extends AppController
      *
      * @return \Cake\Http\Response|void
      */
-    public function index()
-    {
-        $this->paginate = [
-            'contain' => ['ThesisTopics']
-        ];
-        $consultations = $this->paginate($this->Consultations);
-
+    public function index($thesis_topic_id = null){
+        $this->loadModel('Users');
+        $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
+        
+        $thesisTopic = $this->Consultations->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id, 'internal_consultant_id' => $user->has('internal_consultant') ? $user->internal_consultant->id : '',
+                                                                          'thesis_topic_status_id' => 8], //Belső konzulenshez tartozik és elfogadott
+                                                                          ])->first();
+        
+        if(empty($thesisTopic)){
+            $this->Flash->error(__('A téma konzultációi nem elérhetők. Vagy nem létezik a téma, vagy nem Ön a belső konzulense.'));
+            return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);
+        }
+        
+        $consultations = $this->Consultations->find('all', ['conditions' => ['thesis_topic_id' => $thesisTopic->id], 'order' => ['created' => 'DESC']]);
+        
         $this->set(compact('consultations'));
     }
 
@@ -38,7 +46,7 @@ class ConsultationsController extends AppController
     public function view($id = null)
     {
         $consultation = $this->Consultations->get($id, [
-            'contain' => ['ThesisTopics', 'ConsultationOccasions']
+            'contain' => ['Theses', 'ConsultationOccasions']
         ]);
 
         $this->set('consultation', $consultation);
@@ -61,8 +69,8 @@ class ConsultationsController extends AppController
             }
             $this->Flash->error(__('The consultation could not be saved. Please, try again.'));
         }
-        $thesisTopics = $this->Consultations->ThesisTopics->find('list', ['limit' => 200]);
-        $this->set(compact('consultation', 'thesisTopics'));
+        $theses = $this->Consultations->Theses->find('list', ['limit' => 200]);
+        $this->set(compact('consultation', 'theses'));
     }
 
     /**
@@ -86,8 +94,8 @@ class ConsultationsController extends AppController
             }
             $this->Flash->error(__('The consultation could not be saved. Please, try again.'));
         }
-        $thesisTopics = $this->Consultations->ThesisTopics->find('list', ['limit' => 200]);
-        $this->set(compact('consultation', 'thesisTopics'));
+        $theses = $this->Consultations->Theses->find('list', ['limit' => 200]);
+        $this->set(compact('consultation', 'theses'));
     }
 
     /**

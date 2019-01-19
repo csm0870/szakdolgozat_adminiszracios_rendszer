@@ -199,3 +199,4 @@ Type::build('timestamp')
 //Inflector::rules('transliteration', ['/å/' => 'aa']);
 
 Plugin::load('CakePdf', ['bootstrap' => true]);
+Plugin::load('CsvView', ['routes' => true]);

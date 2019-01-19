@@ -10,9 +10,6 @@ use Cake\ORM\Entity;
  * @property string|null $title
  * @property string|null $description
  * @property string|null $cause_of_no_external_consultant
- * @property bool|null $accepted_by_internal_consultant
- * @property bool|null $accepted_by_head_of_department
- * @property bool|null $accepted_by_external_consultant
  * @property bool|null $modifiable
  * @property bool|null $deleted
  * @property bool|null $is_thesis
@@ -30,6 +27,11 @@ use Cake\ORM\Entity;
  * @property int|null $internal_consultant_id
  * @property int|null $language_id
  * @property bool|null $first_thesis_subject_completed
+ * @property string|null $thesis_pdf
+ * @property string|null $thesis_supplements
+ * @property int|null $internal_consultant_grade
+ * @property bool|null $thesis_handed_in
+ * @property bool|null $thesis_accepted
  * @property int|null $student_id
  * @property \Cake\I18n\FrozenTime|null $created
  * @property \Cake\I18n\FrozenTime|null $modified
@@ -40,6 +42,7 @@ use Cake\ORM\Entity;
  * @property \App\Model\Entity\InternalConsultant $internal_consultant
  * @property \App\Model\Entity\Language $language
  * @property \App\Model\Entity\Student $student
+ * @property \App\Model\Entity\ThesisTopicStatus $thesis_topic_status
  * @property \App\Model\Entity\FailedTopicSuggestion[] $failed_topic_suggestions
  * @property \App\Model\Entity\Thesis[] $theses
  */
@@ -59,9 +62,6 @@ class ThesisTopic extends Entity
         'title' => true,
         'description' => true,
         'cause_of_no_external_consultant' => true,
-        'accepted_by_internal_consultant' => true,
-        'accepted_by_head_of_department' => true,
-        'accepted_by_external_consultant' => true,
         'modifiable' => true,
         'deleted' => true,
         'is_thesis' => true,
@@ -79,6 +79,11 @@ class ThesisTopic extends Entity
         'internal_consultant_id' => true,
         'language_id' => true,
         'first_thesis_subject_completed' => true,
+        'thesis_pdf' => true,
+        'thesis_supplements' => true,
+        'internal_consultant_grade' => true,
+        'thesis_handed_in' => true,
+        'thesis_accepted' => true,
         'student_id' => true,
         'created' => true,
         'modified' => true,
@@ -86,9 +91,9 @@ class ThesisTopic extends Entity
         'starting_year' => true,
         'expected_ending_year' => true,
         'internal_consultant' => true,
-        'thesis_topic_status' => true,
         'language' => true,
         'student' => true,
+        'thesis_topic_status' => true,
         'failed_topic_suggestions' => true,
         'theses' => true
     ];

@@ -9,7 +9,7 @@ use Cake\Validation\Validator;
 /**
  * Consultations Model
  *
- * @property \App\Model\Table\ThesesTable|\Cake\ORM\Association\BelongsTo $Theses
+ * @property \App\Model\Table\ThesisTopicsTable|\Cake\ORM\Association\BelongsTo $ThesisTopics
  * @property \App\Model\Table\ConsultationOccasionsTable|\Cake\ORM\Association\HasMany $ConsultationOccasions
  *
  * @method \App\Model\Entity\Consultation get($primaryKey, $options = [])
@@ -20,6 +20,8 @@ use Cake\Validation\Validator;
  * @method \App\Model\Entity\Consultation patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
  * @method \App\Model\Entity\Consultation[] patchEntities($entities, array $data, array $options = [])
  * @method \App\Model\Entity\Consultation findOrCreate($search, callable $callback = null, $options = [])
+ *
+ * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
 class ConsultationsTable extends Table
 {
@@ -38,8 +40,10 @@ class ConsultationsTable extends Table
         $this->setDisplayField('id');
         $this->setPrimaryKey('id');
 
-        $this->belongsTo('Theses', [
-            'foreignKey' => 'thesis_id'
+        $this->addBehavior('Timestamp');
+
+        $this->belongsTo('ThesisTopics', [
+            'foreignKey' => 'thesis_topic_id'
         ]);
         $this->hasMany('ConsultationOccasions', [
             'foreignKey' => 'consultation_id'
@@ -74,7 +78,7 @@ class ConsultationsTable extends Table
      */
     public function buildRules(RulesChecker $rules)
     {
-        $rules->add($rules->existsIn(['thesis_id'], 'Theses'));
+        $rules->add($rules->existsIn(['thesis_topic_id'], 'ThesisTopics'));
 
         return $rules;
     }

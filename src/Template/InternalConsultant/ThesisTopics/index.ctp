@@ -5,7 +5,7 @@
         </div>
         <?= $this->Flash->render() ?>
         <div class="col-12">
-            <div class="row thesisTopic-list-container">
+            <div class="row thesisTopics-index-body">
                     <div class="col-12">
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover topics-table">
@@ -17,7 +17,7 @@
                                 </tr>
                                 <?php foreach($thesisTopics as $thesisTopic){ ?>
                                     <tr>
-                                        <td><?= h($thesisTopic->title) ?></td>
+                                        <td><?= h($thesisTopic->title) . ($thesisTopic->thesis_topic_status_id == 8 ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '') ?></td>
                                         <td><?= $thesisTopic->has('student') ? (h($thesisTopic->student->name) . (empty($thesisTopic->student->neptun) ? '' : ('<br/>(' . h($thesisTopic->student->neptun) . ')'))) : '' ?></td>
                                         <td>
                                             <?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '' ?>

@@ -15,8 +15,11 @@
                 <li class="nav-item" id="set_encryption_requlation_menu_item">
                     <a class="nav-link" href="<?= $this->Url->build(['controller' => 'Information', 'action' => 'setEncryptionRequlation']) ?>"><?= __('Titoktartási kérelem szabályzata') ?></a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" id="thesis_topic_statistics">
                     <a class="nav-link" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'statistics']) ?>"><?= __('Téma kimutatások') ?></a>
+                </li>
+                <li class="nav-item" id="thesis_topic_exports">
+                    <a class="nav-link" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'exports']) ?>"><?= __('Téma adatok exportálása') ?></a>
                 </li>
             </ul>
         </div>

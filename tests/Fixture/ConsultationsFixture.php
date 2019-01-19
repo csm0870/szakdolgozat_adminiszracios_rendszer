@@ -17,15 +17,16 @@ class ConsultationsFixture extends TestFixture
      */
     // @codingStandardsIgnoreStart
     public $fields = [
-        'id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
+        'id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => false, 'default' => null, 'comment' => '', 'autoIncrement' => true, 'precision' => null],
         'accepted' => ['type' => 'boolean', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
-        'thesis_id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
+        'thesis_topic_id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
+        'created' => ['type' => 'datetime', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
         '_indexes' => [
-            'FK_consultations_theses_idx' => ['type' => 'index', 'columns' => ['thesis_id'], 'length' => []],
+            'FK_consultations_thesis_topics_idx' => ['type' => 'index', 'columns' => ['thesis_topic_id'], 'length' => []],
         ],
         '_constraints' => [
             'primary' => ['type' => 'primary', 'columns' => ['id'], 'length' => []],
-            'FK_consultations_theses' => ['type' => 'foreign', 'columns' => ['thesis_id'], 'references' => ['theses', 'id'], 'update' => 'cascade', 'delete' => 'cascade', 'length' => []],
+            'FK_consultations_thesis_topics' => ['type' => 'foreign', 'columns' => ['thesis_topic_id'], 'references' => ['thesis_topics', 'id'], 'update' => 'cascade', 'delete' => 'cascade', 'length' => []],
         ],
         '_options' => [
             'engine' => 'InnoDB',
@@ -45,7 +46,8 @@ class ConsultationsFixture extends TestFixture
             [
                 'id' => 1,
                 'accepted' => 1,
-                'thesis_id' => 1
+                'thesis_topic_id' => 1,
+                'created' => '2019-01-19 16:45:28'
             ],
         ];
         parent::init();
