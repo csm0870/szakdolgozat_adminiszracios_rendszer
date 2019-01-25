@@ -17,17 +17,20 @@
                                 </tr>
                                 <?php foreach($thesisTopics as $thesisTopic){ ?>
                                     <tr>
-                                        <td><?= h($thesisTopic->title) . ($thesisTopic->thesis_topic_status_id == 8 ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '') ?></td>
+                                        <td><?= h($thesisTopic->title) . (in_array($thesisTopic->thesis_topic_status_id, [8, 9]) ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '') ?></td>
                                         <td><?= $thesisTopic->has('student') ? (h($thesisTopic->student->name) . (empty($thesisTopic->student->neptun) ? '' : ('<br/>(' . h($thesisTopic->student->neptun) . ')'))) : '' ?></td>
                                         <td>
                                             <?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '' ?>
                                         </td>
                                         <td class="text-center">
                                             <?php
-                                                echo $this->Html->link(__('PDF'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info btn-pdf', 'target' => '_blank']);
+                                                echo $this->Html->link(__('PDF'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info btn-pdf border-radius-45px', 'target' => '_blank']);
                                                 
                                                 //Akkor törölheti, ha már nincs bírálati folyamatban
-                                                if(in_array($thesisTopic->thesis_topic_status_id, [3, 5, 7, 8])) echo $this->Form->postLink(__('Törlés'), ['action' => 'deleteByInternalConsultant', $thesisTopic->id], ['confirm' => __('Biztosan törlöd?'), 'class' => 'btn btn-danger btn-delete']);
+                                                if(in_array($thesisTopic->thesis_topic_status_id, [3, 5, 7, 8])){
+                                                    echo $this->Html->link('<i class="fas fa-trash fa-lg"></i>', '#', ['escape' => false, 'title' => __('Törlés'), 'style' => 'color: red', 'class' => 'deleteBtn', 'data-id' => $thesisTopic->id]);
+                                                    echo $this->Form->postLink('', ['action' => 'delete', $thesisTopic->id], ['style' => 'display: none', 'id' => 'deleteThesisTopic_' . $thesisTopic->id]);
+                                                }
                                                 
                                                 //Belső konzulensi döntésre vár
                                                 if($thesisTopic->thesis_topic_status_id == 2){
@@ -57,5 +60,25 @@
 <script>
     $(function(){
         $('#thesis_topic_index_menu_item').addClass('active');
+        
+        //Törléskor confirmation modal a megerősítésre
+        $('.internalConsultant-thesisTopics-index .deleteBtn').on('click', function(e){
+            e.preventDefault();
+            
+            $('#confirmationModal .header').text('<?= __('Biztosan törlöd?') ?>');
+            $('#confirmationModal .msg').text('<?= __('Téma törlése.') ?>');
+            $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Törlés') ?>').css('background-color', 'red');
+            //Save gomb eventjeinek resetelése cserével
+            $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
+                        
+            $('#confirmationModal').modal('show');
+            
+            var id = $(this).data('id');
+            $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
+                e.preventDefault();
+                $('#confirmationModal').modal('hide');
+                $('#deleteThesisTopic_' + id).trigger('click');
+            });
+        });
     });
 </script>

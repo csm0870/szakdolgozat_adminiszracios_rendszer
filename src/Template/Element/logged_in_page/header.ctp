@@ -7,7 +7,7 @@
         <span class="title"><?= __('Szakdolgozat adminisztrációs rendszer') ?></span>
     </div>
     <div class="logout-container">
-        <?= $this->Html->link('<i class="fas fa-sign-out-alt fa-3x"></i>', ['controller' => 'Users', 'action' => 'logout', 'prefix' => false], ['escape' => false, 'confirm' => __('Biztosan kijelentkezel?')]) ?>
+        <?= $this->Html->link('<i class="fas fa-sign-out-alt fa-3x"></i>', '#', ['escape' => false, 'class' => 'logoutBtn']) ?>
     </div>
 </div>
 <script>
@@ -15,6 +15,26 @@
         $('.header .title').on('click', function(){
             location.href = '<?= $this->Url->build('/', true) ?>';
         });
+
+       /**
+        * Kijelentkezés popup
+        */
+       $('.logout-container .logoutBtn').on('click', function(e){
+           e.preventDefault();
+
+           $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan kijelentkezel?') ?>');
+           $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Igen') ?>').css('background-color', '#71D0BD');
+           //Save gomb eventjeinek resetelése cserével
+           $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
+           $('#confirmationModal .msg').text('<?= __('Kijelentkezés megerősítése.') ?>');
+
+           $('#confirmationModal').modal('show');
+
+           $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
+               e.preventDefault();
+               location.href = '<?= $this->Url->build(['controller' => 'Users', 'action' => 'logout', 'prefix' => false]) ?>';
+           });
+       });
     });
 </script>
 

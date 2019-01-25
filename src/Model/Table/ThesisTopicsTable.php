@@ -15,9 +15,8 @@ use Cake\Validation\Validator;
  * @property \App\Model\Table\LanguagesTable|\Cake\ORM\Association\BelongsTo $Languages
  * @property \App\Model\Table\StudentsTable|\Cake\ORM\Association\BelongsTo $Students
  * @property \App\Model\Table\ThesisTopicStatusesTable|\Cake\ORM\Association\BelongsTo $ThesisTopicStatuses
- * @property |\Cake\ORM\Association\HasMany $Consultations
- * @property \App\Model\Table\FailedTopicSuggestionsTable|\Cake\ORM\Association\HasMany $FailedTopicSuggestions
- * @property |\Cake\ORM\Association\HasMany $Reviews
+ * @property \App\Model\Table\ConsultationsTable|\Cake\ORM\Association\HasMany $Consultations
+ * @property \App\Model\Table\ReviewsTable|\Cake\ORM\Association\HasMany $Reviews
  *
  * @method \App\Model\Entity\ThesisTopic get($primaryKey, $options = [])
  * @method \App\Model\Entity\ThesisTopic newEntity($data = null, array $options = [])
@@ -70,9 +69,6 @@ class ThesisTopicsTable extends Table
             'foreignKey' => 'thesis_topic_status_id'
         ]);
         $this->hasMany('Consultations', [
-            'foreignKey' => 'thesis_topic_id'
-        ]);
-        $this->hasMany('FailedTopicSuggestions', [
             'foreignKey' => 'thesis_topic_id'
         ]);
         $this->hasMany('Reviews', [
@@ -160,8 +156,12 @@ class ThesisTopicsTable extends Table
             ->allowEmpty('external_consultant_address');
 
         $validator
-            ->boolean('first_thesis_subject_completed')
+            ->boolean('first_thesis_subject_completed', __('Az "első diplomakurzus teljesítése" értéke 0 vagy 1 lehet.'))
             ->allowEmpty('first_thesis_subject_completed');
+
+        $validator
+            ->scalar('first_thesis_subject_failed_suggestion')
+            ->allowEmpty('first_thesis_subject_failed_suggestion');
 
         $validator
             ->scalar('thesis_pdf')

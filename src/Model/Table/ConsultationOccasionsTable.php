@@ -19,6 +19,8 @@ use Cake\Validation\Validator;
  * @method \App\Model\Entity\ConsultationOccasion patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
  * @method \App\Model\Entity\ConsultationOccasion[] patchEntities($entities, array $data, array $options = [])
  * @method \App\Model\Entity\ConsultationOccasion findOrCreate($search, callable $callback = null, $options = [])
+ *
+ * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
 class ConsultationOccasionsTable extends Table
 {
@@ -36,6 +38,8 @@ class ConsultationOccasionsTable extends Table
         $this->setTable('consultation_occasions');
         $this->setDisplayField('id');
         $this->setPrimaryKey('id');
+
+        $this->addBehavior('Timestamp');
 
         $this->belongsTo('Consultations', [
             'foreignKey' => 'consultation_id'

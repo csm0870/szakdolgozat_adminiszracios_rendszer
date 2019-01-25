@@ -38,15 +38,16 @@ class ThesisTopicsFixture extends TestFixture
         'internal_consultant_id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         'language_id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         'first_thesis_subject_completed' => ['type' => 'boolean', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
+        'first_thesis_subject_failed_suggestion' => ['type' => 'text', 'length' => null, 'null' => true, 'default' => null, 'collate' => 'utf8_general_ci', 'comment' => '', 'precision' => null],
         'thesis_pdf' => ['type' => 'string', 'length' => 255, 'null' => true, 'default' => null, 'collate' => 'utf8_general_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
         'thesis_supplements' => ['type' => 'string', 'length' => 255, 'null' => true, 'default' => null, 'collate' => 'utf8_general_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
         'internal_consultant_grade' => ['type' => 'tinyinteger', 'length' => 4, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
         'thesis_handed_in' => ['type' => 'boolean', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
         'thesis_accepted' => ['type' => 'boolean', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
         'student_id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
+        'thesis_topic_status_id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         'created' => ['type' => 'datetime', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
         'modified' => ['type' => 'datetime', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
-        'thesis_topic_status_id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         '_indexes' => [
             'FK_degree_thesis_data_internal_constultants_idx' => ['type' => 'index', 'columns' => ['internal_consultant_id'], 'length' => []],
             'FK_thesis_topics_years_idx' => ['type' => 'index', 'columns' => ['starting_year_id'], 'length' => []],
@@ -101,15 +102,16 @@ class ThesisTopicsFixture extends TestFixture
                 'internal_consultant_id' => 1,
                 'language_id' => 1,
                 'first_thesis_subject_completed' => 1,
+                'first_thesis_subject_failed_suggestion' => 'Lorem ipsum dolor sit amet, aliquet feugiat. Convallis morbi fringilla gravida, phasellus feugiat dapibus velit nunc, pulvinar eget sollicitudin venenatis cum nullam, vivamus ut a sed, mollitia lectus. Nulla vestibulum massa neque ut et, id hendrerit sit, feugiat in taciti enim proin nibh, tempor dignissim, rhoncus duis vestibulum nunc mattis convallis.',
                 'thesis_pdf' => 'Lorem ipsum dolor sit amet',
                 'thesis_supplements' => 'Lorem ipsum dolor sit amet',
                 'internal_consultant_grade' => 1,
                 'thesis_handed_in' => 1,
                 'thesis_accepted' => 1,
                 'student_id' => 1,
-                'created' => '2019-01-19 16:31:26',
-                'modified' => '2019-01-19 16:31:26',
-                'thesis_topic_status_id' => 1
+                'thesis_topic_status_id' => 1,
+                'created' => '2019-01-24 19:03:03',
+                'modified' => '2019-01-24 19:03:03'
             ],
         ];
         parent::init();

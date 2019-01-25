@@ -1,0 +1,49 @@
+.error-modal{
+    text-align: center;
+    padding: 0;
+    background-color: transparent;
+}
+
+.error-modal .error-modal-header{
+    color: white;
+    border-radius: 18px 18px 0 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 30px 0;
+    background-color: #383838;
+}
+
+.error-modal .error-modal-body{
+    padding: 30px 20px 0 20px;
+    background-color: white;
+}
+
+.error-modal .error-modal-body .error-msg{
+    color: #6c757d;
+}
+/*
+.error-modal .error-modal-body .error-code{
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+    color: black;
+    padding: 25px 0;
+    font-weight: bold;
+    margin-top: 50px;
+}*/
+
+.error-modal .error-modal-footer{
+    background-color: white;
+    padding: 30px 0;
+    border-radius: 0 0 18px 18px;
+}
+
+.error-modal .error-modal-footer .closeBtn{
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 45px;
+    padding: 5px 50px;
+    color: white;
+    background-color:  #71D0BD;
+    border: none;
+    cursor: pointer;
+}

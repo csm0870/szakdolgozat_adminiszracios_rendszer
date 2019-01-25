@@ -10,6 +10,7 @@ use Cake\ORM\Entity;
  * @property \Cake\I18n\FrozenDate|null $date
  * @property string|null $activity
  * @property int|null $consultation_id
+ * @property \Cake\I18n\FrozenTime|null $created
  *
  * @property \App\Model\Entity\Consultation $consultation
  */
@@ -29,6 +30,7 @@ class ConsultationOccasion extends Entity
         'date' => true,
         'activity' => true,
         'consultation_id' => true,
+        'created' => true,
         'consultation' => true
     ];
 }

@@ -24,7 +24,9 @@
     $(function(){
         $('#set_topic_filling_in_period_menu_item').addClass('active');
         $('.datepicker').datepicker({
-                dateFormat: 'yy-mm-dd'
-            });;
+            dateFormat: 'yy-mm-dd'
+        }).on('changeDate', function(e){
+            $(this).datepicker('hide');
+        });
     });
 </script>

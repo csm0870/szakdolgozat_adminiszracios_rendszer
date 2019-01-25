@@ -27,15 +27,16 @@ use Cake\ORM\Entity;
  * @property int|null $internal_consultant_id
  * @property int|null $language_id
  * @property bool|null $first_thesis_subject_completed
+ * @property string|null $first_thesis_subject_failed_suggestion
  * @property string|null $thesis_pdf
  * @property string|null $thesis_supplements
  * @property int|null $internal_consultant_grade
  * @property bool|null $thesis_handed_in
  * @property bool|null $thesis_accepted
  * @property int|null $student_id
+ * @property int|null $thesis_topic_status_id
  * @property \Cake\I18n\FrozenTime|null $created
  * @property \Cake\I18n\FrozenTime|null $modified
- * @property int|null $thesis_topic_status_id
  *
  * @property \App\Model\Entity\Year $starting_year
  * @property \App\Model\Entity\Year $expected_ending_year
@@ -43,8 +44,8 @@ use Cake\ORM\Entity;
  * @property \App\Model\Entity\Language $language
  * @property \App\Model\Entity\Student $student
  * @property \App\Model\Entity\ThesisTopicStatus $thesis_topic_status
- * @property \App\Model\Entity\FailedTopicSuggestion[] $failed_topic_suggestions
- * @property \App\Model\Entity\Thesis[] $theses
+ * @property \App\Model\Entity\Consultation[] $consultations
+ * @property \App\Model\Entity\Review[] $reviews
  */
 class ThesisTopic extends Entity
 {
@@ -79,22 +80,23 @@ class ThesisTopic extends Entity
         'internal_consultant_id' => true,
         'language_id' => true,
         'first_thesis_subject_completed' => true,
+        'first_thesis_subject_failed_suggestion' => true,
         'thesis_pdf' => true,
         'thesis_supplements' => true,
         'internal_consultant_grade' => true,
         'thesis_handed_in' => true,
         'thesis_accepted' => true,
         'student_id' => true,
+        'thesis_topic_status_id' => true,
         'created' => true,
         'modified' => true,
-        'thesis_topic_status_id' => true,
         'starting_year' => true,
         'expected_ending_year' => true,
         'internal_consultant' => true,
         'language' => true,
         'student' => true,
         'thesis_topic_status' => true,
-        'failed_topic_suggestions' => true,
-        'theses' => true
+        'consultations' => true,
+        'reviews' => true
     ];
 }

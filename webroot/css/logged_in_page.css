@@ -22,6 +22,58 @@ html, body{
     border-radius: 50%;
 }
 
+.border-radius-45px{
+    border-radius: 45px;
+}
+
+.margin-bottom-10px{
+    margin-bottom: 10px;
+}
+
+.deleteBtn{
+    padding: 5px;
+    margin: 3px;
+}
+
+.deleteBtn:hover{
+    border-bottom: 1px solid red;
+}
+
+/* Overlay */
+.overlay{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 50000;
+    background: rgba(255,255,255,0.7);
+    border-radius: 15px;
+}
+
+.overlay .spinner{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    color: #000;
+    transform: translate(-50%, -50%);
+}
+
+/* Modal */
+
+.modal{
+    padding: 0 !important;
+}
+
+.modal-content{
+    background-color: transparent;
+    border: none;
+}
+
+.modal-body{
+    padding: 0;
+}
+
 /* Header */
 
 .header{
@@ -43,7 +95,7 @@ html, body{
     opacity: 1;
 }
 
-.header .logout-container a{
+.header .logout-container .logoutBtn{
     color: red;
 }
 
@@ -150,24 +202,62 @@ html, body{
     padding-bottom: 10px;
 }
 
-/* Consultations (internal consultant) */
+/* Consultations (internal consultant) and ConsultationOccasions*/
 
-.internalConsultant-consultations-index .add-new-consultation{
+.internalConsultant-consultations-index .add-new-consultation,
+.internalConsultant-consultationOccasions-index .add-new-consultationOccasion{
     text-decoration: none;
     color: black;
     display: inline-block;
-    padding: 3px;
+    padding: 5px;
     border: 0.5px solid green;
     margin-top: 5px;
 }
 
-.internalConsultant-consultations-index .add-btn{
+.internalConsultant-consultations-index .add-btn,
+.internalConsultant-consultationOccasions-index .add-btn{
     background-color: chartreuse;
     display: inline-block;
 }
 
-.internalConsultant-consultations-index .add-btn img{
+.internalConsultant-consultations-index .add-btn img,
+.internalConsultant-consultationOccasions-index .add-btn img{
     width: 20px;
     height: 20px;
     margin: 15px;
+}
+
+/* Form modal */
+
+.form-modal{
+    background-color: transparent;
+}
+
+.form-modal .form-header{
+    background-color: #4286f4;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 20px 0;
+    border-radius: 15px 15px 0 0;
+}
+
+.form-modal .form-body{
+    background-color: white;
+    padding: 10px 8px;
+}
+
+.form-modal .form-body table{
+    width: 100%;
+}
+
+.form-modal .form-body table td.label{
+    vertical-align: top;
+    padding-right: 5px;
+}
+
+.form-modal .form-footer{
+    background-color: white;
+    padding: 15px 0;
+    border-radius: 0 0 15px 15px;
+    border-top: 1px solid #28a745;
 }
