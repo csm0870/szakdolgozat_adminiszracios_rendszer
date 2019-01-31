@@ -8,6 +8,7 @@ use Cake\ORM\Entity;
  *
  * @property int $id
  * @property bool|null $accepted
+ * @property bool|null $current
  * @property int|null $thesis_topic_id
  * @property \Cake\I18n\FrozenTime|null $created
  *
@@ -28,6 +29,7 @@ class Consultation extends Entity
      */
     protected $_accessible = [
         'accepted' => true,
+        'current' => true,
         'thesis_topic_id' => true,
         'created' => true,
         'thesis_topic' => true,

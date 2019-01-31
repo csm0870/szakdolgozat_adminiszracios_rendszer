@@ -18,9 +18,13 @@
                                 <tr>
                                     <td><?= empty($consultationOccasion->date) ? '' : $this->Time->format($consultationOccasion->date, 'yyyy-MM-dd') ?></td>
                                     <td class="text-center">
-                                        <?= $this->Html->link('<i class="fas fa-edit fa-lg"></i>', '#', ['class' => 'editBtn', 'data-id' => $consultationOccasion->id, 'escape' => false, 'title' => __('Szerkesztés')]) ?>
-                                        <?= $this->Html->link('<i class="fas fa-trash fa-lg"></i>', '#', ['escape' => false, 'title' => __('Törlés'), 'style' => 'color: red', 'class' => 'deleteBtn', 'data-id' => $consultationOccasion->id]) ?>
-                                        <?= $this->Form->postLink('', ['action' => 'delete', $consultationOccasion->id], ['style' => 'display: none', 'id' => 'deleteConsultationOccasion_' . $consultationOccasion->id]) ?>
+                                        <?php
+                                            if($consultation->accepted === null){
+                                                echo $this->Html->link('<i class="fas fa-edit fa-lg"></i>', '#', ['class' => 'iconBtn editBtn', 'data-id' => $consultationOccasion->id, 'escape' => false, 'title' => __('Szerkesztés')]);
+                                                echo $this->Html->link('<i class="fas fa-trash fa-lg"></i>', '#', ['escape' => false, 'title' => __('Törlés'), 'class' => 'iconBtn deleteBtn', 'data-id' => $consultationOccasion->id]);
+                                                echo $this->Form->postLink('', ['action' => 'delete', $consultationOccasion->id], ['style' => 'display: none', 'id' => 'deleteConsultationOccasion_' . $consultationOccasion->id]);
+                                            }
+                                        ?>
                                     </td>
                                     <td><?= empty($consultationOccasion->created) ? '' : $this->Time->format($consultationOccasion->created, 'yyyy-MM-dd HH:mm:ss') ?></td>
                                 </tr>
@@ -28,41 +32,45 @@
                         </table>
                     </div>
                 </div>
-                <div class="col-12 text-center">
-                    <?= $this->Html->link(__('Új alkalom hozzáadása') . '&nbsp;&nbsp;&nbsp;<span class="circle-btn add-btn">' . $this->Html->image('plus_icon.png') . '</span>', ['action' => 'add', $consultation->id], ['class' => 'add-new-consultationOccasion', 'escape' => false]) ?>
-                </div>
+                <?php if($consultation->accepted === null && $consultation->current === true){ //Még nincs véglegesítve a konzultációs csoport és a jelenlegi szakdolgozathoz tartozik ?>
+                    <div class="col-12 text-center">
+                        <?= $this->Html->link(__('Új alkalom hozzáadása') . '&nbsp;&nbsp;&nbsp;<span class="circle-btn add-btn">' . $this->Html->image('plus_icon.png') . '</span>', ['action' => 'add', $consultation->id], ['class' => 'add-new-consultationOccasion', 'escape' => false]) ?>
+                    </div>
+                <?php } ?>
             </div>
         </div>
     </div>
 </div>
-<!-- Konzultációs alkalom hozzáadása modal -->
-<div class="modal fade" id="consultationOccasionAddModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-body">
-                <div id="consultationOccasion-add">
+<?php if($consultation->accepted === null){ ?> <!-- Még nincs véglegesítve a konzultációs csoport -->
+    <!-- Konzultációs alkalom hozzáadása modal -->
+    <div class="modal fade" id="consultationOccasionAddModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div id="consultationOccasion-add">
 
+                    </div>
                 </div>
             </div>
-        </div>
-  </div>
-</div>
-<!-- Konzultációs alkalom szerkesztése modal -->
-<div class="modal fade" id="consultationOccasionEditModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-body">
-                <div id="consultationOccasion-edit">
+      </div>
+    </div>
+    <!-- Konzultációs alkalom szerkesztése modal -->
+    <div class="modal fade" id="consultationOccasionEditModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div id="consultationOccasion-edit">
 
+                    </div>
                 </div>
             </div>
-        </div>
-  </div>
-</div>
+      </div>
+    </div>
+<?php } ?>
 <script>
     $(function(){
         $('#thesis_topic_index_menu_item').addClass('active');
-        
+        <?php if($consultation->accepted === null && $consultation->current === true){ //Még nincs véglegesítve a konzultációs csoport és a jelenlegi szakdolgozathoz tartozik ?>
         //Tartalom lekeérése a hozzáadáshoz
         $.ajax({
                 url: '<?= $this->Url->build(['controller' => 'ConsultationOccasions', 'action' => 'add', $consultation->id]) ?>',
@@ -115,5 +123,6 @@
                 $('#deleteConsultationOccasion_' + id).trigger('click');
             });
         });
+        <?php } ?>
     });
 </script>

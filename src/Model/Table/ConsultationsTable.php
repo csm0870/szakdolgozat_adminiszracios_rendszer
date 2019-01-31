@@ -63,8 +63,12 @@ class ConsultationsTable extends Table
             ->allowEmpty('id', 'create');
 
         $validator
-            ->boolean('accepted')
+            ->boolean('accepted', __('A megfelelésnek "0"(nem felelt meg) vagy "1"(megfelelt) értéket kell felvennie!'))
             ->allowEmpty('accepted');
+
+        $validator
+            ->boolean('current')
+            ->allowEmpty('current');
 
         return $validator;
     }
@@ -81,5 +85,11 @@ class ConsultationsTable extends Table
         $rules->add($rules->existsIn(['thesis_topic_id'], 'ThesisTopics'));
 
         return $rules;
+    }
+    
+    public function beforeSave($event, $entity, $options)
+    {
+        if($entity->isNew() && !empty($entity->current)) $entity->current = true;
+        return true;
     }
 }
