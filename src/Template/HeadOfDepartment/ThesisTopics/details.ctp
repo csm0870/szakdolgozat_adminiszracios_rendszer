@@ -1,4 +1,4 @@
-<div class="container internalConsultant-thesisTopics-details">
+<div class="container headOfDepartment-thesisTopics-details">
     <div class="row">
         <div class="col-12 text-center page-title">
             <h4><?= __('Téma kezelése') ?></h4>
@@ -6,12 +6,15 @@
         <?= $this->Flash->render() ?>
         <div class="col-12">
             <div class="row thesisTopics-details-body">
-                <div class="col-12 col-md-6">
+                <div class="col-12">
                     <p>
                         <strong><?= __('Hallgató neve') . ': ' ?></strong><?= $thesisTopic->has('student') ? h($thesisTopic->student->name) : ''?>
                     </p>
                     <p>
                         <strong><?= __('Neptun kód') . ': ' ?></strong><?= $thesisTopic->has('student') ? h($thesisTopic->student->neptun) : ''?>
+                    </p>
+                    <p>
+                        <strong><?= __('Belső konzulens') . ': ' ?></strong><?= $thesisTopic->has('internal_consultant') ? h($thesisTopic->internal_consultant->name) : '' ?>
                     </p>
                     <p>
                         <strong><?= __('Szak') . ': ' ?></strong><?= $thesisTopic->has('student') ? ($thesisTopic->student->has('course') ? h($thesisTopic->student->course->name) : '') : ''?>
@@ -25,23 +28,25 @@
                     <p>
                         <strong><?= __('Téma címe') . ': ' ?></strong><?= h($thesisTopic->title) ?>
                     </p>
-                </div>
-                <div class="col-12 col-md-6 text-center">
-                    <?= $this->Html->link(__('Konzultációk kezelése'), ['controller' => 'Consultations', 'action' => 'index', $thesisTopic->id], ['class' => 'btn btn-secondary border-radius-45px margin-bottom-10px']) ?>
-                    <?php if($thesisTopic->thesis_topic_status_id == 8){ ?>
-                        <?= $this->Html->link(__('Diplomakurzus első félévének teljesítésének rögzítése'), '#', ['class' => 'btn btn-secondary border-radius-45px setFirstThesisSubjectCompletedBtn']) ?>
+                    <?php if($thesisTopic->thesis_topic_status_id == 9){ ?>
+                        <p>
+                            <strong><?= __('Diplomakurzus első félévét nem teljesítette') . ': ' ?></strong>
+                            <?= $this->Html->link(__('Döntés a folytatásról'), '#', ['class' => 'decideToContinueAfterFailedFirstThesisSubjectBtn']) ?>
+                        </p>
                     <?php } ?>
                 </div>
+                <!--<div class="col-12 col-md-6 text-center">
+                </div>-->
             </div>
         </div>
     </div>
 </div>
 <!-- Diplomakurzus első félévének teljesítésének rögzítése modal -->
-<div class="modal fade" id="setFirstThesisSubjectCompletedModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<div class="modal fade" id="decideToContinueAfterFailedFirstThesisSubjectModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-body">
-                <div id="set_first_thesis_subject_completed_container">
+                <div id="decide_to_continue_after_failed_first_thesis_subject_container">
 
                 </div>
             </div>
@@ -54,16 +59,16 @@
         
         //Tartalom lekeérése a "diplomakurzus első félévének teljesítésének rögzítése" modalba
         $.ajax({
-            url: '<?= $this->Url->build(['action' => 'setFirstThesisSubjectCompleted', $thesisTopic->id], true) ?>',
+            url: '<?= $this->Url->build(['action' => 'decideToContinueAfterFailedFirstThesisSubject', $thesisTopic->id], true) ?>',
             cache: false
         })
         .done(function( response ) {
-            $('#set_first_thesis_subject_completed_container').html(response.content);
+            $('#decide_to_continue_after_failed_first_thesis_subject_container').html(response.content);
         });
         
-        $('.internalConsultant-thesisTopics-details .setFirstThesisSubjectCompletedBtn').on('click', function(e){
+        $('.headOfDepartment-thesisTopics-details .decideToContinueAfterFailedFirstThesisSubjectBtn').on('click', function(e){
             e.preventDefault();
-            $('#setFirstThesisSubjectCompletedModal').modal('show');
+            $('#decideToContinueAfterFailedFirstThesisSubjectModal').modal('show');
         });
     });
 </script>

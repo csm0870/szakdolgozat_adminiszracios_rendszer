@@ -19,6 +19,7 @@ class ConsultationsFixture extends TestFixture
     public $fields = [
         'id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => false, 'default' => null, 'comment' => '', 'autoIncrement' => true, 'precision' => null],
         'accepted' => ['type' => 'boolean', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
+        'current' => ['type' => 'boolean', 'length' => null, 'null' => true, 'default' => '1', 'comment' => '', 'precision' => null],
         'thesis_topic_id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         'created' => ['type' => 'datetime', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
         '_indexes' => [
@@ -46,8 +47,9 @@ class ConsultationsFixture extends TestFixture
             [
                 'id' => 1,
                 'accepted' => 1,
+                'current' => 1,
                 'thesis_topic_id' => 1,
-                'created' => '2019-01-19 16:45:28'
+                'created' => '2019-01-31 16:13:28'
             ],
         ];
         parent::init();

@@ -30,13 +30,27 @@ html, body{
     margin-bottom: 10px;
 }
 
-.deleteBtn{
+.iconBtn{
     padding: 5px;
     margin: 3px;
 }
 
+.deleteBtn{
+    color: red;
+}
+
 .deleteBtn:hover{
     border-bottom: 1px solid red;
+    color: red;
+}
+
+.editBtn{
+    color: blue;
+}
+
+.editBtn:hover{
+    border-bottom: 1px solid blue;
+    color: blue;
 }
 
 /* Overlay */
@@ -204,6 +218,15 @@ html, body{
 
 /* Consultations (internal consultant) and ConsultationOccasions*/
 
+.internalConsultant-consultations-index .finalizeBtn{
+    color: green;
+}
+
+.internalConsultant-consultations-index .finalizeBtn:hover{
+    border-bottom: 1px solid green;
+    color: green;
+}
+
 .internalConsultant-consultations-index .add-new-consultation,
 .internalConsultant-consultationOccasions-index .add-new-consultationOccasion{
     text-decoration: none;
@@ -260,4 +283,19 @@ html, body{
     padding: 15px 0;
     border-radius: 0 0 15px 15px;
     border-top: 1px solid #28a745;
+}
+
+/*  HeadOfDepartment thesis topics details */
+
+.headOfDepartment-thesisTopics-details .decideToContinueAfterFailedFirstThesisSubjectBtn{
+    color: red;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-block;
+    border: .5px solid red;
+    padding: 2px;
+}
+
+.headOfDepartment-thesisTopics-details .decideToContinueAfterFailedFirstThesisSubjectBtn:hover{
+    text-decoration: underline;
 }

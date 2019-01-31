@@ -56,7 +56,7 @@ class ThesisTopicStatusesTable extends Table
 
         $validator
             ->scalar('name')
-            ->maxLength('name', 60)
+            ->maxLength('name', 100)
             ->allowEmpty('name');
 
         return $validator;

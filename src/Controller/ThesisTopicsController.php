@@ -239,7 +239,7 @@ class ThesisTopicsController extends AppController
         
         $table3->addRow(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.84), ['cantSplit' => false]);
         $table3->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7.78), ['valign' => 'top']);
-        $table3->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7.94), ['valign' => 'top'])->addText($thesisTopic->has('student') ? $thesisTopic->student->name : '', null, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+        $table3->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7.94), ['valign' => 'top'])->addText($thesisTopic->has('student') ? $thesisTopic->student->name : 'hallgató', null, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
         $table3->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(1.29), ['valign' => 'top']);
         
         $section->addTextBreak(2);

@@ -79,7 +79,6 @@ class ThesisTopic extends Entity
         'external_consultant_address' => true,
         'internal_consultant_id' => true,
         'language_id' => true,
-        'first_thesis_subject_completed' => true,
         'first_thesis_subject_failed_suggestion' => true,
         'thesis_pdf' => true,
         'thesis_supplements' => true,

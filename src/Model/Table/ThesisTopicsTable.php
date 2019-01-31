@@ -156,10 +156,6 @@ class ThesisTopicsTable extends Table
             ->allowEmpty('external_consultant_address');
 
         $validator
-            ->boolean('first_thesis_subject_completed', __('Az "első diplomakurzus teljesítése" értéke 0 vagy 1 lehet.'))
-            ->allowEmpty('first_thesis_subject_completed');
-
-        $validator
             ->scalar('first_thesis_subject_failed_suggestion')
             ->allowEmpty('first_thesis_subject_failed_suggestion');
 
