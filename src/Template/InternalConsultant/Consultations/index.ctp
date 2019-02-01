@@ -37,7 +37,7 @@
                                                     echo $this->Html->link('<i class="fas fa-trash fa-lg"></i>', '#', ['escape' => false, 'title' => __('Törlés'), 'class' => 'iconBtn deleteBtn', 'data-id' => $consultation->id]);
                                                 }
                                             }else
-                                                echo $this->Html->link(__('PDF'), ['controller' => 'Consultations', 'action' => 'exportPdf', $consultation->id], ['class' => 'btn btn-info border-radius-45px', 'target' => '_blank']);
+                                                echo $this->Html->link(__('PDF'), ['controller' => 'Consultations', 'action' => 'exportPdf', $consultation->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px', 'target' => '_blank']);
                                         ?>
                                         <?= $this->Form->postLink('', ['action' => 'delete', $consultation->id], ['style' => 'display: none', 'id' => 'deleteConsultation_' . $consultation->id]) ?>
                                     </td>

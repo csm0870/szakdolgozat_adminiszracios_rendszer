@@ -27,11 +27,11 @@ class StudentsController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $student = $this->Students->patchEntity($student, $this->request->getData());
             if ($this->Students->save($student)) {
-                $this->Flash->success(__('The student has been saved.'));
+                $this->Flash->success(__('Mentés sikeres.'));
 
                 return $this->redirect(['action' => 'edit', $student->id]);
             }
-            $this->Flash->error(__('The student could not be saved. Please, try again.'));
+            $this->Flash->error(__('Mentés sikertelen.'));
         }
         $courses = $this->Students->Courses->find('list');
         $courseLevels = $this->Students->CourseLevels->find('list');

@@ -138,10 +138,10 @@ class UsersController extends AppController
     }
     
     public function logout() {
-		$logout_redirect = $this->Auth->logout();
-		$this->getRequest()->getSession()->destroy();
-                $this->Flash->success(__('Sikeresen kijelentkeztél.'));
-		return $this->redirect($logout_redirect);
+        $logout_redirect = $this->Auth->logout();
+        $this->getRequest()->getSession()->destroy();
+        $this->Flash->success(__('Sikeresen kijelentkeztél.'));
+        return $this->redirect($logout_redirect);
     }
     
     private function _doLogin($group_id = null){

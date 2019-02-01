@@ -17,7 +17,7 @@
                                 </tr>
                                 <?php foreach($thesisTopics as $thesisTopic){ ?>
                                     <tr>
-                                        <td><?= h($thesisTopic->title) . (in_array($thesisTopic->thesis_topic_status_id, [8, 9, 10, 11]) ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '') ?></td>
+                                        <td><?= h($thesisTopic->title) . (in_array($thesisTopic->thesis_topic_status_id, [8, 9, 10, 11, 12]) ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '') ?></td>
                                         <td><?= $thesisTopic->has('student') ? (h($thesisTopic->student->name) . (empty($thesisTopic->student->neptun) ? '' : ('<br/>(' . h($thesisTopic->student->neptun) . ')'))) : '' ?></td>
                                         <td>
                                             <?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '' ?>
@@ -27,7 +27,7 @@
                                                 echo $this->Html->link(__('PDF'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info btn-pdf border-radius-45px', 'target' => '_blank']);
                                                 
                                                 //Akkor törölheti, ha már nincs bírálati folyamatban
-                                                if(in_array($thesisTopic->thesis_topic_status_id, [3, 5, 7, 8, 10, 11])){
+                                                if(in_array($thesisTopic->thesis_topic_status_id, [3, 5, 7, 8, 10, 11, 12])){
                                                     echo $this->Html->link('<i class="fas fa-trash fa-lg"></i>', '#', ['escape' => false, 'title' => __('Törlés'), 'class' => 'iconBtn deleteBtn', 'data-id' => $thesisTopic->id]);
                                                     echo $this->Form->postLink('', ['action' => 'delete', $thesisTopic->id], ['style' => 'display: none', 'id' => 'deleteThesisTopic_' . $thesisTopic->id]);
                                                 }

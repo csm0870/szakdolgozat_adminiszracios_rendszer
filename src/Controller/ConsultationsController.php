@@ -12,101 +12,93 @@ use App\Controller\AppController;
  */
 class ConsultationsController extends AppController
 {
+    public function exportPdf($id = null){
+        $consultation = $this->Consultations->find('all', ['conditions' => ['Consultations.id' => $id], 'contain' => ['ConsultationOccasions' => ['sort' => ['date' => 'ASC']]]])->first();
+                
+        $ok = true;
+        
+        $prefix = false;
+        
+        $group_id = $this->Auth->user('group_id');
+        if($group_id == 1) // Admin
+            $prefix = 'admin';
+        elseif($group_id == 2) // Belső konzulens
+            $prefix = 'internal_consultant';
+        elseif($group_id == 3) // Tanszékvezető
+            $prefix = 'head_of_department';
+        elseif($group_id == 4) // Témakezelő
+            $prefix = 'topic_manager';
+        elseif($group_id == 5) // Szakdolgozatkezelő
+            $prefix = 'thesis_manager';
+        elseif($group_id == 6) // Hallgató
+            $prefix = 'student';
+        
+        if(empty($consultation)){ //Konzultációs csoport
+            $this->Flash->error(__('Nem exportálható PDF-be.') . ' ' . __('Konzultációs csoport nem létezik.'));
+            $ok = false;
+        }elseif($consultation->accepted === null){
+            $this->Flash->error(__('Nem exportálható PDF-be.') . ' ' . __('Konzultációs csoport még nem véglegesített.'));
+            $ok = false;
+        }elseif(count($consultation->consultation_occasions) <= 0){
+            $this->Flash->error(__('Nem exportálható PDF-be.') . ' ' . __('A konzultációs csoporthoz nincs egy alkalom sem hozzárendelve.'));
+            $ok = false;
+        }
+        
+        if($prefix == false) $this->Flash->error(__('Ismeretlen felhasználótípus. Ki lettél jelentkeztetve.'));
+        
+        if(!$ok) return $this->redirect($prefix === false ? ['controller' => 'Users', 'action' => 'logout'] : ['controller' => 'ThesisTopics', 'action' => 'index', 'prefix' => $prefix]);
+        
+        $thesisTopic = $this->Consultations->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $consultation->thesis_topic_id], 'contain' => ['ThesisTopicStatuses']])->first();
 
-    /**
-     * Index method
-     *
-     * @return \Cake\Http\Response|void
-     */
-    public function index()
-    {
-        $this->paginate = [
-            'contain' => ['ThesisTopics']
-        ];
-        $consultations = $this->paginate($this->Consultations);
+        if($this->Auth->user('group_id') == 2){ //Belső konzulens
+            $this->loadModel('Users');
+            $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
+        }
+        
+        if(empty($thesisTopic)){ //Nem létezik a téma
+            $this->Flash->error(__('Nem exportálható PDF-be.') . ' ' . __('A téma, amelyhez tartozna, nem létezik.'));
+            $ok = false;
+        }elseif($this->Auth->user('group_id') == 2 && $thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : '')){ //Nem ehhez a belső konzulenshez tartozik
+            $this->Flash->error(__('Nem exportálható PDF-be.') . ' ' . __('A témának, amelyhez tartozik, nem Ön a belső konzulense.'));
+            $ok = false;
+        }elseif($thesisTopic->thesis_topic_status_id != 12){ //Nem "A téma nem elfogadott", nem "Diplomakurzus sikertelen, tanaszékvezető döntésére vár", nem "Első diplomakurzus teljesítve", vagy nem "Elutsítva (első diplomakurzus sikertelen)" státuszban van
+            $this->Flash->error(__('Nem exportálható PDF-be.') . ' ' . __('A téma, amelyhez tartozik,'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.');
+            $ok = false;
+        }
+        
+        if($prefix == false) $this->Flash->error(__('Ismeretlen felhasználótípus. Ki lettél jelentkeztetve.'));
+        
+        if(!$ok) return $this->redirect($prefix === false ? ['controller' => 'Users', 'action' => 'logout'] : ['controller' => 'ThesisTopics', 'action' => 'index', 'prefix' => $prefix]);
+        
+        $internalConsultant = $this->Consultations->ThesisTopics->InternalConsultants->find('all', ['conditions' => ['InternalConsultants.id' => $thesisTopic->internal_consultant_id], 'contain' => ['InternalConsultantPositions']])->first();
+        if(empty($internalConsultant)){ //Nem létezik a téma
+            $this->Flash->error(__('Nem exportálható PDF-be.') . ' ' . __('A téma, amelyhez tartozik, nincs belső konzulense.'));
+            return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index', 'prefix' => $prefix]);
+        }
+        
+        $student = $this->Consultations->ThesisTopics->Students->find('all', ['conditions' => ['Students.id' => $thesisTopic->student_id], 'contain' => ['Courses', 'CourseLevels']])->first();
+        if(empty($student)){ //Nem létezik a téma
+            $this->Flash->error(__('Nem exportálható PDF-be.') . ' ' . __('A téma, amelyhez tartozik, nem tartozik hozzá hallgató.'));
+            if($prefix == false) $this->Flash->error(__('Ismeretlen felhasználótípus. Ki lettél jelentkeztetve.'));
+            return $this->redirect($prefix === false ? ['controller' => 'Users', 'action' => 'logout'] : ['controller' => 'ThesisTopics', 'action' => 'index', 'prefix' => $prefix]);
+        
+        }
+        
+        $this->viewBuilder()->setLayout('default');
+        $this->viewBuilder()->setClassName('CakePdf.Pdf');
 
-        $this->set(compact('consultations'));
-    }
-
-    /**
-     * View method
-     *
-     * @param string|null $id Consultation id.
-     * @return \Cake\Http\Response|void
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function view($id = null)
-    {
-        $consultation = $this->Consultations->get($id, [
-            'contain' => ['ThesisTopics', 'ConsultationOccasions']
+        $this->viewBuilder()->options([
+            'pdfConfig' => [
+                'title' => "konzultacios_lap-" . date("Y-m-d-H-i-s"),
+                'margin' => [
+                    'bottom' => 12,
+                    'left' => 12,
+                    'right' => 12,
+                    'top' => 12
+                ]
+            ]
         ]);
-
-        $this->set('consultation', $consultation);
-    }
-
-    /**
-     * Add method
-     *
-     * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
-     */
-    public function add()
-    {
-        $consultation = $this->Consultations->newEntity();
-        if ($this->request->is('post')) {
-            $consultation = $this->Consultations->patchEntity($consultation, $this->request->getData());
-            if ($this->Consultations->save($consultation)) {
-                $this->Flash->success(__('The consultation has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The consultation could not be saved. Please, try again.'));
-        }
-        $thesisTopics = $this->Consultations->ThesisTopics->find('list', ['limit' => 200]);
-        $this->set(compact('consultation', 'thesisTopics'));
-    }
-
-    /**
-     * Edit method
-     *
-     * @param string|null $id Consultation id.
-     * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function edit($id = null)
-    {
-        $consultation = $this->Consultations->get($id, [
-            'contain' => []
-        ]);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $consultation = $this->Consultations->patchEntity($consultation, $this->request->getData());
-            if ($this->Consultations->save($consultation)) {
-                $this->Flash->success(__('The consultation has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The consultation could not be saved. Please, try again.'));
-        }
-        $thesisTopics = $this->Consultations->ThesisTopics->find('list', ['limit' => 200]);
-        $this->set(compact('consultation', 'thesisTopics'));
-    }
-
-    /**
-     * Delete method
-     *
-     * @param string|null $id Consultation id.
-     * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function delete($id = null)
-    {
-        $this->request->allowMethod(['post', 'delete']);
-        $consultation = $this->Consultations->get($id);
-        if ($this->Consultations->delete($consultation)) {
-            $this->Flash->success(__('The consultation has been deleted.'));
-        } else {
-            $this->Flash->error(__('The consultation could not be deleted. Please, try again.'));
-        }
-
-        return $this->redirect(['action' => 'index']);
+        
+        $this->set(compact('consultation', 'internalConsultant', 'student'));
     }
 }

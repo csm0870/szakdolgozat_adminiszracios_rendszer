@@ -45,14 +45,18 @@ class ThesisTopicsController extends AppController
                 return $this->redirect(['action' => 'index']);
             }
 
-            $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['id' => $thesisTopic_id, 'modifiable' => false,
-                                                                              'thesis_topic_status_id' => 4 //Tanszékvezetői döntésre vár
-                                                                              ]])->first();
-
+            $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['id' => $thesisTopic_id]])->first();
+            
+            $ok = true;
             if(empty($thesisTopic)){
-                $this->Flash->error(__('Ezt a témát nem fogadhatja el. Már vagy döntést hozott, vagy nem Önhöz tartozik, vagy még nem véglegesített, vagy már el lett utasítva a téma!'));
-                return $this->redirect(['action' => 'index']);
+                $this->Flash->error(__('Erről a témáról nem dönthet.') . ' ' . __('A téma nem létezik.'));
+                $ok = false;
+            }elseif($thesisTopic->thesis_topic_id != 4){ //Nem "A téma tanszékvezetői döntésre vár" státuszban van
+                $this->Flash->error(__('Erről a témáról nem dönthet.') . ' ' . __('Nem tanszékvezetői döntésre vár.'));
+                $ok = false;
             }
+            
+            if(!$ok) return $this->redirect(['action' => 'index']);
             
             //Elutasítás vagy elfogadás esetén, ha van külső konzulens, akkor külső konzulensi ellenőrzésre vár státuszú lesz, ha nincs, akkor pedig elfogadva
             $thesisTopic->thesis_topic_status_id = $accepted == 0 ? 5 : ($thesisTopic->cause_of_no_external_consultant === null ? 8 : 6);
@@ -78,13 +82,13 @@ class ThesisTopicsController extends AppController
         $ok = true;
         
         if(empty($thesisTopic)){ //Nem létezik a téma
-            $this->Flash->error(__('A téma részletei nem elérhetők. Nem létező téma.'));
+            $this->Flash->error(__('A téma részletei nem elérhetők.') . ' ' . __('Nem létező téma.'));
             $ok = false;
         }elseif($thesisTopic->modifiable === true || $thesisTopic->thesis_topic_status_id === 1){ //Véglegesítésre vár
-            $this->Flash->error(__('A téma részletei nem elérhetők. A téma még nem véglegesített.'));
+            $this->Flash->error(__('A téma részletei nem elérhetők.') . ' ' . __('A téma még nem véglegesített.'));
             $ok = false;
         }elseif(!in_array($thesisTopic->thesis_topic_status_id, [8, 9, 10])){ //Nem elfogadott, vagy nem diplomakurzus sikertelen státuszban van
-            $this->Flash->error(__('A téma részletei nem elérhetők. A téma'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.' );
+            $this->Flash->error(__('A téma részletei nem elérhetők.') . ' ' . __('A téma'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.' );
             $ok = false;
         }
         
@@ -108,13 +112,13 @@ class ThesisTopicsController extends AppController
         $no_thesis_topic = false;
         
         if(empty($thesisTopic)){ //Nem létezik a téma
-            $error_msg = __('Nem dönthet. Nem létező téma.');
+            $error_msg = __('Nem dönthet.') . ' ' . __('Nem létező téma.');
             $no_thesis_topic = true;
         }elseif($thesisTopic->modifiable === true || $thesisTopic->thesis_topic_status_id === 1){ //Véglegesítésre vár
-            $error_msg = __('Nem dönthet. A téma még nem véglegesített.');
+            $error_msg = __('Nem dönthet.') . ' ' . __('A téma még nem véglegesített.');
             $no_thesis_topic = true;
         }elseif($thesisTopic->thesis_topic_status_id != 9){ //Nem "Első diplomakurzus sikertelen, tanszékvezető döntésére vár" státuszban van
-            $error_msg = __('Nem dönthet. A téma'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.';
+            $error_msg = __('Nem dönthet.') . ' ' . __('A téma'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.';
             $no_thesis_topic = true;
         }
         

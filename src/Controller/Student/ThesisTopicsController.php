@@ -203,7 +203,12 @@ class ThesisTopicsController extends AppController
             return $this->redirect(['controller' => 'Students', 'action' => 'edit', $data['student_id']]);
         }
 
-        $thesisTopic = $this->ThesisTopics->get($id);
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['id' => $id]])->first();
+        if(empty($thesisTopic)){
+            $this->Flash->error(__('Téma nem létezik.'));
+            return $this->redirect(['action' => 'index']);
+        }
+        
         $thesisTopic->modifiable = false;
         //Belső konzulensi döntésre vár
         $thesisTopic->thesis_topic_status_id = 2;

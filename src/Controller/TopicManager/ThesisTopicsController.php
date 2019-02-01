@@ -39,16 +39,22 @@ class ThesisTopicsController extends AppController
                 return $this->redirect(['action' => 'index']);
             }
 
-            $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['id' => $thesisTopic_id,
-                                                                              'modifiable' => false,
-                                                                              'cause_of_no_external_consultant IS' => null, //Van külső konzulens
-                                                                              'thesis_topic_status_id' => 6 //Külső konzulensi aláírás ellenőrzésre vár
-                                                                              ]])->first();
+            $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['id' => $thesisTopic_id]])->first();
 
-            if(empty($thesisTopic)){
-                $this->Flash->error(__('Ezt a témát nem fogadhatja el. Már vagy döntést hozott, vagy nem Önhöz tartozik, vagy még nem véglegesített, vagy már el lett utasítva a téma!'));
+            $ok = true;
+            
+            if(empty($thesisTopic)){ //Nem létezik a téma
+                $this->Flash->error(__('A téma elfogadásáról nem dönthet.') . ' ' . __('Nem létező téma.'));
+                $ok = false;
+            }elseif($thesisTopic->cause_of_no_external_consultant !== null){ //Nincs külső konzulens
+                $this->Flash->error(__('A téma elfogadásáról nem dönthet.') . ' ' . __('A témának nincs kölső konzulense.'));
+                $ok = false;
+            }elseif($thesisTopic->thesis_topic_status_id != 6){ //Ha bírálati folyamatban van
+                $this->Flash->error(__('A téma elfogadásáról nem dönthet.') . ' ' . __('A téma nem külső konzulensi aláírás ellenőrzsére vár.'));
                 return $this->redirect(['action' => 'index']);
             }
+            
+            if(!$ok) return $this->redirect(['action' => 'index']);
             
             //Elfogadás vagy elutasítás
             $thesisTopic->thesis_topic_status_id = $accepted == 0 ? 7 : 8;
