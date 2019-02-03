@@ -62,7 +62,7 @@
 
 .consultation-pdf .footer .signatures .signature{
     border-top: 1px solid black;
-    padding-top: 10px;
+    padding-bottom: 5px;
     width: 210px;
     display: inline-block;
 }

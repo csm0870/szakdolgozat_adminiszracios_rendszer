@@ -108,9 +108,14 @@
         <div class="signatures">
             <table>
                 <tr>
-                    <td><div class="signature">Belső konzulens</div></td>
-                    <td><div class="signature">Külső konzulens</div></td>
-                    <td><div class="signature">Tanszékvezető</div></td>
+                    <td><div class="signature"></div></td>
+                    <td><div class="signature"></div></td>
+                    <td><div class="signature"></div></td>
+                </tr>
+                <tr>
+                    <td>Belső konzulens</td>
+                    <td>Külső konzulens</td>
+                    <td>Tanszékvezető</td>
                 </tr>
             </table>
         </div>
