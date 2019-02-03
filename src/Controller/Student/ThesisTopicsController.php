@@ -147,7 +147,7 @@ class ThesisTopicsController extends AppController
 
         $thesisTopic = $this->ThesisTopics->get($id);
 
-        if(!$thesisTopic->modifiable){
+        if(!$thesisTopic->modifiable || $thesisTopic->thesis_topic_status_id != 1){
             $this->Flash->error(__('A téma nem módosítható!!'));
             return $this->redirect(['action' => 'index']);
         }

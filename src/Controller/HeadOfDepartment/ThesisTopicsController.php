@@ -51,7 +51,7 @@ class ThesisTopicsController extends AppController
             if(empty($thesisTopic)){
                 $this->Flash->error(__('Erről a témáról nem dönthet.') . ' ' . __('A téma nem létezik.'));
                 $ok = false;
-            }elseif($thesisTopic->thesis_topic_id != 4){ //Nem "A téma tanszékvezetői döntésre vár" státuszban van
+            }elseif($thesisTopic->thesis_topic_status_id != 4){ //Nem "A téma tanszékvezetői döntésre vár" státuszban van
                 $this->Flash->error(__('Erről a témáról nem dönthet.') . ' ' . __('Nem tanszékvezetői döntésre vár.'));
                 $ok = false;
             }
@@ -59,7 +59,7 @@ class ThesisTopicsController extends AppController
             if(!$ok) return $this->redirect(['action' => 'index']);
             
             //Elutasítás vagy elfogadás esetén, ha van külső konzulens, akkor külső konzulensi ellenőrzésre vár státuszú lesz, ha nincs, akkor pedig elfogadva
-            $thesisTopic->thesis_topic_status_id = $accepted == 0 ? 5 : ($thesisTopic->cause_of_no_external_consultant === null ? 8 : 6);
+            $thesisTopic->thesis_topic_status_id = $accepted == 0 ? 5 : ($thesisTopic->cause_of_no_external_consultant === null ? 6 : 8);
 
             if($this->ThesisTopics->save($thesisTopic)){
                 $this->Flash->success(__('Mentés sikeres!!'));

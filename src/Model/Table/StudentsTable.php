@@ -161,7 +161,7 @@ class StudentsTable extends Table
     /**
      * Megnézi, hogy az adott hallgató adhat-e le új témát
      * 
-     * @param type $student_id
+     * @param type $student_id Hallgató azonosítója
      * @return boolean Adhat-e hozzá témát
      */
     public function canAddTopic($student_id = null){
@@ -173,9 +173,8 @@ class StudentsTable extends Table
             
         $can_add_topic = true;
         foreach($thesisTopics as $thesisTopic){
-            
             //Ha már van elfogadási folyamatban témája, vagy van elfogadott témája, vagy van, ami véglegesítésre vár
-            if(in_array($thesisTopic->thesis_topic_status_id, [1, 2, 4, 6, 8])){
+            if(in_array($thesisTopic->thesis_topic_status_id, [1, 2, 4, 6, 8, 9, 11, 12])){
                 $can_add_topic = false;
                 break;
             }
