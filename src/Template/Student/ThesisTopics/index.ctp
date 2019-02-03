@@ -25,16 +25,16 @@
                                                 if($thesisTopic->modifiable == true && $thesisTopic->thesis_topic_status_id == 1){
                                                     //Ha kitöltési időszak van, csak akkor lehet véglegesíteni
                                                     if(!empty($can_fill_in_topic) && $can_fill_in_topic === true){
-                                                        echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary edit-btn']);
-                                                        echo $this->Html->link(__('Véglegesítés'), ['controller' => 'ThesisTopics', 'action' => 'finalize', $thesisTopic->id], ['class' => 'btn btn-success finalize-btn', 'confirm' => __('Bitosan véglegesíted?')]);
+                                                        echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary edit-btn border-radius-45px']);
+                                                        echo $this->Html->link(__('Véglegesítés'), '#', ['class' => 'btn btn-success finalize-btn border-radius-45px', 'data-id' => $thesisTopic->id]);
                                                     }else{
-                                                        echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary edit-btn']);
+                                                        echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary edit-btn border-radius-45px']);
                                                     }
                                                     
                                                     echo '<br/>';
                                                 }
                                                 
-                                                echo $this->Html->link(__('PDF'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info', 'target' => '_blank']);
+                                                echo $this->Html->link(__('PDF'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px', 'target' => '_blank']);
                                                 if($thesisTopic->encrypted) echo $this->Html->link(__('Titkosítási kérelem'), ['controller' => 'ThesisTopics', 'action' => 'encyptionRegulationDoc', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info enrcyption-doc-btn', 'target' => '_blank']);
                                             ?>
                                         </td>
@@ -58,9 +58,31 @@
         </div>
     </div>
 </div>
-
 <script>
     $(function(){
         $('#thesis_topics_index_menu_item').addClass('active');
+        
+        /**
+        * Confirmation modal megnyitása submit előtt
+        */
+        $('.student-thesisTopics-index .finalize-btn').on('click', function(e){
+            e.preventDefault();
+
+            $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan véglegesíted?') ?>');
+            $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
+            //Save gomb eventjeinek resetelése cserével
+            $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
+            $('#confirmationModal .msg').text('<?= __('Téma véglegesítése.') ?>');
+
+            $('#confirmationModal').modal('show');
+            
+            var thesis_topic_id = $(this).data('id');
+            
+            $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
+                e.preventDefault();
+                $('#confirmationModal').modal('hide');
+                location.href = '<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'finalize'], true) ?>' + '/' + thesis_topic_id;
+            });
+        });
     });
 </script>

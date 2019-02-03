@@ -11,7 +11,7 @@
         </div>
         <div class="col-12">
             <?= $this->Html->link(__('Exportálás CSV-be'), ['controller' => 'ThesisTopics', 'action' => 'exportCsv', $year->id, $semester],
-                                  ['class' => 'btn btn-info', 'target' => '_blank', 'id' => 'export_csv']) ?>
+                                  ['class' => 'btn btn-info border-radius-45px', 'target' => '_blank', 'id' => 'export_csv']) ?>
         </div>
     </div>
 </div>

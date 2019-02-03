@@ -42,8 +42,12 @@
         <div class="signatures">
             <table>
                 <tr>
-                    <td><div class="signature">dátum</div></td>
-                    <td><div class="signature"><?= h(trim($internalConsultant->name)) . ($internalConsultant->has('internal_consultant_position') ? (empty($internalConsultant->internal_consultant_position->name) ? '' : (', ' . h($internalConsultant->internal_consultant_position->name))) : '') ?></div></td>
+                    <td><div class="signature"></div></td>
+                    <td><div class="signature"></div></td>
+                </tr>
+                <tr>
+                    <td style="vertical-align: top">dátum</td>
+                    <td style="vertical-align: top"><?= h(trim($internalConsultant->name)) . ($internalConsultant->has('internal_consultant_position') ? (empty($internalConsultant->internal_consultant_position->name) ? '' : (',<br/>' . h($internalConsultant->internal_consultant_position->name))) : '') ?></td>
                 </tr>
             </table>
         </div>
