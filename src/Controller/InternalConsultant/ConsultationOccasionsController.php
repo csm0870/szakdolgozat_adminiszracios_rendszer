@@ -62,7 +62,7 @@ class ConsultationOccasionsController extends AppController
         
         $consultationOccasions = $this->ConsultationOccasions->find('all', ['conditions' => ['consultation_id' => $consultation->id], 'order' => ['date' => 'DESC']]);
         
-        $this->set(compact('consultationOccasions', 'consultation'));
+        $this->set(compact('consultationOccasions', 'consultation', 'thesisTopic'));
     }
     
     /**

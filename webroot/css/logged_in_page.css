@@ -53,6 +53,18 @@ html, body{
     color: blue;
 }
 
+.backBtn{
+    padding: 3px 4px;
+    border: 1px solid blue;
+    text-decoration: none;
+    color: blue;
+}
+
+.backBtn:hover{
+    text-decoration: none;
+    background-color: #e0fffd;
+}
+
 /* Overlay */
 .overlay{
     position: absolute;

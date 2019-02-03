@@ -1,6 +1,7 @@
 <div class="container internalConsultant-consultationOccasions-index">
     <div class="row">
         <div class="col-12 text-center page-title">
+            <?= $this->Html->link('<i class="fas fa-arrow-alt-circle-left fa-lg"></i>' . '&nbsp;' . __('Vissza'), ['controller' => 'Consultations', 'action' => 'index', $thesisTopic->id], ['escape' => false, 'class' => 'backBtn float-left border-radius-45px', 'title' => __('Vissza')]) ?>
             <h4><?= __('Konzultációs alkalmak') ?></h4>
         </div>
         <?= $this->Flash->render() ?>
