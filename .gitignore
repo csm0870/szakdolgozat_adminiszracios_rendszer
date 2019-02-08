@@ -4,7 +4,6 @@
 /config/.env
 /logs/*
 /tmp/*
-/vendor/*
 
 # OS generated files #
 ######################
@@ -38,3 +37,4 @@ nbproject/*
 .vscode
 # Sass preprocessor
 .sass-cache/
+/files/
