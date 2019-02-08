@@ -61,15 +61,15 @@ class FinalExamSubjectsTable extends Table
         $validator
             ->scalar('name')
             ->maxLength('name', 50)
-            ->allowEmpty('name');
+            ->notEmpty('name', __('Név megadása közelező.'));
 
         $validator
             ->scalar('teachers')
-            ->allowEmpty('teachers');
+            ->notEmpty('teachers', __('Tanár(ok) megadása közelező.'));
 
         $validator
             ->boolean('semester')
-            ->allowEmpty('semester');
+            ->notEmpty('semester', __('Félév megadása közelező.'));
 
         return $validator;
     }

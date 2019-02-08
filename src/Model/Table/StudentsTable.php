@@ -173,8 +173,8 @@ class StudentsTable extends Table
             
         $can_add_topic = true;
         foreach($thesisTopics as $thesisTopic){
-            //Ha már van elfogadási folyamatban témája, vagy van elfogadott témája, vagy van, ami véglegesítésre vár
-            if(in_array($thesisTopic->thesis_topic_status_id, [1, 2, 4, 6, 8, 9, 11, 12])){
+            //Ha csak elutasított témája van
+            if(!in_array($thesisTopic->thesis_topic_status_id, [3, 5, 7, 10])){
                 $can_add_topic = false;
                 break;
             }

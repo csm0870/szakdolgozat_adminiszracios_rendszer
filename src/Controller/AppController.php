@@ -108,4 +108,38 @@ class AppController extends Controller
                 ]);
         }
     }
+    
+    /**
+     * Adott mappába(path) a fájlnév alapján nevet ad a fájlnak és kiszedi a spaceket a névből, ha már létezik a megadott név akkor számmal bővíti, ha még nem létezik
+     * akkor marad ugyanaz.
+     * 
+     * @param string $file_name Fájl neve
+     * @param string $path Fájl elérési útja
+     * @param string $ext Fájl kiterjesztése, ha null, akkor a fájlnévből veszi ki
+     * @return boolean|string FALSE ha nincs path vagy file_name, amugy a fájl neve
+     */
+    protected function addFileName($file_name = null, $path = null, $ext = null){
+        if(empty($file_name) || empty($path)) return false;
+        $trans = $translate = \Transliterator::createFromRules(':: Any-Latin; :: Latin-ASCII; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC;', \Transliterator::FORWARD);
+        $file_name = $trans->transliterate(str_replace(' ', '', $file_name));
+        
+        $files = array_diff(scandir($path), array('..', '.'));
+        if($ext === null) $name = substr($file_name ,0, strrpos($file_name, "."));
+        else $name = $file_name;
+        if($ext === null) $ext = pathinfo($file_name, PATHINFO_EXTENSION);
+        $new_name = $name . "."  . $ext;
+        $i = 0;
+        $ok = false;
+
+        while($ok !== true){
+            if(in_array($new_name, $files)){
+                $new_name = $name . "-" . $i . "." . $ext;
+                ++$i;
+            }else{
+                $ok = true;
+            }
+        }
+        
+        return $new_name;
+    }
 }

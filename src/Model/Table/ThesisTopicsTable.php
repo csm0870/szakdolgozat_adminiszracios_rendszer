@@ -17,6 +17,7 @@ use Cake\Validation\Validator;
  * @property \App\Model\Table\ThesisTopicStatusesTable|\Cake\ORM\Association\BelongsTo $ThesisTopicStatuses
  * @property \App\Model\Table\ConsultationsTable|\Cake\ORM\Association\HasMany $Consultations
  * @property \App\Model\Table\ReviewsTable|\Cake\ORM\Association\HasMany $Reviews
+ * @property |\Cake\ORM\Association\HasMany $ThesisSupplements
  *
  * @method \App\Model\Entity\ThesisTopic get($primaryKey, $options = [])
  * @method \App\Model\Entity\ThesisTopic newEntity($data = null, array $options = [])
@@ -72,6 +73,9 @@ class ThesisTopicsTable extends Table
             'foreignKey' => 'thesis_topic_id'
         ]);
         $this->hasMany('Reviews', [
+            'foreignKey' => 'thesis_topic_id'
+        ]);
+        $this->hasMany('ThesisSupplements', [
             'foreignKey' => 'thesis_topic_id'
         ]);
     }
@@ -160,21 +164,7 @@ class ThesisTopicsTable extends Table
             ->allowEmpty('first_thesis_subject_failed_suggestion');
 
         $validator
-            ->scalar('thesis_pdf')
-            ->maxLength('thesis_pdf', 255)
-            ->allowEmpty('thesis_pdf');
-
-        $validator
-            ->scalar('thesis_supplements')
-            ->maxLength('thesis_supplements', 255)
-            ->allowEmpty('thesis_supplements');
-
-        $validator
             ->allowEmpty('internal_consultant_grade');
-
-        $validator
-            ->boolean('thesis_handed_in')
-            ->allowEmpty('thesis_handed_in');
 
         $validator
             ->boolean('thesis_accepted')

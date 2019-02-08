@@ -16,7 +16,12 @@
                                 </tr>
                                 <?php foreach($thesisTopics as $thesisTopic){ ?>
                                     <tr>
-                                        <td><?= h($thesisTopic->title) ?></td>
+                                        <td>
+                                            <?= h($thesisTopic->title) .
+                                                (in_array($thesisTopic->thesis_topic_status_id, [12, 13]) ? ('<br/>' . $this->Html->link(__('Diplomamunka/szakdolgozat feltöltése') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'uploadThesis', $thesisTopic->id])) : '') .
+                                                ($thesisTopic->thesis_topic_status_id == 14 ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '')
+                                            ?>
+                                        </td>
                                         <td>
                                             <?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '' ?>
                                         </td>
@@ -26,7 +31,7 @@
                                                     //Ha kitöltési időszak van, csak akkor lehet véglegesíteni
                                                     if(!empty($can_fill_in_topic) && $can_fill_in_topic === true){
                                                         echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary edit-btn border-radius-45px']);
-                                                        echo $this->Html->link(__('Véglegesítés'), '#', ['class' => 'btn btn-success finalize-btn border-radius-45px', 'data-id' => $thesisTopic->id]);
+                                                        echo $this->Html->link(__('Téma véglegesítés'), '#', ['class' => 'btn btn-success finalize-thesis-topic-btn border-radius-45px', 'data-id' => $thesisTopic->id]);
                                                     }else{
                                                         echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary edit-btn border-radius-45px']);
                                                     }
@@ -36,6 +41,11 @@
                                                 
                                                 echo $this->Html->link(__('PDF'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px', 'target' => '_blank']);
                                                 if($thesisTopic->encrypted) echo $this->Html->link(__('Titkosítási kérelem'), ['controller' => 'ThesisTopics', 'action' => 'encyptionRegulationDoc', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info enrcyption-doc-btn', 'target' => '_blank']);
+                                                
+                                                if($thesisTopic->thesis_topic_status_id == 13){
+                                                    echo '<br/>';
+                                                    echo $this->Html->link(__('Feltöltés véglegesítése'), '#', ['class' => 'btn btn-success finalizeUpoadedThesisBtn border-radius-45px', 'data-id' => $thesisTopic->id]);
+                                                }
                                             ?>
                                         </td>
                                     </tr>
@@ -65,14 +75,14 @@
         /**
         * Confirmation modal megnyitása submit előtt
         */
-        $('.student-thesisTopics-index .finalize-btn').on('click', function(e){
+        $('.student-thesisTopics-index .finalize-thesis-topic-btn').on('click', function(e){
             e.preventDefault();
 
             $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan véglegesíted?') ?>');
             $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
             //Save gomb eventjeinek resetelése cserével
             $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-            $('#confirmationModal .msg').text('<?= __('Téma véglegesítése.') ?>');
+            $('#confirmationModal .msg').text('<?= __('Téma véglegesítése. A hallgatói adatait nem módosíthatja, amíg a téma elfogadási státuszban van, vagy elfogadott lesz.') ?>');
 
             $('#confirmationModal').modal('show');
             
@@ -81,7 +91,30 @@
             $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
                 e.preventDefault();
                 $('#confirmationModal').modal('hide');
-                location.href = '<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'finalize'], true) ?>' + '/' + thesis_topic_id;
+                location.href = '<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'finalizeThesisTopic'], true) ?>' + '/' + thesis_topic_id;
+            });
+        });
+        
+        /**
+        * Confirmation modal megnyitása submit előtt
+        */
+        $('.student-thesisTopics-index .finalizeUpoadedThesisBtn').on('click', function(e){
+            e.preventDefault();
+
+            $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan véglegesíted?') ?>');
+            $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
+            //Save gomb eventjeinek resetelése cserével
+            $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
+            $('#confirmationModal .msg').text('<?= __('Feltöltés véglegesítése.') ?>');
+
+            $('#confirmationModal').modal('show');
+            
+            var thesis_topic_id = $(this).data('id');
+            
+            $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
+                e.preventDefault();
+                $('#confirmationModal').modal('hide');
+                location.href = '<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'finalizeUploadedThesis'], true) ?>' + '/' + thesis_topic_id;
             });
         });
     });

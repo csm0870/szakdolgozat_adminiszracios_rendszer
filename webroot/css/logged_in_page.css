@@ -65,6 +65,14 @@ html, body{
     background-color: #e0fffd;
 }
 
+.border-1-grey{
+    border: 1px solid grey;
+}
+
+.error-message{
+    color: red;
+}
+
 /* Overlay */
 .overlay{
     position: absolute;
@@ -168,12 +176,16 @@ html, body{
     margin-bottom: 8px;
 }
 
-.thesisTopics-index.student-thesisTopics-index .topics-table .finalize-btn{
+.thesisTopics-index.student-thesisTopics-index .topics-table .finalize-thesis-topic-btn{
     margin: 0 0 8px 8px;
 }
 
 .thesisTopics-index.student-thesisTopics-index .topics-table .enrcyption-doc-btn{
     margin-left: 8px;
+}
+
+.thesisTopics-index.student-thesisTopics-index .topics-table .finalizeUpoadedThesisBtn{
+    margin-top: 8px;
 }
 
 /* Thesis topics internal consultant index */
@@ -310,4 +322,10 @@ html, body{
 
 .headOfDepartment-thesisTopics-details .decideToContinueAfterFailedFirstThesisSubjectBtn:hover{
     text-decoration: underline;
+}
+
+/*  Student thesis topics details */
+
+.student-thesisTopics-details .supplements-container p{
+    margin-bottom: 3px;
 }

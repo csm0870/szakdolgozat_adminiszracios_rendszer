@@ -26,12 +26,8 @@ use Cake\ORM\Entity;
  * @property string|null $external_consultant_address
  * @property int|null $internal_consultant_id
  * @property int|null $language_id
- * @property bool|null $first_thesis_subject_completed
  * @property string|null $first_thesis_subject_failed_suggestion
- * @property string|null $thesis_pdf
- * @property string|null $thesis_supplements
  * @property int|null $internal_consultant_grade
- * @property bool|null $thesis_handed_in
  * @property bool|null $thesis_accepted
  * @property int|null $student_id
  * @property int|null $thesis_topic_status_id
@@ -46,6 +42,7 @@ use Cake\ORM\Entity;
  * @property \App\Model\Entity\ThesisTopicStatus $thesis_topic_status
  * @property \App\Model\Entity\Consultation[] $consultations
  * @property \App\Model\Entity\Review[] $reviews
+ * @property \App\Model\Entity\ThesisSupplement[] $thesis_supplements
  */
 class ThesisTopic extends Entity
 {
@@ -80,10 +77,7 @@ class ThesisTopic extends Entity
         'internal_consultant_id' => true,
         'language_id' => true,
         'first_thesis_subject_failed_suggestion' => true,
-        'thesis_pdf' => true,
-        'thesis_supplements' => true,
         'internal_consultant_grade' => true,
-        'thesis_handed_in' => true,
         'thesis_accepted' => true,
         'student_id' => true,
         'thesis_topic_status_id' => true,
@@ -96,6 +90,7 @@ class ThesisTopic extends Entity
         'student' => true,
         'thesis_topic_status' => true,
         'consultations' => true,
-        'reviews' => true
+        'reviews' => true,
+        'thesis_supplements' => true
     ];
 }
