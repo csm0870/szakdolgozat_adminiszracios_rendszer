@@ -11,7 +11,7 @@
                             <table class="table table-bordered table-hover topics-table">
                                 <tr>
                                     <th><?= __('Téma címe') ?></th>
-                                    <th><?= __('Státusz') ?></th>
+                                    <th><?= __('Állapot') ?></th>
                                     <th><?= __('Műveletek') ?></th>
                                 </tr>
                                 <?php foreach($thesisTopics as $thesisTopic){ ?>
@@ -82,7 +82,7 @@
             $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
             //Save gomb eventjeinek resetelése cserével
             $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-            $('#confirmationModal .msg').text('<?= __('Téma véglegesítése. A hallgatói adatait nem módosíthatja, amíg a téma elfogadási státuszban van, vagy elfogadott lesz.') ?>');
+            $('#confirmationModal .msg').html('<?= __('Téma véglegesítése. Véglegesítés után az adatok nem módosíthatóak.<br/>A véglegesítés után a hallgatói adatok sem módosíthatóak, csak ha elutasíják a témát.') ?>');
 
             $('#confirmationModal').modal('show');
             

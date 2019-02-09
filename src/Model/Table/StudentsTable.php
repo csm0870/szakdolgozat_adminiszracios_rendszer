@@ -182,4 +182,29 @@ class StudentsTable extends Table
         
         return $can_add_topic;
     }
+    
+    /**
+     * Megnézi, hogy az adott hallgató adhat-e le új témát
+     * 
+     * @param type $student_id Hallgató azonosítója
+     * @return boolean Adhat-e hozzá témát
+     */
+    public function canModifyData($student_id = null){
+        if(empty($student_id)) return false;
+        
+        if(!$this->exists(['id' => $student_id])) return false;
+        
+        $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['student_id' => $student_id, 'deleted' => false], 'order' => ['created' => 'ASC']]);
+            
+        $can_modify_data = true;
+        foreach($thesisTopics as $thesisTopic){
+            //Ha csak elutasított témája van vagy véglegesítésre váró
+            if(!in_array($thesisTopic->thesis_topic_status_id, [1, 3, 5, 7, 10])){
+                $can_modify_data = false;
+                break;
+            }
+        }
+        
+        return $can_modify_data;
+    }
 }

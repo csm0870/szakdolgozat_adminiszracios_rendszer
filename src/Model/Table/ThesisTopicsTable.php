@@ -95,11 +95,11 @@ class ThesisTopicsTable extends Table
         $validator
             ->scalar('title')
             ->maxLength('title', 255)
-            ->allowEmpty('title');
+            ->notEmpty('title', __('Cím megadása kötelező.'));
 
         $validator
             ->scalar('description')
-            ->allowEmpty('description');
+            ->notEmpty('description', __('Leírás megadása kötelező.'));
 
         $validator
             ->scalar('cause_of_no_external_consultant')
@@ -115,19 +115,19 @@ class ThesisTopicsTable extends Table
 
         $validator
             ->boolean('is_thesis')
-            ->allowEmpty('is_thesis');
+            ->notEmpty('is_thesis', __('Dolgozat típusának megadása kötelező.'));
 
         $validator
             ->boolean('encrypted')
-            ->allowEmpty('encrypted');
+            ->notEmpty('encrypted', __('Titkosítottság megadása kötelező.'));
 
         $validator
             ->boolean('starting_semester')
-            ->allowEmpty('starting_semester');
+            ->notEmpty('starting_semester', __('Kezdési félév megadása kötelező.'));
 
         $validator
             ->boolean('expected_ending_semester')
-            ->allowEmpty('expected_ending_semester');
+            ->notEmpty('expected_ending_semester', __('Kezdési tanév megadása kötelező.'));
 
         $validator
             ->scalar('external_consultant_name')
@@ -145,7 +145,7 @@ class ThesisTopicsTable extends Table
             ->allowEmpty('external_consultant_position');
 
         $validator
-            ->scalar('external_consultant_email')
+            ->email('external_consultant_email', __('Nem megfelelő e-mail cím formátum.'))
             ->maxLength('external_consultant_email', 60)
             ->allowEmpty('external_consultant_email');
 
@@ -191,4 +191,62 @@ class ThesisTopicsTable extends Table
 
         return $rules;
     }
+    
+    /**
+     * Mentés előtti callback
+     * 
+     * @param type $event
+     * @param type $entity
+     * @param type $options
+     */
+    public function beforeSave($event, $entity, $options){
+        if($entity->cause_of_no_external_consultant === null){ //Ha van külső konzulens
+            //Külső konzulens adatainak ellenőrzése: nem lehetnek üresek
+            
+            $ok = true;
+            if(empty($entity->external_consultant_name)){
+                $entity->setError('external_consultant_name', __('Külső konzulens nevének megadása kötelező.'));
+                $ok = false;
+            }
+            if(empty($entity->external_consultant_workplace)){
+                $entity->setError('external_consultant_workplace', __('Külső konzulens munkahelyének megadása kötelező.'));
+                $ok = false;
+            }
+            if(empty($entity->external_consultant_position)){
+                $entity->setError('external_consultant_position', __('Külső konzulens poziciójának megadása kötelező.'));
+                $ok = false;
+            }
+            if(empty($entity->external_consultant_email)){
+                $entity->setError('external_consultant_email', __('Külső konzulens e-mail címének megadása kötelező.'));
+                $ok = false;
+            }
+            if(empty($entity->external_consultant_phone_number)){
+                $entity->setError('external_consultant_phone_number', __('Külső konzulens telefonszámának megadása kötelező.'));
+                $ok = false;
+            }
+            if(empty($entity->external_consultant_address)){
+                $entity->setError('external_consultant_address', __('Külső konzulens címének megadása kötelező.'));
+                $ok = false;
+            }
+            
+            return $ok;
+        }elseif(empty($entity->cause_of_no_external_consultant)){\Cake\Log\Log::write('error', 'nincs');
+            //Ha nincs külső konzulens, akkor annak indoklása kötelező
+            $entity->setError('cause_of_no_external_consultant', __('Külső konzulenstől való eltekintés indoklása kötelező.'));
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Mentés után callback
+     * 
+     * Itt majd az egyes állapotokból a másikba történő modosuláskor a különböző értékek resetelése kell, vagy akár emailek küldése iss
+     * 
+     * @param type $event
+     * @param type $entity
+     * @param type $options
+     */
+    public function afterSave($event, $entity, $options){}
 }

@@ -71,13 +71,13 @@
                                                                       'templates' => ['inputContainer' => '<div class="form-group external-consultants-data-field">{{content}}</div>',
                                                                                       'inputContainerError' => '<div class="form-group external-consultants-data-field">{{content}}{{error}}</div>']]) ?>
             <?= $this->Form->control('external_consultant_address', ['class' => 'form-control external-consultants-data-field', 'label' => ['text' => __('Külső konzulens címe')],
-                                                                      'templates' => ['inputContainer' => '<div class="form-group external-consultants-data-field">{{content}}</div>',
+                                                                     'templates' => ['inputContainer' => '<div class="form-group external-consultants-data-field">{{content}}</div>',
                                                                                       'inputContainerError' => '<div class="form-group external-consultants-data-field">{{content}}{{error}}</div>']]) ?>
             <?= $this->Form->control('external_consultant_phone_number', ['class' => 'form-control external-consultants-data-field', 'label' => ['text' => __('Külső konzulens telefonszáma')],
-                                                                      'templates' => ['inputContainer' => '<div class="form-group external-consultants-data-field">{{content}}</div>',
+                                                                          'templates' => ['inputContainer' => '<div class="form-group external-consultants-data-field">{{content}}</div>',
                                                                                       'inputContainerError' => '<div class="form-group external-consultants-data-field">{{content}}{{error}}</div>']]) ?>
-            <?= $this->Form->control('external_consultant_email', ['class' => 'form-control external-consultants-data-field', 'label' => ['text' => __('Külső konzulens email címe')], 'placeholer' => __('+36701234567 formátumban.'),
-                                                                      'templates' => ['inputContainer' => '<div class="form-group external-consultants-data-field">{{content}}</div>',
+            <?= $this->Form->control('external_consultant_email', ['type' => 'email', 'class' => 'form-control external-consultants-data-field', 'label' => ['text' => __('Külső konzulens email címe')], 'placeholer' => __('+36701234567 formátumban.'),
+                                                                   'templates' => ['inputContainer' => '<div class="form-group external-consultants-data-field">{{content}}</div>',
                                                                                       'inputContainerError' => '<div class="form-group external-consultants-data-field">{{content}}{{error}}</div>']]) ?>
             <?= $this->Form->control('cause_of_no_external_consultant', ['class' => 'form-control', 'label' => ['text' => __('Külső konzulens kijelölésétől való eltekintés indoklása')],
                                                                          'templates' => ['inputContainer' => '<div id="cause_of_no_external_consultant" class="form-group">{{content}}</div>',
@@ -100,11 +100,15 @@
         function setExternalConsultantFields(){
             var has_e_consultant = $('#has_external_consultant').val();
             if(has_e_consultant == 1){
-                $('#cause_of_no_external_consultant').css('display', 'none');
-                $('.external-consultants-data-field').css('display', 'block');
+                $('#cause_of_no_external_consultant').css('display', 'none').find('textarea')[0].required = false;
+                $('.external-consultants-data-field').css('display', 'block').find('input').each(function(){
+                    this.required = true;
+                });
             }else if(has_e_consultant == 0){
-                $('#cause_of_no_external_consultant').css('display', 'block');
-                $('.external-consultants-data-field').css('display', 'none');
+                $('#cause_of_no_external_consultant').css('display', 'block').find('textarea')[0].required = true;
+                $('.external-consultants-data-field').css('display', 'none').find('input').each(function(){
+                    this.required = false;
+                });
             }
         }
         setExternalConsultantFields();
@@ -117,11 +121,14 @@
         $('#thesisTopicEditForm .submitBtn').on('click', function(e){
             e.preventDefault();
 
+            //Formvalidáció manuális meghívása
+            if($('#thesisTopicEditForm')[0].reportValidity() === false) return;
+            
             $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan mented?') ?>');
             $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
             //Save gomb eventjeinek resetelése cserével
             $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-            $('#confirmationModal .msg').text('<?= __('Téma adatok mentése.') ?>');
+            $('#confirmationModal .msg').text('<?= __('Téma adatok mentése. Mentés után még módosíthatóak.') ?>');
 
             $('#confirmationModal').modal('show');
 

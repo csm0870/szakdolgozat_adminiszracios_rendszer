@@ -12,7 +12,7 @@
                                 <tr>
                                     <th><?= __('Téma címe') ?></th>
                                     <th><?= __('Hallgató') ?></th>
-                                    <th><?= __('Státusz') ?></th>
+                                    <th><?= __('Állapot') ?></th>
                                     <th><?= __('Műveletek') ?></th>
                                 </tr>
                                 <?php foreach($thesisTopics as $thesisTopic){ ?>

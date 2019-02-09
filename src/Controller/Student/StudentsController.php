@@ -22,13 +22,13 @@ class StudentsController extends AppController
     public function edit($id = null){
         $data = $this->Students->checkStundentData($this->Auth->user('id'));
         
-        $can_add_topic = $this->Students->canAddTopic($data['student_id']);
-        if($can_add_topic === false){//Ha adhat hozzá témát
-            $this->Flash->error(__('Nem módosíthatja az adatait, mert van elfogadott témája.'));
+        $can_modify_data = $this->Students->canModifyData($data['student_id']);
+        if($can_modify_data === false){//Ha adhat hozzá témát
+            $this->Flash->error(__('Nem módosíthatja az adatait, mert van elfogadott vagy elfogadási folyamatban lévő témája.'));
         }
         
         $student = $this->Students->find('all', ['conditions' => ['id' => $data['student_id']]])->first();
-        if($can_add_topic === true && $this->request->is(['patch', 'post', 'put'])) {
+        if($can_modify_data === true && $this->request->is(['patch', 'post', 'put'])) {
             $student = $this->Students->patchEntity($student, $this->request->getData());
             if ($this->Students->save($student)) {
                 $this->Flash->success(__('Mentés sikeres.'));
@@ -40,6 +40,6 @@ class StudentsController extends AppController
         $courses = $this->Students->Courses->find('list');
         $courseLevels = $this->Students->CourseLevels->find('list');
         $courseTypes = $this->Students->CourseTypes->find('list');
-        $this->set(compact('student', 'courses', 'courseLevels', 'courseTypes', 'can_add_topic'));
+        $this->set(compact('student', 'courses', 'courseLevels', 'courseTypes', 'can_modify_data'));
     }
 }

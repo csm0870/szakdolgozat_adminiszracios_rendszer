@@ -146,6 +146,7 @@ class ThesisTopicsController extends AppController
         }
 
         $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['id' => $id]])->first();
+        $student = $this->ThesisTopics->Students->find('all',['conditions' => ['Students.user_id' => $this->Auth->user('id')]])->first();
         
         $ok = true;
         if(empty($thesisTopic)){
@@ -210,7 +211,7 @@ class ThesisTopicsController extends AppController
         }
 
         $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['id' => $id]])->first();
-        $student = $this->ThesisTopics->Students->find('all',['conditions' => ['Students.user_id' => $this->Auth->user('id')]]);
+        $student = $this->ThesisTopics->Students->find('all',['conditions' => ['Students.user_id' => $this->Auth->user('id')]])->first();
         
         $ok = true;
         if(empty($thesisTopic)){
@@ -248,7 +249,7 @@ class ThesisTopicsController extends AppController
             return $this->redirect(['controller' => 'Students', 'action' => 'edit', $data['student_id']]);
         }
         
-        $student = $this->ThesisTopics->Students->find('all',['conditions' => ['Students.user_id' => $this->Auth->user('id')] ,'contain' => ['FinalExamSubjects']]);
+        $student = $this->ThesisTopics->Students->find('all',['conditions' => ['Students.user_id' => $this->Auth->user('id')] ,'contain' => ['FinalExamSubjects']])->first();
         $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id],
                                                          'contain' => ['ThesisSupplements']])->first(); 
     
