@@ -65,21 +65,21 @@ class ReviewersTable extends Table
         $validator
             ->scalar('name')
             ->maxLength('name', 50)
-            ->allowEmpty('name');
+            ->notEmpty('name', __('Név megadása kötelező.'));
 
         $validator
-            ->email('email')
-            ->allowEmpty('email');
+            ->email('email', __('Helytelen email formátum.'))
+            ->notEmpty('email', __('Email megadása kötelező.'));
 
         $validator
             ->scalar('workplace')
             ->maxLength('workplace', 50)
-            ->allowEmpty('workplace');
+            ->notEmpty('workplace', __('Munkahely megadása kötelező.'));
 
         $validator
             ->scalar('position')
             ->maxLength('position', 255)
-            ->allowEmpty('position');
+            ->notEmpty('position', __('Pozíció megadása kötelező.'));
 
         return $validator;
     }
@@ -93,7 +93,6 @@ class ReviewersTable extends Table
      */
     public function buildRules(RulesChecker $rules)
     {
-        $rules->add($rules->isUnique(['email']));
         $rules->add($rules->existsIn(['user_id'], 'Users'));
 
         return $rules;

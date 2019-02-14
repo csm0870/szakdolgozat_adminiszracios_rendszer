@@ -394,7 +394,7 @@ class ThesisTopicsController extends AppController
             $this->Flash->error(__('Feltöltés nem véglegesíthető.') . ' ' . __('Nincs feltöltve melléklet.'));
             $ok = false;
         }elseif($student->course_id == 1 && count($student->final_exam_subjects) != 3){ //Mérnökinformatikus és nem három ZV tárgya van
-            $this->Flash->error(__('Feltöltés nem véglegesíthető.') . ' ' . __('3 záróvizsga tárgyat kell választania.'));
+            $this->Flash->error(__('Feltöltés nem véglegesíthető.') . ' ' . __('3 záróvizsga-tárgyat kell választania.'));
             $ok = false;
         }
         

@@ -12,9 +12,10 @@
  * @since     0.2.9
  * @license   https://opensource.org/licenses/mit-license.php MIT License
  */
-namespace App\Controller\Student;
+namespace App\Controller\ThesisManager;
 
 use App\Controller\AppController;
+
 use Cake\Core\Configure;
 use Cake\Http\Exception\ForbiddenException;
 use Cake\Http\Exception\NotFoundException;
@@ -29,16 +30,10 @@ use Cake\Event\Event;
  * @link https://book.cakephp.org/3.0/en/controllers/pages-controller.html
  */
 class PagesController extends AppController
-{
+{  
     /**
      * Dashboard
      */
     public function dashboard(){
-        $this->loadModel('Students');
-        $data = $this->Students->checkStundentData($this->Auth->user('id'));
-        if($data['success'] === false){
-            $this->Flash->error(__('Adja meg az adatit a továbblépéshez!'));
-            return $this->redirect(['controller' => 'Students', 'action' => 'edit', $data['student_id']]);
-        }
     }
 }

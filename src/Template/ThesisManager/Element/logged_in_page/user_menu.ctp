@@ -6,11 +6,8 @@
                 <li class="nav-item" id="dashboard_menu_item">
                     <a class="nav-link" href="<?= $this->Url->build(['controller' => 'Pages', 'action' => 'dashboard'], true) ?>"><?= __('Dashboard') ?></a>
                 </li>
-                <li class="nav-item" id="thesis_topic_index_menu_item">
-                    <a class="nav-link" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'index']) ?>"><?= __('Leadott témák') ?></a>
-                </li>
-                <li class="nav-item" id="reviewers_index_menu_item">
-                    <a class="nav-link" href="<?= $this->Url->build(['controller' => 'Reviewers', 'action' => 'index']) ?>"><?= __('Bírálók') ?></a>
+                <li class="nav-item" id="thesis_topics_index_menu_item">
+                    <a class="nav-link" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'index']) ?>"><?= __('Szakdolgozatok kezelése') ?></a>
                 </li>
             </ul>
         </div>

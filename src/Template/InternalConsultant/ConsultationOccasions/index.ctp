@@ -77,8 +77,8 @@
                 url: '<?= $this->Url->build(['controller' => 'ConsultationOccasions', 'action' => 'add', $consultation->id]) ?>',
                 cache: false
         })
-        .done(function( response ) {
-            $('#consultationOccasion-add').html( response.content );
+        .done(function(response) {
+            $('#consultationOccasion-add').html(response.content);
         });
         
         //Konzultációs alkalom hozzáadása popup megnyitása

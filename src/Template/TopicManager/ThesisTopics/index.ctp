@@ -1,7 +1,7 @@
 <div class="container thesisTopics-index topicManager-thesisTopics-index">
     <div class="row">
         <div class="col-12 text-center page-title">
-            <h4><?= __('Témák') ?></h4>
+            <h4><?= __('Témák kezelése') ?></h4>
         </div>
         <?= $this->Flash->render() ?>
         <div class="col-12">

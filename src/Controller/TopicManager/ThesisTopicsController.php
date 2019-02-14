@@ -139,8 +139,9 @@ class ThesisTopicsController extends AppController
             $labels_for_course_levels[] = $course_level;
         }
         
+        $years = $this->Years->find('list');
         $this->set(compact('labels_for_courses', 'labels_for_course_types', 'labels_for_course_levels',
-                           'data_for_courses', 'data_for_course_types', 'data_for_course_levels'));
+                           'data_for_courses', 'data_for_course_types', 'data_for_course_levels', 'years', 'year', 'semester'));
         
     }
     

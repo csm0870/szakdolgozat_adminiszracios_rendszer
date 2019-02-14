@@ -323,9 +323,3 @@ html, body{
 .headOfDepartment-thesisTopics-details .decideToContinueAfterFailedFirstThesisSubjectBtn:hover{
     text-decoration: underline;
 }
-
-/*  Student thesis topics details */
-
-.student-thesisTopics-details .supplements-container p{
-    margin-bottom: 3px;
-}
