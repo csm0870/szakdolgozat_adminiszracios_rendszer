@@ -13,6 +13,7 @@ use Cake\ORM\Entity;
  * @property string|null $email
  * @property string|null $phone_number
  * @property string|null $specialisation
+ * @property int|null $final_exam_subjects_status
  * @property \Cake\I18n\FrozenTime|null $created
  * @property \Cake\I18n\FrozenTime|null $modified
  * @property int|null $course_id
@@ -46,6 +47,7 @@ class Student extends Entity
         'email' => true,
         'phone_number' => true,
         'specialisation' => true,
+        'final_exam_subjects_status' => true, //0 vagy null - még nincs feltöltve, 1 - feltöltve, 2 - véglegesítve, 3 - elfogadva, 4 - elutasítva
         'created' => true,
         'modified' => true,
         'course_id' => true,

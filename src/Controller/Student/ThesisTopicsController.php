@@ -249,7 +249,7 @@ class ThesisTopicsController extends AppController
             return $this->redirect(['controller' => 'Students', 'action' => 'edit', $data['student_id']]);
         }
         
-        $student = $this->ThesisTopics->Students->find('all',['conditions' => ['Students.user_id' => $this->Auth->user('id')] ,'contain' => ['FinalExamSubjects']])->first();
+        $student = $this->ThesisTopics->Students->find('all',['conditions' => ['Students.user_id' => $this->Auth->user('id')]])->first();
         $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id],
                                                          'contain' => ['ThesisSupplements']])->first(); 
     
@@ -270,8 +270,8 @@ class ThesisTopicsController extends AppController
         
         if($this->getRequest()->is(['post', 'put', 'patch'])){
             $thesis_supplements = $this->getRequest()->getData('thesis_supplements');
-            $ok = true;
             
+            $ok = true;
             foreach($thesis_supplements as $supplement){
                 $thesisSupplement = $this->ThesisTopics->ThesisSupplements->newEntity();
                 if(!empty($supplement['name'])){
@@ -286,40 +286,6 @@ class ThesisTopicsController extends AppController
                 }
             }
             
-            if($ok && $student->course_id == 1){ //Ha mérnökinformatikus, akkor a záróvizsga tárgyakat is mentjük
-                    $final_exam_subjects = $this->getRequest()->getData('final_exam_subjects');
-                    
-                    $count_of_current_subjects = count($student->final_exam_subjects);
-                    $count_of_new_subjects = 0;
-                    if(count($final_exam_subjects) == 3){
-                        foreach($final_exam_subjects as $subject){
-                            if(isset($subject['id'])){ //Ha van ID, akkor azt jelenti, hogy meglévő módosítása van
-                                $final_exam_subject = $this->ThesisTopics->Students->FinalExamSubjects->find('all', ['conditions' => ['id' => $subject['id'], 'student_id' => $student->id]])->first();
-                                if(empty($final_exam_subject)) break;
-                            }else{
-                                $count_of_current_subjects++;
-                                if($count_of_current_subjects + $count_of_new_subjects > 3){
-                                    $this->Flash->error(__('Maximum 3 záróvizgsa tárgyat adhat hozzá.'));
-                                    $ok = false;
-                                    break;
-                                }
-                                $final_exam_subject = $this->ThesisTopics->Students->FinalExamSubjects->newEntity();
-                            }
-                            
-                            $final_exam_subject = $this->ThesisTopics->Students->FinalExamSubjects->patchEntity($final_exam_subject, $subject);
-                            $final_exam_subject->student_id = $student->id;
-                            if(!$this->ThesisTopics->Students->FinalExamSubjects->save($final_exam_subject)){
-                                $this->Flash->error(__('Záróvizsga tárgy mentése sikertelen. Próbálja újra!'));
-                                $ok = false;
-                                break;
-                            }
-                        }
-                    }else{
-                        $ok = false;
-                        $this->Flash->error(__('Három záróvizsga tárgyat kell megadnia!'));
-                    }
-            }
-            
             if($ok){
                 $thesisTopic->thesis_topic_status_id = 13;
                 if($this->ThesisTopics->save($thesisTopic)){
@@ -330,9 +296,7 @@ class ThesisTopicsController extends AppController
             }
         }
         
-        $this->loadModel('Years');
-        $years = $this->Years->find('list');
-        $this->set(compact('thesisTopic', 'student', 'years', 'final_exam_subjects'));
+        $this->set(compact('thesisTopic'));
     }
     
     /**
@@ -419,7 +383,7 @@ class ThesisTopicsController extends AppController
         }
 
         $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['id' => $id], 'contain' => ['ThesisSupplements']])->first();
-        $student = $this->ThesisTopics->Students->find('all', ['conditions' => ['Students.user_id' => $this->Auth->user('id')], 'contain' => ['FinalExamSubjects' => ['Years']]])->first();
+        $student = $this->ThesisTopics->Students->find('all', ['conditions' => ['Students.user_id' => $this->Auth->user('id')]])->first();
         
         $ok = true;
         //Megnézzük, hogy megfelelő-e a téma a diplomamunka/szakdolgozat feltöltéséhez
@@ -436,6 +400,6 @@ class ThesisTopicsController extends AppController
         
         if(!$ok) return $this->redirect(['action' => 'index']);
         
-        $this->set(compact('thesisTopic', 'student'));
+        $this->set(compact('thesisTopic'));
     }
 }

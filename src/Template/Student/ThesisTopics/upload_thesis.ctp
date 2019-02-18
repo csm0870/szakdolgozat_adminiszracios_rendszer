@@ -31,59 +31,6 @@
                      ?>
                 </fieldset>
             </div>
-            <?php if($student->course_id == 1){ //Ha mérnökinformatikus ?>
-                <div class="col-12 text-center page-title">
-                    <h4>
-                        <?= __('Záróvizsga tárgyak megadása') ?>
-                    </h4>
-                </div>
-                <div class="col-12">
-                    <?php $i = 0;
-                        foreach($student->final_exam_subjects as $subject){ $i++; if($i >= 4) break; ?>
-                            <fieldset class="border-1-grey p-3 mb-2">
-                                <legend class="w-auto">
-                                    <?php
-                                        if($i == 1) echo __('Első') . ' ' . __('záróvizsga tárgy');
-                                        elseif($i == 2) echo __('Második') . ' ' . __('záróvizsga tárgy');
-                                        elseif($i == 3) echo __('Harmadik') . ' ' . __('záróvizsga tárgy');
-                                    ?>
-                                </legend>
-                                <?= $this->Form->control("final_exam_subjects[{$i}][id]", ['type' => 'hidden', 'value' => $subject->id]) ?>
-                                <?= $this->Form->control("final_exam_subjects[{$i}][name]", ['label' => ['text' => __('Tárgy neve')], 'class' => 'form-control', 'required' => true, 'value' => $subject->name]) ?>
-                                <?= $this->Form->control("final_exam_subjects[{$i}][teachers]", ['label' => ['text' => __('Tanár(ok)')], 'class' => 'form-control', 'required' => true, 'value' => $subject->teachers]) ?>
-                                <?= $this->Form->control("final_exam_subjects[{$i}][year_id]", ['options' => $years, 'label' => ['text' => __('Tanév, amikor tanulta')], 'class' => 'form-control', 'required' => true, 'value' => $subject->year_id]) ?>
-                                <?= $this->Form->control("final_exam_subjects[{$i}][semester]", ['options' => [__('Ősz'), __('Tavasz')], 'label' => ['text' => __('Félév, amikor tanulta')], 'class' => 'form-control', 'required' => true, 'value' => $subject->semester]) ?>
-                            </fieldset>
-                    <?php } ?>
-                    <?php if($i == 0){?>
-                        <fieldset class="border-1-grey p-3 mb-2">
-                            <legend class="w-auto"><?= __('Első') . ' ' . __('záróvizsga tárgy') ?></legend>
-                            <?= $this->Form->control('final_exam_subjects[1][name]', ['label' => ['text' => __('Tárgy neve')], 'class' => 'form-control', 'required' => true]) ?>
-                            <?= $this->Form->control('final_exam_subjects[1][teachers]', ['label' => ['text' => __('Tanár(ok)')], 'class' => 'form-control', 'required' => true]) ?>
-                            <?= $this->Form->control('final_exam_subjects[1][year_id]', ['options' => $years, 'label' => ['text' => __('Tanév, amikor tanulta')], 'class' => 'form-control', 'required' => true]) ?>
-                            <?= $this->Form->control('final_exam_subjects[1][semester]', ['options' => [__('Ősz'), __('Tavasz')], 'label' => ['text' => __('Félév, amikor tanulta')], 'class' => 'form-control', 'required' => true]) ?>
-                        </fieldset>
-                    <?php } ?>
-                    <?php if($i == 0 || $i == 1){?>
-                        <fieldset class="border-1-grey p-3 mb-2">
-                            <legend class="w-auto"><?= __('Második') . ' ' . __('záróvizsga tárgy') ?></legend>
-                            <?= $this->Form->control('final_exam_subjects[2][name]', ['label' => ['text' => __('Tárgy neve')], 'class' => 'form-control', 'required' => true]) ?>
-                            <?= $this->Form->control('final_exam_subjects[2][teachers]', ['label' => ['text' => __('Tanár(ok)')], 'class' => 'form-control', 'required' => true]) ?>
-                            <?= $this->Form->control('final_exam_subjects[2][year_id]', ['options' => $years, 'label' => ['text' => __('Tanév, amikor tanulta')], 'class' => 'form-control', 'required' => true]) ?>
-                            <?= $this->Form->control('final_exam_subjects[2][semester]', ['options' => [__('Ősz'), __('Tavasz')], 'label' => ['text' => __('Félév, amikor tanulta')], 'class' => 'form-control', 'required' => true]) ?>
-                        </fieldset>
-                    <?php } ?>
-                    <?php if($i == 0 || $i == 1 || $i == 2){?>
-                        <fieldset class="border-1-grey p-3 mb-2">
-                            <legend class="w-auto"><?= __('Harmadik') . ' ' . __('záróvizsga tárgy') ?></legend>
-                            <?= $this->Form->control('final_exam_subjects[3][name]', ['label' => ['text' => __('Tárgy neve')], 'class' => 'form-control', 'required' => true]) ?>
-                            <?= $this->Form->control('final_exam_subjects[3][teachers]', ['label' => ['text' => __('Tanár(ok)')], 'class' => 'form-control', 'required' => true]) ?>
-                            <?= $this->Form->control('final_exam_subjects[3][year_id]', ['options' => $years, 'label' => ['text' => __('Tanév, amikor tanulta')], 'class' => 'form-control', 'required' => true]) ?>
-                            <?= $this->Form->control('final_exam_subjects[3][semester]', ['options' => [__('Ősz'), __('Tavasz')], 'label' => ['text' => __('Félév, amikor tanulta')], 'class' => 'form-control', 'required' => true]) ?>
-                        </fieldset>
-                    <?php } ?>
-                </div>
-            <?php } ?>
             <div class="col-12">
                 <?= $this->Form->button(__('Mentés'), ['type' => 'submit', 'class' => 'btn btn-primary border-radius-45px submitBtn']) ?>
             </div>
@@ -139,7 +86,7 @@
             $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
             //Save gomb eventjeinek resetelése cserével
             $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-            $('#confirmationModal .msg').text('<?= __('Mellékletek') . ($student->course_id == 1 ? __(' és záróvizsga tárgyak') : '') . __(' mentése')?>');
+            $('#confirmationModal .msg').text('<?= __('Záróvizsga-tárgyak mentése.') ?>');
 
             $('#confirmationModal').modal('show');
 

@@ -106,4 +106,14 @@ class StudentsTableTest extends TestCase
     {
         $this->markTestIncomplete('Not implemented yet.');
     }
+
+    /**
+     * Test canModifyData method
+     *
+     * @return void
+     */
+    public function testCanModifyData()
+    {
+        $this->markTestIncomplete('Not implemented yet.');
+    }
 }

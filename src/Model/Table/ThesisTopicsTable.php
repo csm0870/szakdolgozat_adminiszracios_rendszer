@@ -230,7 +230,7 @@ class ThesisTopicsTable extends Table
             }
             
             return $ok;
-        }elseif(empty($entity->cause_of_no_external_consultant)){\Cake\Log\Log::write('error', 'nincs');
+        }elseif(empty($entity->cause_of_no_external_consultant)){
             //Ha nincs külső konzulens, akkor annak indoklása kötelező
             $entity->setError('cause_of_no_external_consultant', __('Külső konzulenstől való eltekintés indoklása kötelező.'));
             return false;

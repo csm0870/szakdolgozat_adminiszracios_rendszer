@@ -40,7 +40,7 @@
                                                 }
                                                 
                                                 echo $this->Html->link(__('PDF'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px', 'target' => '_blank']);
-                                                if($thesisTopic->encrypted) echo $this->Html->link(__('Titkosítási kérelem'), ['controller' => 'ThesisTopics', 'action' => 'encyptionRegulationDoc', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info enrcyption-doc-btn', 'target' => '_blank']);
+                                                if($thesisTopic->encrypted) echo '<br/>' . $this->Html->link(__('Titkosítási kérelem'), ['controller' => 'ThesisTopics', 'action' => 'encyptionRegulationDoc', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info enrcyption-doc-btn border-radius-45px', 'target' => '_blank']);
                                                 
                                                 if($thesisTopic->thesis_topic_status_id == 13){
                                                     echo '<br/>';
@@ -59,7 +59,7 @@
                     <?php 
                         if(!empty($can_fill_in_topic) && $can_fill_in_topic === true){
                             if(!empty($can_add_topic) && $can_add_topic === true)
-                                echo $this->Html->link(__('Új téma hozzáadása'), ['controller' => 'ThesisTopics', 'action' => 'add'], ['class' => 'btn btn-outline-secondary btn-block']);
+                                echo $this->Html->link(__('Új téma hozzáadása'), ['controller' => 'ThesisTopics', 'action' => 'add'], ['class' => 'btn btn-outline-secondary btn-block border-radius-45px']);
                         }else{ ?>
                             <h5 style="color: red"><?= __('Nincs kitöltési időszak!') ?></h5>
                         <?php } ?>
@@ -82,7 +82,7 @@
             $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
             //Save gomb eventjeinek resetelése cserével
             $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-            $('#confirmationModal .msg').html('<?= __('Téma véglegesítése. Véglegesítés után az adatok nem módosíthatóak.<br/>A véglegesítés után a hallgatói adatok sem módosíthatóak, csak ha elutasíják a témát.') ?>');
+            $('#confirmationModal .msg').html('<?= __('Téma véglegesítése. Véglegesítés után a téma adatai nem módosíthatóak.<br/>A véglegesítés után a hallgatói adatok sem módosíthatóak, csak ha elutasíják a témát.') ?>');
 
             $('#confirmationModal').modal('show');
             
