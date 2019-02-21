@@ -20,12 +20,13 @@ use Cake\ORM\Entity;
  * @property int|null $course_level_id
  * @property int|null $course_type_id
  * @property int|null $user_id
- * @property int|null $final_exam_subject_internal_consultant_id
+ * @property int|null $final_exam_subjects_internal_consultant_id
  *
  * @property \App\Model\Entity\Course $course
  * @property \App\Model\Entity\CourseLevel $course_level
  * @property \App\Model\Entity\CourseType $course_type
  * @property \App\Model\Entity\User $user
+ * @property \App\Model\Entity\InternalConsultant $internal_consultant
  * @property \App\Model\Entity\FinalExamSubject[] $final_exam_subjects
  * @property \App\Model\Entity\OfferedTopic[] $offered_topics
  * @property \App\Model\Entity\ThesisTopic[] $thesis_topics
@@ -56,11 +57,12 @@ class Student extends Entity
         'course_level_id' => true,
         'course_type_id' => true,
         'user_id' => true,
-        'final_exam_subject_internal_consultant_id' => true, //null - még nincsenek kiválasztva, 1 - feltöltve, 2 - véglegesítve, 3 - elfogadva, 4 - elutasítva
+        'final_exam_subjects_internal_consultant_id' => true,
         'course' => true,
         'course_level' => true,
         'course_type' => true,
         'user' => true,
+        'final_exam_subjects_internal_consultant' => true,
         'final_exam_subjects' => true,
         'offered_topics' => true,
         'thesis_topics' => true

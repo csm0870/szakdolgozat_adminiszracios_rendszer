@@ -13,7 +13,7 @@ use Cake\Validation\Validator;
  * @property \App\Model\Table\CourseLevelsTable|\Cake\ORM\Association\BelongsTo $CourseLevels
  * @property \App\Model\Table\CourseTypesTable|\Cake\ORM\Association\BelongsTo $CourseTypes
  * @property \App\Model\Table\UsersTable|\Cake\ORM\Association\BelongsTo $Users
- * @property |\Cake\ORM\Association\BelongsTo $InternalConsultants
+ * @property \App\Model\Table\InternalConsultantsTable|\Cake\ORM\Association\BelongsTo $InternalConsultants
  * @property \App\Model\Table\FinalExamSubjectsTable|\Cake\ORM\Association\HasMany $FinalExamSubjects
  * @property \App\Model\Table\OfferedTopicsTable|\Cake\ORM\Association\HasMany $OfferedTopics
  * @property \App\Model\Table\ThesisTopicsTable|\Cake\ORM\Association\HasMany $ThesisTopics
@@ -60,8 +60,9 @@ class StudentsTable extends Table
         $this->belongsTo('Users', [
             'foreignKey' => 'user_id'
         ]);
-        $this->belongsTo('InternalConsultants', [
-            'foreignKey' => 'final_exam_subject_internal_consultant_id'
+        $this->belongsTo('FinalExamSubjectsInternalConsultants', [
+            'foreignKey' => 'final_exam_subjects_internal_consultant_id',
+            'className' => 'InternalConsultants'
         ]);
         $this->hasMany('FinalExamSubjects', [
             'foreignKey' => 'student_id'
@@ -137,7 +138,7 @@ class StudentsTable extends Table
         $rules->add($rules->existsIn(['course_level_id'], 'CourseLevels'));
         $rules->add($rules->existsIn(['course_type_id'], 'CourseTypes'));
         $rules->add($rules->existsIn(['user_id'], 'Users'));
-        $rules->add($rules->existsIn(['final_exam_subject_internal_consultant_id'], 'InternalConsultants'));
+        $rules->add($rules->existsIn(['final_exam_subjects_internal_consultant_id'], 'FinalExamSubjectsInternalConsultants'));
 
         return $rules;
     }
@@ -158,7 +159,7 @@ class StudentsTable extends Table
             $student->user_id = $user_id;
             if(!$this->save($student)){
                 throw new \Cake\Core\Exception\Exception(__('Hiba történt. Próbálja újra!'));
-            }
+}
             return ['success' => false, 'student_id' => $student->id];
         }
 

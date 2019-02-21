@@ -23,7 +23,7 @@
                     ?>
                 </div>
                 <div class="col-12 mb-4">
-                    <?= $this->Form->control('internal_consultant_id', ['options' => $internalConsultants, 'label' => ['text' => __('Belső konzulens') . ':'], 'class' => 'form-control', 'required' => true, 'value' => $student->final_exam_subject_internal_consultant_id,  'disabled' => in_array($student->final_exam_subjects_status, [2, 3])]) ?>
+                    <?= $this->Form->control('internal_consultant_id', ['options' => $internalConsultants, 'label' => ['text' => __('Belső konzulens') . ':'], 'class' => 'form-control', 'required' => true, 'value' => $student->final_exam_subjects_internal_consultant_id,  'disabled' => in_array($student->final_exam_subjects_status, [2, 3])]) ?>
                 </div>
                 <div class="col-12">
                     <div id="accordion">
@@ -123,9 +123,14 @@
                         <?php } ?>
                     </div>
                 </div>
-                <div class="col-12">
+                <div class="col-12 col-sm-6 text-center">
                     <?= in_array($student->final_exam_subjects_status, [2, 3]) ? '' : $this->Form->button(__('Mentés'), ['type' => 'submit', 'class' => 'btn btn-primary border-radius-45px submitBtn']) ?>
+                </div>
+                <div class="col-12 col-sm-6  text-center">
                     <?= in_array($student->final_exam_subjects_status, [1, 4]) ? $this->Form->button(__('Tárgyak véglegesítése'), ['type' => 'button', 'role' => 'button', 'class' => 'btn btn-success border-radius-45px finalizeBtn']) : '' ?>
+                </div>
+                <div class="col-12 text-center">
+                    <?= $student->final_exam_subjects_status == 3 ? $this->Html->link(__('Záróvizsga-tárgy kérelem letöltése'), ['controller' => 'FinalExamSubjects', 'action' => 'exportDoc', $student->id, 'prefix' => false], ['target' => '_blank', 'class' => 'btn btn-primary border-radius-45px']) : '' ?>
                 </div>
                 <?= in_array($student->final_exam_subjects_status, [2, 3]) ? '' : $this->Form->end() ?>
             </div>

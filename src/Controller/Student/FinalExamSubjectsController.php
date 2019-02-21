@@ -51,7 +51,7 @@ class FinalExamSubjectsController extends AppController
             $internal_consultant_ids[] = $topic->internal_consultant_id;
         }
         //Azon belső konzulensek, amelyek a hallgató témáihoz tartoznak
-        $internalConsultants = $this->FinalExamSubjects->Students->InternalConsultants->find('list', ['conditions' => ['id IN' => $internal_consultant_ids]]);        
+        $internalConsultants = $this->FinalExamSubjects->Students->FinalExamSubjectsInternalConsultants->find('list', ['conditions' => ['id IN' => $internal_consultant_ids]]);        
         
         if(empty($internalConsultants)){
             $ok = false;
@@ -129,7 +129,7 @@ class FinalExamSubjectsController extends AppController
                 
                 if($save_ok === true){
                     $student->final_exam_subjects_status = 1;
-                    $student->final_exam_subject_internal_consultant_id = $internal_consultant_id;
+                    $student->final_exam_subjects_internal_consultant_id = $internal_consultant_id;
                     if($this->FinalExamSubjects->Students->save($student)){
                         $this->Flash->success(__('Mentés sikeres.'));
                         return $this->redirect(['action' => 'index']);

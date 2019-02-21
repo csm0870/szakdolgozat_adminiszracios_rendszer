@@ -29,6 +29,7 @@ class StudentsTableTest extends TestCase
         'app.course_levels',
         'app.course_types',
         'app.users',
+        'app.internal_consultants',
         'app.final_exam_subjects',
         'app.offered_topics',
         'app.thesis_topics'
