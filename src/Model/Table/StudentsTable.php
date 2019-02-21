@@ -13,7 +13,9 @@ use Cake\Validation\Validator;
  * @property \App\Model\Table\CourseLevelsTable|\Cake\ORM\Association\BelongsTo $CourseLevels
  * @property \App\Model\Table\CourseTypesTable|\Cake\ORM\Association\BelongsTo $CourseTypes
  * @property \App\Model\Table\UsersTable|\Cake\ORM\Association\BelongsTo $Users
+ * @property |\Cake\ORM\Association\BelongsTo $InternalConsultants
  * @property \App\Model\Table\FinalExamSubjectsTable|\Cake\ORM\Association\HasMany $FinalExamSubjects
+ * @property \App\Model\Table\OfferedTopicsTable|\Cake\ORM\Association\HasMany $OfferedTopics
  * @property \App\Model\Table\ThesisTopicsTable|\Cake\ORM\Association\HasMany $ThesisTopics
  *
  * @method \App\Model\Entity\Student get($primaryKey, $options = [])
@@ -58,7 +60,13 @@ class StudentsTable extends Table
         $this->belongsTo('Users', [
             'foreignKey' => 'user_id'
         ]);
+        $this->belongsTo('InternalConsultants', [
+            'foreignKey' => 'final_exam_subject_internal_consultant_id'
+        ]);
         $this->hasMany('FinalExamSubjects', [
+            'foreignKey' => 'student_id'
+        ]);
+        $this->hasMany('OfferedTopics', [
             'foreignKey' => 'student_id'
         ]);
         $this->hasMany('ThesisTopics', [
@@ -108,6 +116,9 @@ class StudentsTable extends Table
             ->maxLength('specialisation', 40)
             ->allowEmpty('specialisation');
 
+        $validator
+            ->allowEmpty('final_exam_subjects_status');
+
         return $validator;
     }
 
@@ -126,6 +137,7 @@ class StudentsTable extends Table
         $rules->add($rules->existsIn(['course_level_id'], 'CourseLevels'));
         $rules->add($rules->existsIn(['course_type_id'], 'CourseTypes'));
         $rules->add($rules->existsIn(['user_id'], 'Users'));
+        $rules->add($rules->existsIn(['final_exam_subject_internal_consultant_id'], 'InternalConsultants'));
 
         return $rules;
     }

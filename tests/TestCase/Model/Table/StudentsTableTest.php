@@ -30,6 +30,7 @@ class StudentsTableTest extends TestCase
         'app.course_types',
         'app.users',
         'app.final_exam_subjects',
+        'app.offered_topics',
         'app.thesis_topics'
     ];
 

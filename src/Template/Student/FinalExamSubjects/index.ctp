@@ -11,6 +11,20 @@
                                             'inputContainerError' => '<div class="form-group">{{content}}{{error}}</div>']);
                     echo in_array($student->final_exam_subjects_status, [2, 3]) ? '' : $this->Form->create(null, ['id' => 'saveFinalExamSubjectsForm', 'type' => 'file', 'class' => 'row']);
                 ?>
+                <div class="col-12 mb-4">
+                    <?php
+                        echo '<strong>' . __('Állapot') . '</strong>:&nbsp;';
+                        
+                        if($student->final_exam_subjects_status === null) echo __('Még nincsenek kiválasztva.');
+                        elseif($student->final_exam_subjects_status === 1) echo __('Kiválasztva. Véglegesíthető.');
+                        elseif($student->final_exam_subjects_status === 2) echo __('Véglegesítve. Ellenőrzésre vár.');
+                        elseif($student->final_exam_subjects_status === 3) echo __('Elfogadva.');
+                        elseif($student->final_exam_subjects_status === 4) echo __('Elutasítva.')
+                    ?>
+                </div>
+                <div class="col-12 mb-4">
+                    <?= $this->Form->control('internal_consultant_id', ['options' => $internalConsultants, 'label' => ['text' => __('Belső konzulens') . ':'], 'class' => 'form-control', 'required' => true, 'value' => $student->final_exam_subject_internal_consultant_id,  'disabled' => in_array($student->final_exam_subjects_status, [2, 3])]) ?>
+                </div>
                 <div class="col-12">
                     <div id="accordion">
                         <?php 
@@ -34,10 +48,10 @@
                                     <div id="finalExamSubjectCollapse_<?= $i ?>" class="collapse" aria-labelledby="heading_<?= $i ?>" data-parent="#accordion">
                                         <div class="card-body">
                                             <?= $this->Form->control("final_exam_subjects[{$i}][id]", ['type' => 'hidden', 'value' => $subject->id]) ?>
-                                            <?= $this->Form->control("final_exam_subjects[{$i}][name]", ['label' => ['text' => __('Tárgy neve')], 'class' => 'form-control', 'required' => true, 'value' => $subject->name, 'data-id' => $i]) ?>
-                                            <?= $this->Form->control("final_exam_subjects[{$i}][teachers]", ['label' => ['text' => __('Tanár(ok)')], 'class' => 'form-control', 'required' => true, 'value' => $subject->teachers, 'data-id' => $i]) ?>
-                                            <?= $this->Form->control("final_exam_subjects[{$i}][year_id]", ['options' => $years, 'label' => ['text' => __('Tanév, amikor tanulta')], 'class' => 'form-control', 'required' => true, 'value' => $subject->year_id, 'data-id' => $i]) ?>
-                                            <?= $this->Form->control("final_exam_subjects[{$i}][semester]", ['options' => [__('Ősz'), __('Tavasz')], 'label' => ['text' => __('Félév, amikor tanulta')], 'class' => 'form-control', 'required' => true, 'value' => $subject->semester, 'data-id' => $i]) ?>
+                                            <?= $this->Form->control("final_exam_subjects[{$i}][name]", ['label' => ['text' => __('Tárgy neve')], 'class' => 'form-control', 'required' => true, 'value' => $subject->name, 'data-id' => $i, 'readonly' => in_array($student->final_exam_subjects_status, [2, 3])]) ?>
+                                            <?= $this->Form->control("final_exam_subjects[{$i}][teachers]", ['label' => ['text' => __('Tanár(ok)')], 'class' => 'form-control', 'required' => true, 'value' => $subject->teachers, 'data-id' => $i, 'readonly' => in_array($student->final_exam_subjects_status, [2, 3])]) ?>
+                                            <?= $this->Form->control("final_exam_subjects[{$i}][year_id]", ['options' => $years, 'label' => ['text' => __('Tanév, amikor tanulta')], 'class' => 'form-control', 'required' => true, 'value' => $subject->year_id, 'data-id' => $i, 'disabled' => in_array($student->final_exam_subjects_status, [2, 3])]) ?>
+                                            <?= $this->Form->control("final_exam_subjects[{$i}][semester]", ['options' => [__('Ősz'), __('Tavasz')], 'label' => ['text' => __('Félév, amikor tanulta')], 'class' => 'form-control', 'required' => true, 'value' => $subject->semester, 'data-id' => $i, 'disabled' => in_array($student->final_exam_subjects_status, [2, 3])]) ?>
                                         </div>
                                     </div>
                                 </div>
@@ -113,7 +127,7 @@
                     <?= in_array($student->final_exam_subjects_status, [2, 3]) ? '' : $this->Form->button(__('Mentés'), ['type' => 'submit', 'class' => 'btn btn-primary border-radius-45px submitBtn']) ?>
                     <?= in_array($student->final_exam_subjects_status, [1, 4]) ? $this->Form->button(__('Tárgyak véglegesítése'), ['type' => 'button', 'role' => 'button', 'class' => 'btn btn-success border-radius-45px finalizeBtn']) : '' ?>
                 </div>
-                <?= $this->Form->end() ?>
+                <?= in_array($student->final_exam_subjects_status, [2, 3]) ? '' : $this->Form->end() ?>
             </div>
         <?php }else{ ?>
             <div class="col-12">
@@ -127,72 +141,77 @@
 <script>
     $(function(){
         $('#final_exam_subjects_index_menu_item').addClass('active');
-        
-        function validateForm(){
-            $('#saveFinalExamSubjectsForm input').each(function(){
-                var id = $(this).data('id');
-                if(this.checkValidity() === false){
-                    $('#finalExamSubjectCollapse_' + id).collapse('show');
-                    return;
-                }
-            });
-        }
-        
-        <?php if(isset($final_exam_subject_error_number)){ ?> // Ha van hiba, akkor azt a collapse-ot kinyitjuk, ahol a hiba van
+        <?php if($ok === true){ ?>
+            function validateForm(){
+                $('#saveFinalExamSubjectsForm input').each(function(){
+                    var id = $(this).data('id');
+                    if(this.checkValidity() === false){
+                        $('#finalExamSubjectCollapse_' + id).collapse('show');
+                        return;
+                    }
+                });
+            }
+
+            <?php if(isset($final_exam_subject_error_number)){ ?> // Ha van hiba, akkor azt a collapse-ot kinyitjuk, ahol a hiba van
                 $('#final_exam_subject_arrow_up_<?= $final_exam_subject_error_number ?>').removeClass('d-none');
                 $('#final_exam_subject_arrow_down_<?= $final_exam_subject_error_number ?>').addClass('d-none');
                 $('#finalExamSubjectCollapse_<?= $final_exam_subject_error_number ?>').collapse('show');
+            <?php } ?>
+
+            <?php if(!in_array($student->final_exam_subjects_status, [2, 3])){ ?>
+                /**
+                * Confirmation modal megnyitása submit előtt
+                */
+                $('#saveFinalExamSubjectsForm .submitBtn').on('click', function(e){
+                    e.preventDefault();
+
+                    validateForm();
+                    //Formvalidáció manuális meghívása
+                    if($('#saveFinalExamSubjectsForm')[0].reportValidity() === false) return;
+
+                    $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan mented?') ?>');
+                    $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
+                    //Save gomb eventjeinek resetelése cserével
+                    $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
+                    $('#confirmationModal .msg').html('<?= __('Záróvizsga-tárgyak mentése.') ?>');
+
+                    $('#confirmationModal').modal('show');
+
+                    var thesis_topic_id = $(this).data('id');
+
+                    $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
+                        e.preventDefault();
+                        $('#confirmationModal').modal('hide');
+                        $('#saveFinalExamSubjectsForm').trigger('submit');
+                    });
+                });
+            <?php } ?>
+
+            <?php if(in_array($student->final_exam_subjects_status, [1, 4])){ ?>
+                /**
+                * Confirmation modal megnyitása submit előtt
+                */
+                $('.finalizeBtn').on('click', function(e){
+                    e.preventDefault();
+
+                    $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan véglegesíted?') ?>');
+                    $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
+                    //Save gomb eventjeinek resetelése cserével
+                    $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
+                    $('#confirmationModal .msg').text('<?= __('Záróvizsga-tárgyak véglegesítése.') ?>');
+
+                    $('#confirmationModal').modal('show');
+
+                    var thesis_topic_id = $(this).data('id');
+
+                    $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
+                        e.preventDefault();
+                        $('#confirmationModal').modal('hide');
+                        location.href = '<?= $this->Url->build(['controller' => 'FinalExamSubjects', 'action' => 'finalize'], true) ?>' + '/' + thesis_topic_id;
+                    });
+                });
+            <?php } ?>
         <?php } ?>
-                
-        /**
-        * Confirmation modal megnyitása submit előtt
-        */
-        $('#saveFinalExamSubjectsForm .submitBtn').on('click', function(e){
-            e.preventDefault();
-            
-            validateForm();
-            //Formvalidáció manuális meghívása
-            if($('#saveFinalExamSubjectsForm')[0].reportValidity() === false) return;
-
-            $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan mented?') ?>');
-            $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
-            //Save gomb eventjeinek resetelése cserével
-            $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-            $('#confirmationModal .msg').html('<?= __('Záróvizsga-tárgyak mentése.') ?>');
-
-            $('#confirmationModal').modal('show');
-            
-            var thesis_topic_id = $(this).data('id');
-            
-            $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
-                e.preventDefault();
-                $('#confirmationModal').modal('hide');
-                $('#saveFinalExamSubjectsForm').trigger('submit');
-            });
-        });
-        
-        /**
-        * Confirmation modal megnyitása submit előtt
-        */
-        $('.student-thesisTopics-index .finalizeUpoadedThesisBtn').on('click', function(e){
-            e.preventDefault();
-
-            $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan véglegesíted?') ?>');
-            $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
-            //Save gomb eventjeinek resetelése cserével
-            $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-            $('#confirmationModal .msg').text('<?= __('Feltöltés véglegesítése.') ?>');
-
-            $('#confirmationModal').modal('show');
-            
-            var thesis_topic_id = $(this).data('id');
-            
-            $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
-                e.preventDefault();
-                $('#confirmationModal').modal('hide');
-                location.href = '<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'finalizeUploadedThesis'], true) ?>' + '/' + thesis_topic_id;
-            });
-        });
     });
 </script>
 

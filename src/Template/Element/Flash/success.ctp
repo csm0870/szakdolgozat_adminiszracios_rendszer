@@ -1,4 +1,4 @@
-<div class="col-12 flash-success" style="margin: 10px 0">
+<div class="col-12 flash-success" style="margin-bottom: 10px; margin-top: 10px">
     <div class="alert alert-success alert-dismissible">
         <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
         <p><i class="icon fa fa-check"></i> <?= h($message) ?></p>

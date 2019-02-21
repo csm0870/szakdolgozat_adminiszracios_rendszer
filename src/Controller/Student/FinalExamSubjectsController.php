@@ -30,25 +30,60 @@ class FinalExamSubjectsController extends AppController
         $error_msg = '';
         
         $student = $this->FinalExamSubjects->Students->find('all', ['conditions' => ['Students.id' => $data['student_id']], 'contain' => ['FinalExamSubjects']])->first();
+        //Olyan témák száma, amivel már lehet ZV tárgyak megadni
+        $thesisTopics = $this->FinalExamSubjects->Students->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.thesis_topic_status_id IN' => [11, 12, 13, 14], 'deleted' => false]]);
         
         if($student->course_id != 1){ //Ha nem mérnökinformatikus
             $ok = false;
             $error_msg = __('Csak mérnökinformatikus hallgató választhat záróvizsga-tárgyakat.');
-        }elseif($student->final_exam_subjects_status == 2){ //Ha már véglegesítve vannak a tárgyak
+        }elseif($ok === true && $thesisTopics->count() == 0){
             $ok = false;
-            $error_msg = __('Már nincs lehetősége tárgyakat választani.') . ' ' . __('Már véglegesítve vannak.');
-        }elseif($student->final_exam_subjects_status == 3){ //Ha már el van fogadva a tárgyak
-            $ok = false;
-            $error_msg = __('Már nincs lehetősége tárgyakat választani.') . ' ' . __('Már el vannak fogadva.');
+            $error_msg = __('Nincs olyan állapotban lévő szakdolgozata, ami alapján záróvizsga-tárgyakat választhatna.');
         }
         
-        if($ok === false){
+        if(!$ok){
+            $this->set(compact('ok', 'error_msg'));
+            return;
+        }
+        
+        $internal_consultant_ids = [];
+        foreach($thesisTopics as $topic){
+            $internal_consultant_ids[] = $topic->internal_consultant_id;
+        }
+        //Azon belső konzulensek, amelyek a hallgató témáihoz tartoznak
+        $internalConsultants = $this->FinalExamSubjects->Students->InternalConsultants->find('list', ['conditions' => ['id IN' => $internal_consultant_ids]]);        
+        
+        if(empty($internalConsultants)){
+            $ok = false;
+            $error_msg = __('Nincs belső konzulens, akit megjelölhetne a záróvizsga-megjelölő lapon.');
             $this->set(compact('ok', 'error_msg'));
             return;
         }
         
         //Akkor tölthet fel új tárgyakat, ha még eddig nem voltak, illetve, ha van olyan témája amely olyan állapotban van, hogy egyáltalán ZV tárgyválasztás lehet
         if($this->getRequest()->is(['post', 'patch', 'put'])){
+            if($student->final_exam_subjects_status == 2){ //Ha már véglegesítve vannak a tárgyak
+                $ok = false;
+                $this->Flash->error(__('Már nincs lehetősége tárgyakat választani.') . ' ' . __('Már véglegesítve vannak.'));
+            }elseif($student->final_exam_subjects_status == 3){ //Ha már el van fogadva a tárgyak
+                $ok = false;
+                $this->Flash->error(__('Már nincs lehetősége tárgyakat választani.') . ' ' . __('Már el vannak fogadva.'));
+            }
+            
+            if($ok === true){
+                $internal_consultant_id = $this->getRequest()->getData('internal_consultant_id');
+                
+                if(empty($internal_consultant_id)){ //Nincs belső konzulens ID
+                    $ok = false;
+                    $this->Flash->error(__('Nem választhat záróvizsga-tárgyakat.') . ' ' . __('Belső konzulens választása kötelező.'));
+                }elseif(!in_array($internal_consultant_id, $internal_consultant_ids)){ //Nincs a belső konzulens ID-k között a kérésben lévő ID
+                    $ok = false;
+                    $this->Flash->error(__('Nem választhat záróvizsga-tárgyakat.') . ' ' . __('A választott belső konzulens nincs olyan állapotú témához rendelve, amely alapján záróvizsga-tárgyakat választhatna.'));
+                }
+            }
+            
+            if($ok === false)  return $this->redirect(['action' => 'index']);
+            
             $final_exam_subjects = $this->getRequest()->getData('final_exam_subjects');
                     
             $error_message = ''; //Hibaüzenet, ha nem sikerült a ZV-tárgyak mentése
@@ -94,6 +129,7 @@ class FinalExamSubjectsController extends AppController
                 
                 if($save_ok === true){
                     $student->final_exam_subjects_status = 1;
+                    $student->final_exam_subject_internal_consultant_id = $internal_consultant_id;
                     if($this->FinalExamSubjects->Students->save($student)){
                         $this->Flash->success(__('Mentés sikeres.'));
                         return $this->redirect(['action' => 'index']);
@@ -109,6 +145,53 @@ class FinalExamSubjectsController extends AppController
         //Hallgató lekérése újra, hogy, ha van mentett ZV-tárgy, akkor azok bekerüljenek a mezőkbe sikertelen mentés után is (olyan esetben, ha pl. 1-et el tudunk menteni, de egy másikat nem, így az elmentett adatok jó helyre kerülnek)
         $student = $this->FinalExamSubjects->Students->find('all', ['conditions' => ['Students.id' => $data['student_id']], 'contain' => ['FinalExamSubjects']])->first();
         $years = $this->FinalExamSubjects->Years->find('list');
-        $this->set(compact('student', 'ok', 'error_msg', 'years'));
+        $this->set(compact('student', 'ok', 'error_msg', 'years', 'internalConsultants'));
+    }
+    
+    /**
+     * Záróvizsga-tárgyak véglegesítése
+     * 
+     * @return type
+     */
+    public function finalize(){
+        //Hallgatói adatellenőrzés
+        $this->loadModel('Students');
+        $data = $this->FinalExamSubjects->Students->checkStundentData($this->Auth->user('id'));
+        if($data['success'] === false){
+            $this->Flash->error(__('Adja meg az adatit a továbblépéshez!'));
+            return $this->redirect(['controller' => 'Students', 'action' => 'edit', $data['student_id']]);
+        }
+        
+        $ok = true;
+        $error_msg = '';
+        
+        $student = $this->FinalExamSubjects->Students->find('all', ['conditions' => ['Students.id' => $data['student_id']], 'contain' => ['FinalExamSubjects']])->first();
+        
+        if($student->course_id != 1){ //Ha nem mérnökinformatikus
+            $ok = false;
+            $error_msg = __('Záróvizsga-tárgyak nem véglegesíthetők.') . ' ' . __('Csak mérnökinformatikus hallgatónak lehetnek záróvizsga-tárgyai.');
+        }elseif(count($student->final_exam_subjects) != 3){ //Ha nem három ZV-tárgy van
+            $ok = false;
+            $error_msg = __('Záróvizsga-tárgyak nem véglegesíthetők.') . ' ' . __('Három záróvizsga-tárgyat kell választani.');
+        }elseif($student->final_exam_subjects_status == 2){ //Ha már véglegesítve vannak a tárgyak
+            $ok = false;
+            $error_msg = __('Záróvizsga-tárgyak nem véglegesíthetők.') . ' ' . __('Már véglegesítve vannak.');
+        }elseif($student->final_exam_subjects_status == 3){ //Ha már el van fogadva a tárgyak
+            $ok = false;
+            $error_msg = __('Záróvizsga-tárgyak nem véglegesíthetők.') . ' ' . __('Már el vannak fogadva.');
+        }
+        
+        if($ok === false){
+            $this->set(compact('ok', 'error_msg'));
+            return;
+        }
+        
+        $student->final_exam_subjects_status = 2;
+        if($this->FinalExamSubjects->Students->save($student)){
+            $this->Flash->success(__('Véglegesítés sikeres.'));
+        }else{
+            $this->Flash->error(__('Véglegesítés sikeretlen. Próbálja újra!'));
+        }
+        return $this->redirect(['action' => 'index']);
     }
 }

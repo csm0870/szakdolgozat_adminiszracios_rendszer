@@ -169,6 +169,9 @@ class ThesisTopicsTable extends Table
         $validator
             ->boolean('thesis_accepted')
             ->allowEmpty('thesis_accepted');
+        
+        $validator
+            ->notEmpty('internal_consultant_id', __('Belső konzulens választása kötelező!'));
 
         return $validator;
     }
