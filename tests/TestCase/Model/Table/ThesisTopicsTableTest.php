@@ -32,7 +32,8 @@ class ThesisTopicsTableTest extends TestCase
         'app.students',
         'app.thesis_topic_statuses',
         'app.consultations',
-        'app.reviews'
+        'app.reviews',
+        'app.thesis_supplements'
     ];
 
     /**
@@ -85,6 +86,26 @@ class ThesisTopicsTableTest extends TestCase
      * @return void
      */
     public function testBuildRules()
+    {
+        $this->markTestIncomplete('Not implemented yet.');
+    }
+
+    /**
+     * Test beforeSave method
+     *
+     * @return void
+     */
+    public function testBeforeSave()
+    {
+        $this->markTestIncomplete('Not implemented yet.');
+    }
+
+    /**
+     * Test afterSave method
+     *
+     * @return void
+     */
+    public function testAfterSave()
     {
         $this->markTestIncomplete('Not implemented yet.');
     }

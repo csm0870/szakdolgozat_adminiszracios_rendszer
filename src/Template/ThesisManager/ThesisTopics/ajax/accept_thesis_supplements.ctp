@@ -1,7 +1,7 @@
-<div class="form-modal internalConsultant-setThesisSubjectCompleted">
-    <?= $ok ? $this->Form->create($thesisTopic, ['id' => 'setThesisSubjectCompletedForm']) : '' ?>
+<div class="form-modal">
+    <?= $ok === true ? $this->Form->create($thesisTopic, ['id' => 'acceptThesisSupplements']) : '' ?>
     <div class="form-header text-center">
-        <?= __('Diplomakurzus első félévének teljesítésének rögzítése') ?>
+        <?= __('Szakdolgozat/Diplomamunka mellékleteinek elfogadása') ?>
     </div>
     <div class="form-body">
         <?php if($ok === false){ ?>
@@ -12,21 +12,21 @@
             <table>
                 <tr>
                     <td>
-                        <?= $this->Form->control('first_thesis_subject_completed', ['label' => __('Első diplomakurzus teljesítve') . ": ", 'id' => 'first_thesis_subject_completed', 'error' => false,
-                                                                                    'options' => [__('Nem'), __('Igen')], 'templates' => ['formGroup' => '{{label}}&nbsp;&nbsp;{{input}}']]) ?>
+                        <?= $this->Form->control('accepted', ['label' => __('Mellékletek elfogadása') . ": ", 'id' => 'accept_thesis_supplements_select', 'error' => false,
+                                                              'options' => [__('Elutasítás'), __('Elfogadás')], 'templates' => ['formGroup' => '{{label}}&nbsp;&nbsp;{{input}}']]) ?>
                     </td>
                 </tr>
-                <tr class="first_thesis_subject_failed_suggestion_row">
+                <tr class="rejected_supplements_row">
                     <td>
                         <label>
-                            <?= __('Javaslat a téma javítására vagy új választásához (tanszékvezető döntéséhez)') . ": " ?>
+                            <?= __('Az elutasítás oka') . ": " ?>
                         </label>
                     </td>
                 </tr>
-                <tr class="first_thesis_subject_failed_suggestion_row">
+                <tr class="rejected_supplements_row">
                     <td>
-                        <?= $this->Form->control('first_thesis_subject_failed_suggestion', ['label' => false, 'style' => 'width: 100%', 'error' => false,
-                                                                                            'id' => 'first_thesis_subject_failed_suggestion']) ?>
+                        <?= $this->Form->control('cause_of_rejecting_thesis_supplements', ['label' => false, 'style' => 'width: 100%', 'error' => false,
+                                                                                            'id' => 'cause_of_rejecting_thesis_supplements_input']) ?>
                     </td>
                 </tr>
             </table>
@@ -35,8 +35,8 @@
     <div class="form-footer text-center">
         <?= $ok === true ? $this->Form->button(__('Mentés'), ['type' => 'button', 'role' => 'button', 'class' => 'btn btn-success submitBtn border-radius-45px']) : '' ?>
     </div>
-    <?= $ok === true ? '' : $this->Form->end() ?>
-    <div class="overlay overlay-set_first_thesis_subject_completed" style="display:none">
+    <?= $ok === true ? $this->Form->end() : '' ?>
+    <div class="overlay overlay-accept_thesis_supplements" style="display:none">
         <div class="spinner fa-3x">
             <i class="fas fa-spinner fa-pulse"></i>
         </div>
@@ -47,50 +47,50 @@
     <script>
         $(function(){
             /**
-             *  first_thesis_subject_completed select változtatásakor megjelenítjük vagy elrejtjük a javaslathoz tartozó mezőket
+             *  accept_thesis_supplements_select select változtatásakor megjelenítjük vagy elrejtjük az okhoz tartozó mezőket
              */
-            $('#first_thesis_subject_completed').on('change', function(){
+            $('#accept_thesis_supplements_select').on('change', function(){
                if($(this).val() == 1){
-                   $('.first_thesis_subject_failed_suggestion_row').css('display', 'none');
+                   $('.rejected_supplements_row').css('display', 'none');
                    //Textarea resetelése
-                   $('#first_thesis_subject_failed_suggestion').val('');
+                   $('#cause_of_rejecting_thesis_supplements_input').val('');
                }else if($(this).val() == 0){
-                   $('.first_thesis_subject_failed_suggestion_row').css('display', 'table-row');
+                   $('.rejected_supplements_row').css('display', 'table-row');
                }
             });
 
             /**
              * Confirmation modal megnyitása submit előtt
              */
-            $('#setThesisSubjectCompletedForm .submitBtn').on('click', function(e){
+            $('#acceptThesisSupplements .submitBtn').on('click', function(e){
                 e.preventDefault();
 
                 $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan mented?') ?>');
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
                 //Save gomb eventjeinek resetelése cserével
                 $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-                $('#confirmationModal .msg').text('<?= __('Szakdolgozat/Diplomakurzus első félévének teljesítésének rögzítése.') ?>');
+                $('#confirmationModal .msg').text('<?= __('Szakdolgozat/Diplomamunka mellékleteinek elfogadása.') ?>');
 
                 $('#confirmationModal').modal('show');
 
                 $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
                     e.preventDefault();
                     $('#confirmationModal').modal('hide');
-                    $('#setThesisSubjectCompletedForm').trigger('submit');
+                    $('#acceptThesisSupplements').trigger('submit');
                 });
             });
 
             //consultationOccasionAddForm ajaxform
-            $('#setThesisSubjectCompletedForm').ajaxForm({
+            $('#acceptThesisSupplements').ajaxForm({
                 replaceTarget: false,
                 target: null,
                 beforeSubmit: function(arr, $form, options) {
-                    $('.overlay-set_first_thesis_subject_completed').show();
+                    $('.overlay-accept_thesis_supplements').show();
                 },
                 success: function (response, textStatus, jqXHR, $form){
                     if(response.saved == false){
-                        $('.overlay-set_first_thesis_subject_completed').hide();
-                        $('#set_first_thesis_subject_completed_container').html(response.content);
+                        $('.overlay-accept_thesis_supplements').hide();
+                        $('#accept_thesis_supplements_container').html(response.content);
                         $('#error_modal_ajax .error-msg').html(response.error_ajax);
                         $('#error_modal_ajax').modal('show');
                     }else{
@@ -98,7 +98,7 @@
                     }
                 },
                 error: function(jqXHR, textStatus, errorThrown){
-                    $('.overlay-set_first_thesis_subject_completed').hide();
+                    $('.overlay-accept_thesis_supplements').hide();
                     $('#error_modal_ajax .error-msg').html('<?= __('Hiba történt mentés közben. Próbálja újra!') . '<br/>' . __('Hiba') . ': ' ?>' + errorThrown);
                     $('#error_modal_ajax .error-code').text('-1000');
                     $('#error_modal_ajax').modal('show');

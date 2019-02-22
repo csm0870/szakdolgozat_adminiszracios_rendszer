@@ -17,7 +17,7 @@ use Cake\Validation\Validator;
  * @property \App\Model\Table\ThesisTopicStatusesTable|\Cake\ORM\Association\BelongsTo $ThesisTopicStatuses
  * @property \App\Model\Table\ConsultationsTable|\Cake\ORM\Association\HasMany $Consultations
  * @property \App\Model\Table\ReviewsTable|\Cake\ORM\Association\HasMany $Reviews
- * @property |\Cake\ORM\Association\HasMany $ThesisSupplements
+ * @property \App\Model\Table\ThesisSupplementsTable|\Cake\ORM\Association\HasMany $ThesisSupplements
  *
  * @method \App\Model\Entity\ThesisTopic get($primaryKey, $options = [])
  * @method \App\Model\Entity\ThesisTopic newEntity($data = null, array $options = [])
@@ -102,18 +102,6 @@ class ThesisTopicsTable extends Table
             ->notEmpty('description', __('Leírás megadása kötelező.'));
 
         $validator
-            ->scalar('cause_of_no_external_consultant')
-            ->allowEmpty('cause_of_no_external_consultant');
-
-        $validator
-            ->boolean('modifiable')
-            ->allowEmpty('modifiable');
-
-        $validator
-            ->boolean('deleted')
-            ->allowEmpty('deleted');
-
-        $validator
             ->boolean('is_thesis')
             ->notEmpty('is_thesis', __('Dolgozat típusának megadása kötelező.'));
 
@@ -128,6 +116,10 @@ class ThesisTopicsTable extends Table
         $validator
             ->boolean('expected_ending_semester')
             ->notEmpty('expected_ending_semester', __('Kezdési tanév megadása kötelező.'));
+
+        $validator
+            ->scalar('cause_of_no_external_consultant')
+            ->allowEmpty('cause_of_no_external_consultant');
 
         $validator
             ->scalar('external_consultant_name')
@@ -160,18 +152,27 @@ class ThesisTopicsTable extends Table
             ->allowEmpty('external_consultant_address');
 
         $validator
-            ->scalar('first_thesis_subject_failed_suggestion')
-            ->allowEmpty('first_thesis_subject_failed_suggestion');
+            ->boolean('thesis_accepted')
+            ->allowEmpty('thesis_accepted');
 
         $validator
             ->allowEmpty('internal_consultant_grade');
 
         $validator
-            ->boolean('thesis_accepted')
-            ->allowEmpty('thesis_accepted');
-        
+            ->scalar('first_thesis_subject_failed_suggestion')
+            ->allowEmpty('first_thesis_subject_failed_suggestion');
+
         $validator
-            ->notEmpty('internal_consultant_id', __('Belső konzulens választása kötelező!'));
+            ->scalar('cause_of_rejecting_thesis_supplements')
+            ->allowEmpty('cause_of_rejecting_thesis_supplements');
+
+        $validator
+            ->boolean('modifiable')
+            ->allowEmpty('modifiable');
+
+        $validator
+            ->boolean('deleted')
+            ->allowEmpty('deleted');
 
         return $validator;
     }
@@ -210,7 +211,7 @@ class ThesisTopicsTable extends Table
             if(empty($entity->external_consultant_name)){
                 $entity->setError('external_consultant_name', __('Külső konzulens nevének megadása kötelező.'));
                 $ok = false;
-            }
+}
             if(empty($entity->external_consultant_workplace)){
                 $entity->setError('external_consultant_workplace', __('Külső konzulens munkahelyének megadása kötelező.'));
                 $ok = false;

@@ -166,23 +166,22 @@ class ThesisTopicsController extends AppController
         $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id], 'contain' => ['ThesisTopicStatuses']])->first();
 
         $error_msg = '';
-        $no_thesis_topic = false;
+        $ok = true;
         
         if(empty($thesisTopic)){ //Nem létezik a téma
             $error_msg = __('A diplomakurzus első félévének teljesítésének rögzítését nem teheti meg.') . ' ' . __('Nem létező téma.');
-            $no_thesis_topic = true;
+            $ok = false;
         }elseif($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : -1)){ ////Nem ehhez a belső konzulenshez tartozik
             $error_msg = __('A diplomakurzus első félévének teljesítésének rögzítését nem teheti meg.') . ' ' . __('A témának nem Ön a belső konzulense.');
-            $no_thesis_topic = true;
+            $ok = false;
         }elseif($thesisTopic->thesis_topic_status_id != 8){ //Nem "A téma elfogadott" státuszban van
             $error_msg = __('A diplomakurzus első félévének teljesítésének rögzítését nem teheti meg.') . ' ' . __('A téma'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.';
-            $no_thesis_topic = true;
+            $ok = false;
         }
         
         //Ha a feltételeknek megfelelő téma nem található
-        if(empty($thesisTopic)){
-            $no_thesis_topic = true;
-            $this->set(compact('no_thesis_topic', 'error_msg'));
+        if($ok === false){
+            $this->set(compact('ok', 'error_msg'));
             return;
         }
                 
@@ -225,7 +224,7 @@ class ThesisTopicsController extends AppController
             }
         }
         
-        $this->set(compact('thesisTopic' ,'no_thesis_topic', 'error_msg', 'saved', 'error_ajax'));
+        $this->set(compact('thesisTopic' ,'ok', 'error_msg', 'saved', 'error_ajax'));
         $this->set('_serialize', ['saved', 'error_ajax']);
     }
 }

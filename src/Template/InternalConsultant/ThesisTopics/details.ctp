@@ -8,22 +8,25 @@
         <div class="col-12">
             <div class="row thesisTopics-details-body">
                 <div class="col-12 col-md-6">
-                    <p>
+                    <p class="mb-4">
+                        <strong><?= __('Állapot') . ': ' ?></strong><?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : ''?>
+                    </p>
+                    <p class="mb-1">
                         <strong><?= __('Hallgató neve') . ': ' ?></strong><?= $thesisTopic->has('student') ? h($thesisTopic->student->name) : ''?>
                     </p>
-                    <p>
+                    <p class="mb-1">
                         <strong><?= __('Neptun kód') . ': ' ?></strong><?= $thesisTopic->has('student') ? h($thesisTopic->student->neptun) : ''?>
                     </p>
-                    <p>
+                    <p class="mb-1">
                         <strong><?= __('Szak') . ': ' ?></strong><?= $thesisTopic->has('student') ? ($thesisTopic->student->has('course') ? h($thesisTopic->student->course->name) : '') : ''?>
                     </p>
-                    <p>
+                    <p class="mb-1">
                         <strong><?= __('Képzés szintje') . ': ' ?></strong><?= $thesisTopic->has('student') ? ($thesisTopic->student->has('course_level') ? h($thesisTopic->student->course_level->name) : '') : ''?>
                     </p>
-                    <p>
+                    <p class="mb-1">
                         <strong><?= __('Képzés típusa') . ': ' ?></strong><?= $thesisTopic->has('student') ? ($thesisTopic->student->has('course_type') ? h($thesisTopic->student->course_type->name) : '') : ''?>
                     </p>
-                    <p>
+                    <p class="mb-1">
                         <strong><?= __('Téma címe') . ': ' ?></strong><?= h($thesisTopic->title) ?>
                     </p>
                 </div>

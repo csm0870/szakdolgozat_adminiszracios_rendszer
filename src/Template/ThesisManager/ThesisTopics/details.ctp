@@ -5,6 +5,37 @@
             <h4><?= __('Téma részletei') ?></h4>
         </div>
         <?= $this->Flash->render() ?>
+        <div class="col-12 col-md-6">
+            <p class="<?= $thesisTopic->thesis_topic_status_id == 15 ? 'mb-1' : 'mb-4' ?>">
+                <strong><?= __('Állapot') . ': ' ?></strong><?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : ''?>
+            </p>
+            <?php if($thesisTopic->thesis_topic_status_id == 15){ ?>
+                <p class="mb-3">
+                    <strong><?= __('Elutasítás oka') . ': ' ?></strong><?= h($thesisTopic->cause_of_rejecting_thesis_supplements) ?>
+                </p>
+            <?php } ?>
+            <p class="mb-1">
+                <strong><?= __('Hallgató neve') . ': ' ?></strong><?= $thesisTopic->has('student') ? h($thesisTopic->student->name) : ''?>
+            </p>
+            <p class="mb-1">
+                <strong><?= __('Neptun kód') . ': ' ?></strong><?= $thesisTopic->has('student') ? h($thesisTopic->student->neptun) : ''?>
+            </p>
+            <p class="mb-1">
+                <strong><?= __('Szak') . ': ' ?></strong><?= $thesisTopic->has('student') ? ($thesisTopic->student->has('course') ? h($thesisTopic->student->course->name) : '') : ''?>
+            </p>
+            <p class="mb-1">
+                <strong><?= __('Képzés szintje') . ': ' ?></strong><?= $thesisTopic->has('student') ? ($thesisTopic->student->has('course_level') ? h($thesisTopic->student->course_level->name) : '') : ''?>
+            </p>
+            <p class="mb-1">
+                <strong><?= __('Képzés típusa') . ': ' ?></strong><?= $thesisTopic->has('student') ? ($thesisTopic->student->has('course_type') ? h($thesisTopic->student->course_type->name) : '') : ''?>
+            </p>
+            <p class="mb-1">
+                <strong><?= __('Belső konzulens') . ': ' ?></strong><?= $thesisTopic->has('internal_consultant') ? h($thesisTopic->internal_consultant->name) : '' ?>
+            </p>
+            <p class="mb-1">
+                <strong><?= __('Téma címe') . ': ' ?></strong><?= h($thesisTopic->title) ?>
+            </p>
+        </div>
         <div class="col-12">
             <div id="accordion">
                 <div class="card">
@@ -23,9 +54,9 @@
                              <ul>
                                 <?php
                                     foreach($thesisTopic->thesis_supplements as $supplement){
-                                        if(!empty($supplement->file)){ 
+                                        if(!empty($supplement->file)){
                                             echo '<li>' .
-                                                    $this->Html->link($supplement->file, ['controller' => 'ThesisSupplements', 'action' => 'downloadFile', $supplement->id], ['target' => '_blank']) .
+                                                    $this->Html->link($supplement->file, ['controller' => 'ThesisSupplements', 'action' => 'downloadFile', $supplement->id, 'prefix' => false], ['target' => '_blank']) .
                                                  '</li>';
                                         }
                                     }
@@ -34,45 +65,44 @@
                         </div>
                     </div>
                 </div>
-                <?php if($student->course_id == 1){ //Ha mérnökinformatikus ?>
-                    <div class="card mt-4">
-                        <div class="card-header" id="headingTwo">
-                            <h5 class="mb-0">
-                                <button class="btn btn-link" data-toggle="collapse" data-target="#final_exam_subjects_collapse" aria-expanded="true" aria-controls="collapseTwo">
-                                    <?= __('Záróvizsga-tárgyak') ?>
-                                    <i class="fas fa-angle-down fa-lg" id="final_exam_subjects_arrow_down"></i>
-                                    <i class="fas fa-angle-up fa-lg d-none" id="final_exam_subjects_arrow_up"></i>
-                                </button>
-                            </h5>
-                        </div>
-
-                        <div id="final_exam_subjects_collapse" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
-                            <div class="card-body">
-                                <div class="row">
-                                    <?php $i = 0;
-                                        foreach($student->final_exam_subjects as $subject){ $i++; if($i >= 4) break; ?>
-                                            <div class="col-12 col-md-6 mb-2">
-                                                <strong><?=  __('Tárgy neve') ?>:&nbsp;</strong><?= h($subject->name) ?><br/>
-                                                <strong><?= __('Tanár(ok)') ?>:&nbsp;</strong><?= h($subject->teachers) ?><br/>
-                                                <strong><?=  __('Tanév') ?>:&nbsp;</strong><?= $subject->has('year') ? h($subject->year->name) : '' ?><br/>
-                                                <strong><?=  __('Félév') ?>:&nbsp;</strong><?= $subject->semester !== null ? ($subject->semester === true ? __('Tavasz') : __('Ősz')) : '-' ?>
-                                            </div>
-                                    <?php } ?>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                <?php } ?>
             </div>
         </div>
-        <div class="col-12 mt-5 text-center">
-            <?= $this->Html->link(__('Szakdolgozat/Diplomamunka feltöltés elfogadása'), ['controller' => 'ThesisTopics', 'action' => '', $thesisTopic->id], ['class' => 'btn btn-info border-radius-45px']) ?>
-        </div>
+        <?php if($thesisTopic->thesis_topic_status_id == 14){ ?>
+            <div class="col-12 mt-3 text-center">
+                <?= $this->Form->button(__('Mellékletek elfogadása'), ['class' => 'btn btn-primary acceptThesisSupplementsBtn border-radius-45px']) ?>
+            </div>
+        <?php } ?>
     </div>
+</div>
+<!-- Diplomakurzus első félévének teljesítésének rögzítése modal -->
+<div class="modal fade" id="acceptThesisSupplementsModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div id="accept_thesis_supplements_container">
+
+                </div>
+            </div>
+        </div>
+  </div>
 </div>
 <script>
     $(function(){
         $('#thesis_topics_index_menu_item').addClass('active');
+        
+        //Tartalom lekeérése a "diplomakurzus első félévének teljesítésének rögzítése" modalba
+        $.ajax({
+            url: '<?= $this->Url->build(['action' => 'acceptThesisSupplements', $thesisTopic->id], true) ?>',
+            cache: false
+        })
+        .done(function( response ) {
+            $('#accept_thesis_supplements_container').html(response.content);
+        });
+        
+        $('.acceptThesisSupplementsBtn').on('click', function(e){
+            e.preventDefault();
+            $('#acceptThesisSupplementsModal').modal('show');
+        });
         
         /**
          * Accordion megjelenítésekor nyíl cseréje
@@ -90,22 +120,42 @@
             $('#supplement_arrow_up').addClass('d-none');
         });
         
-        <?php if($student->course_id == 1){ //Ha mérnökinformatikus ?>
-            /**
-             * Accordion megjelenítésekor nyíl cseréje
-             */
-            $('#final_exam_subjects_collapse').on('show.bs.collapse', function () {
-                $('#final_exam_subjects_arrow_up').removeClass('d-none');
-                $('#final_exam_subjects_arrow_down').addClass('d-none');
+        //Confirmation modal elfogadás előtt
+        $('.acceptBtn').on('click', function(e){
+            e.preventDefault();
+            
+            $('#confirmationModal .header').text('<?= __('Biztosan elfogadod?') ?>');
+            $('#confirmationModal .msg').text('<?= __('Mellékletek elfogadása.') ?>');
+            $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Elfogadás') ?>').css('background-color', '#71D0BD');
+            //Save gomb eventjeinek resetelése cserével
+            $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
+                        
+            $('#confirmationModal').modal('show');
+            
+            $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
+                e.preventDefault();
+                $('#confirmationModal').modal('hide');
+                $('#acceptThesisSupplements').trigger('submit');
             });
-
-            /**
-             * Accordion eltüntetésekor nyíl cseréje
-             */
-            $('#final_exam_subjects_collapse').on('hide.bs.collapse', function () {
-                $('#final_exam_subjects_arrow_down').removeClass('d-none');
-                $('#final_exam_subjects_arrow_up').addClass('d-none');
+        });
+        
+        //Confirmation modal elutasítás előtt
+        $('.rejectBtn').on('click', function(e){
+            e.preventDefault();
+            
+            $('#confirmationModal .header').text('<?= __('Biztosan elutasítod?') ?>');
+            $('#confirmationModal .msg').text('<?= __('Mellékletek elutasítása.') ?>');
+            $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Elutasítás') ?>').css('background-color', 'red');
+            //Save gomb eventjeinek resetelése cserével
+            $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
+                        
+            $('#confirmationModal').modal('show');
+            
+            $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
+                e.preventDefault();
+                $('#confirmationModal').modal('hide');
+                $('#rejectThesisSupplements').trigger('submit');
             });
-        <?php } ?>
+        });
     });
 </script>

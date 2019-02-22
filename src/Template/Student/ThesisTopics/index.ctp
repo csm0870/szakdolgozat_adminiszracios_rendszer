@@ -18,8 +18,8 @@
                                     <tr>
                                         <td>
                                             <?= h($thesisTopic->title) .
-                                                (in_array($thesisTopic->thesis_topic_status_id, [12, 13]) ? ('<br/>' . $this->Html->link(__('Diplomamunka/szakdolgozat feltöltése') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'uploadThesis', $thesisTopic->id])) : '') .
-                                                ($thesisTopic->thesis_topic_status_id == 14 ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '')
+                                                (in_array($thesisTopic->thesis_topic_status_id, [12, 13, 15]) ? ('<br/>' . $this->Html->link(__('Diplomamunka/szakdolgozat feltöltése') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'uploadThesis', $thesisTopic->id])) : '') .
+                                                (in_array($thesisTopic->thesis_topic_status_id, [14, 16]) ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '')
                                             ?>
                                         </td>
                                         <td>
@@ -41,11 +41,6 @@
                                                 
                                                 echo $this->Html->link(__('PDF'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px', 'target' => '_blank']);
                                                 if($thesisTopic->encrypted) echo '<br/>' . $this->Html->link(__('Titkosítási kérelem'), ['controller' => 'ThesisTopics', 'action' => 'encyptionRegulationDoc', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info enrcyption-doc-btn border-radius-45px', 'target' => '_blank']);
-                                                
-                                                if($thesisTopic->thesis_topic_status_id == 13){
-                                                    echo '<br/>';
-                                                    echo $this->Html->link(__('Feltöltés véglegesítése'), '#', ['class' => 'btn btn-success finalizeUpoadedThesisBtn border-radius-45px', 'data-id' => $thesisTopic->id]);
-                                                }
                                             ?>
                                         </td>
                                     </tr>
@@ -92,29 +87,6 @@
                 e.preventDefault();
                 $('#confirmationModal').modal('hide');
                 location.href = '<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'finalizeThesisTopic'], true) ?>' + '/' + thesis_topic_id;
-            });
-        });
-        
-        /**
-        * Confirmation modal megnyitása submit előtt
-        */
-        $('.student-thesisTopics-index .finalizeUpoadedThesisBtn').on('click', function(e){
-            e.preventDefault();
-
-            $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan véglegesíted?') ?>');
-            $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
-            //Save gomb eventjeinek resetelése cserével
-            $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-            $('#confirmationModal .msg').text('<?= __('Feltöltés véglegesítése.') ?>');
-
-            $('#confirmationModal').modal('show');
-            
-            var thesis_topic_id = $(this).data('id');
-            
-            $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
-                e.preventDefault();
-                $('#confirmationModal').modal('hide');
-                location.href = '<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'finalizeUploadedThesis'], true) ?>' + '/' + thesis_topic_id;
             });
         });
     });

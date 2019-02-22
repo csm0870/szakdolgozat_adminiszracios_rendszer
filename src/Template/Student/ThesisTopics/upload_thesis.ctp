@@ -11,6 +11,16 @@
                                         'inputContainerError' => '<div class="form-group">{{content}}{{error}}</div>']);
                 echo $this->Form->create($thesisTopic, ['id' => 'uploadThesisForm', 'type' => 'file', 'class' => 'row'])
             ?>
+            <?php if($thesisTopic->thesis_topic_status_id == 15){ ?>
+                <div class="col-12">
+                    <p class="<?= $thesisTopic->thesis_topic_status_id == 15 ? 'mb-1' : 'mb-4' ?>">
+                        <strong><?= __('Állapot') . ': ' ?></strong><?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : ''?>
+                    </p>
+                    <p class="mb-3">
+                        <strong><?= __('Elutasítás oka') . ': ' ?></strong><?= h($thesisTopic->cause_of_rejecting_thesis_supplements) ?>
+                    </p>
+                </div>
+            <?php } ?>
             <div class="col-12">
                 <fieldset class="border-1-grey p-3 mb-2">
                     <legend class="w-auto"><?= __('Mellékletek feltöltése') ?></legend>
@@ -32,7 +42,14 @@
                 </fieldset>
             </div>
             <div class="col-12">
-                <?= $this->Form->button(__('Mentés'), ['type' => 'submit', 'class' => 'btn btn-primary border-radius-45px submitBtn']) ?>
+                <div class="row">
+                    <div class="col-12 <?= $thesisTopic->thesis_topic_status_id == 13 ? 'col-sm-6' : '' ?> text-center">
+                        <?= $this->Form->button(__('Mentés'), ['type' => 'submit', 'class' => 'btn btn-primary border-radius-45px submitBtn']) ?>
+                    </div>
+                    <div class=" col-12 col-sm-6 text-center">
+                        <?= $thesisTopic->thesis_topic_status_id == 13 ? $this->Html->link(__('Feltöltés véglegesítése'), '#', ['class' => 'btn btn-success finalizeUpoadedThesisBtn border-radius-45px']) : ''?>
+                    </div>
+                </div>
             </div>
             <?= $this->Form->end() ?>
             <?php
@@ -94,6 +111,27 @@
                 e.preventDefault();
                 $('#confirmationModal').modal('hide');
                 $('#uploadThesisForm').trigger('submit');
+            });
+        });
+        
+        /**
+        * Confirmation modal megnyitása submit előtt
+        */
+        $('.finalizeUpoadedThesisBtn').on('click', function(e){
+            e.preventDefault();
+
+            $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan véglegesíted?') ?>');
+            $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
+            //Save gomb eventjeinek resetelése cserével
+            $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
+            $('#confirmationModal .msg').text('<?= __('Feltöltés véglegesítése.') ?>');
+
+            $('#confirmationModal').modal('show');
+            
+            $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
+                e.preventDefault();
+                $('#confirmationModal').modal('hide');
+                location.href = '<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'finalizeUploadedThesis', $thesisTopic->id], true) ?>';
             });
         });
     });
