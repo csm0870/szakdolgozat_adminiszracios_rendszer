@@ -10,8 +10,9 @@ use Cake\Validation\Validator;
  * InternalConsultants Model
  *
  * @property \App\Model\Table\DepartmentsTable|\Cake\ORM\Association\BelongsTo $Departments
- * @property |\Cake\ORM\Association\BelongsTo $InternalConsultantPositions
+ * @property \App\Model\Table\InternalConsultantPositionsTable|\Cake\ORM\Association\BelongsTo $InternalConsultantPositions
  * @property \App\Model\Table\UsersTable|\Cake\ORM\Association\BelongsTo $Users
+ * @property \App\Model\Table\OfferedTopicsTable|\Cake\ORM\Association\HasMany $OfferedTopics
  * @property \App\Model\Table\ThesisTopicsTable|\Cake\ORM\Association\HasMany $ThesisTopics
  *
  * @method \App\Model\Entity\InternalConsultant get($primaryKey, $options = [])
@@ -52,6 +53,9 @@ class InternalConsultantsTable extends Table
         ]);
         $this->belongsTo('Users', [
             'foreignKey' => 'user_id'
+        ]);
+        $this->hasMany('OfferedTopics', [
+            'foreignKey' => 'internal_consultant_id'
         ]);
         $this->hasMany('ThesisTopics', [
             'foreignKey' => 'internal_consultant_id'

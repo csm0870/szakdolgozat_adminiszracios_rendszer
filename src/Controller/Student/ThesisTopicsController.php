@@ -91,7 +91,6 @@ class ThesisTopicsController extends AppController
             $thesisTopic = $this->ThesisTopics->newEntity();
             if ($this->request->is('post')) {
                 $thesisTopic = $this->ThesisTopics->patchEntity($thesisTopic, $this->request->getData());
-                $thesisTopic->modifiable = true;
                 $thesisTopic->student_id = $data['student_id'];
                 $has_external_consultant = $this->getRequest()->getData('has_external_consultant');
 
@@ -153,7 +152,10 @@ class ThesisTopicsController extends AppController
             $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A téma nem létezik.'));
             $ok = false;
         }elseif($thesisTopic->student_id != (empty($student) ? 'null' : $student->id)){ //Nem a bejelntkezett hallgató szakdolgozata
-            $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A szakdolgozat nem Önhöz tartozik.'));
+            $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A téma nem Önhöz tartozik.'));
+            $ok = false;
+        }elseif(!in_array($thesisTopic->thesis_topic_id, [1, 4])){ //Nem véglegesítésre vár
+            $this->Flash->error(__('A szakdolgozat állapota alapján nem módosítható.'));
             $ok = false;
         }
         
@@ -175,13 +177,9 @@ class ThesisTopicsController extends AppController
             }else{
                 $thesisTopic->cause_of_no_external_consultant = null;
             }
-            
-            //Véglegesítésre vár
-            $thesisTopic->thesis_topic_status_id = 1;
 
-            if ($this->ThesisTopics->save($thesisTopic)) {
+            if($this->ThesisTopics->save($thesisTopic)){
                 $this->Flash->success(__('Mentés sikeres.'));
-
                 return $this->redirect(['action' => 'index']);
             }
 
@@ -218,15 +216,17 @@ class ThesisTopicsController extends AppController
             $this->Flash->error(__('A téma nem véglegesíthető.') . ' ' . __('A téma nem létezik.'));
             $ok = false;
         }elseif($thesisTopic->student_id != (empty($student) ? 'null' : $student->id)){ //Nem a bejelntkezett hallgató szakdolgozata
-            $this->Flash->error(__('A téma nem véglegesíthető.') . ' ' . __('A szakdolgozat nem Önhöz tartozik.'));
+            $this->Flash->error(__('A téma nem véglegesíthető.') . ' ' . __('A téma nem Önhöz tartozik.'));
+            $ok = false;
+        }elseif(!in_array($thesisTopic->thesis_topic_id, [1, 4])){ //Nem véglegesítésre vár
+            $this->Flash->error(__('A téma nem véglegesíthető.') . ' ' . __('A téma nem véglegesíthető állapotban van.'));
             $ok = false;
         }
         
         if(!$ok) return $this->redirect(['action' => 'index']);
         
-        $thesisTopic->modifiable = false;
         //Belső konzulensi döntésre vár
-        $thesisTopic->thesis_topic_status_id = 2;
+        $thesisTopic->thesis_topic_status_id = 6;
 
         if ($this->ThesisTopics->save($thesisTopic)) $this->Flash->success(__('Véglegesítve'));
         else $this->Flash->error(__('Hiba történt. Próbálja újra!'));
@@ -261,7 +261,7 @@ class ThesisTopicsController extends AppController
         }elseif($thesisTopic->student_id != (empty($student) ? 'null' : $student->id)){ //Nem a bejelntkezett hallgató szakdolgozata
             $this->Flash->error(__('Diplomamunka/Szakdolgozat nem tölthető fel.') . ' ' . __('A szakdolgozat nem Önhöz tartozik.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [12, 13, 15])){ //Nem "A szakdolgozat/diplomamunka a formai követelményeknek megfelelt, feltölthető", vagy nem "Szakdolgozat feltöltve, hallgató véglegesítésére vár",
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [16, 17, 19])){ //Nem "A szakdolgozat/diplomamunka a formai követelményeknek megfelelt, feltölthető", vagy nem "Szakdolgozat feltöltve, hallgató véglegesítésére vár",
                                                                                 //vagy nem "Szakdolgozat mellékletek elutasítva" státuszban van
             $this->Flash->error(__('Diplomamunka/Szakdolgozat nem tölthető fel.') . ' ' . __('Nem feltöltési státuszban van.'));
             $ok = false;
@@ -288,7 +288,7 @@ class ThesisTopicsController extends AppController
             }
             
             if($ok){
-                $thesisTopic->thesis_topic_status_id = 13;
+                $thesisTopic->thesis_topic_status_id = 17;
                 if($this->ThesisTopics->save($thesisTopic)){
                     $this->Flash->success(__('Mentés sikeres.'));
                     return $this->redirect(['action' => 'uploadThesis', $thesisTopic->id]);
@@ -352,7 +352,7 @@ class ThesisTopicsController extends AppController
         }elseif($thesisTopic->student_id != (empty($student) ? 'null' : $student->id)){ //Nem a bejelntkezett hallgató szakdolgozata
             $this->Flash->error(__('Feltöltés nem véglegesíthető.') . ' ' . __('A szakdolgozat nem Önhöz tartozik.'));
             $ok = false;
-        }elseif($thesisTopic->thesis_topic_status_id != 13){ //Nem "A szakdolgozat/diplomamunka a formai követelményeknek megfelelt, feltölthető" státuszban van
+        }elseif($thesisTopic->thesis_topic_status_id != 17){ //Nem "Szakdolgozat feltöltve, hallgató véglegesítésére vár" státuszban van
             $this->Flash->error(__('Feltöltés nem véglegesíthető.') . ' ' . __('Még nem lett feltöltve.'));
             $ok = false;
         }elseif(count($thesisTopic->thesis_supplements) == 0){
@@ -366,7 +366,7 @@ class ThesisTopicsController extends AppController
         if(!$ok) return $this->redirect(['action' => 'index']);
         
         //Mellékletek ellenőrzésére vár
-        $thesisTopic->thesis_topic_status_id = 14;
+        $thesisTopic->thesis_topic_status_id = 18;
         $thesisTopic->cause_of_rejecting_thesis_supplements = null;
         if ($this->ThesisTopics->save($thesisTopic)) $this->Flash->success(__('Véglegesítve'));
         else $this->Flash->error(__('Hiba történt. Próbálja újra!'));
@@ -389,13 +389,13 @@ class ThesisTopicsController extends AppController
         $ok = true;
         //Megnézzük, hogy megfelelő-e a téma a diplomamunka/szakdolgozat feltöltéséhez
         if(empty($thesisTopic)){ //Nem létezik a téma
-            $this->Flash->error(__('Részeletek nem elérhetőek.') . ' ' . __('Nem létezik a téma.'));
+            $this->Flash->error(__('Részletek nem elérhetőek.') . ' ' . __('Nem létezik a téma.'));
             $ok = false;
         }elseif($thesisTopic->student_id != (empty($student) ? 'null' : $student->id)){ //Nem a bejelntkezett hallgató szakdolgozata
-            $this->Flash->error(__('Részeletek nem elérhetőek.') . ' ' . __('A szakdolgozat nem Önhöz tartozik.'));
+            $this->Flash->error(__('Részletek nem elérhetőek.') . ' ' . __('A szakdolgozat nem Önhöz tartozik.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [14, 15, 16])){ //A szakdolgozati feltöltés nincs véglegesítve, vagy nincs elfogadva még
-            $this->Flash->error(__('Részeletek nem elérhetőek.') . ' ' . __('A szakdolgozat felöltése még nincs véglegesítve, vagy még nins elfogadva.'));
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [18, 20])){ //A szakdolgozati feltöltés nincs véglegesítve, vagy nincs elfogadva még
+            $this->Flash->error(__('Részletek nem elérhetőek.') . ' ' . __('A szakdolgozat felöltése még nincs véglegesítve, vagy még nins elfogadva.'));
             $ok = false;
         }
         

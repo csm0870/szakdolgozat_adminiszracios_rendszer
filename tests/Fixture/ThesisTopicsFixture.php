@@ -37,7 +37,6 @@ class ThesisTopicsFixture extends TestFixture
         'internal_consultant_grade' => ['type' => 'tinyinteger', 'length' => 4, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
         'first_thesis_subject_failed_suggestion' => ['type' => 'text', 'length' => null, 'null' => true, 'default' => null, 'collate' => 'utf8_general_ci', 'comment' => '', 'precision' => null],
         'cause_of_rejecting_thesis_supplements' => ['type' => 'text', 'length' => null, 'null' => true, 'default' => null, 'collate' => 'utf8_general_ci', 'comment' => '', 'precision' => null],
-        'modifiable' => ['type' => 'boolean', 'length' => null, 'null' => true, 'default' => '1', 'comment' => '', 'precision' => null],
         'deleted' => ['type' => 'boolean', 'length' => null, 'null' => true, 'default' => '0', 'comment' => '', 'precision' => null],
         'created' => ['type' => 'datetime', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
         'modified' => ['type' => 'datetime', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
@@ -45,6 +44,7 @@ class ThesisTopicsFixture extends TestFixture
         'language_id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         'student_id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         'thesis_topic_status_id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
+        'offered_topic_id' => ['type' => 'integer', 'length' => 10, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         '_indexes' => [
             'FK_degree_thesis_data_internal_constultants_idx' => ['type' => 'index', 'columns' => ['internal_consultant_id'], 'length' => []],
             'FK_thesis_topics_years_idx' => ['type' => 'index', 'columns' => ['starting_year_id'], 'length' => []],
@@ -52,12 +52,14 @@ class ThesisTopicsFixture extends TestFixture
             'FK_thesis_topics_ending_year_idx' => ['type' => 'index', 'columns' => ['expected_ending_year_id'], 'length' => []],
             'FK_thesis_topics_languages_idx' => ['type' => 'index', 'columns' => ['language_id'], 'length' => []],
             'FK_thesis_topics_thesis_topic_statuses_idx' => ['type' => 'index', 'columns' => ['thesis_topic_status_id'], 'length' => []],
+            'FK_thesis_topics_offered_topics_idx' => ['type' => 'index', 'columns' => ['offered_topic_id'], 'length' => []],
         ],
         '_constraints' => [
             'primary' => ['type' => 'primary', 'columns' => ['id'], 'length' => []],
             'FK_degree_thesis_data_internal_constultants' => ['type' => 'foreign', 'columns' => ['internal_consultant_id'], 'references' => ['internal_consultants', 'id'], 'update' => 'cascade', 'delete' => 'setNull', 'length' => []],
             'FK_thesis_topics_ending_year' => ['type' => 'foreign', 'columns' => ['expected_ending_year_id'], 'references' => ['years', 'id'], 'update' => 'cascade', 'delete' => 'setNull', 'length' => []],
             'FK_thesis_topics_languages' => ['type' => 'foreign', 'columns' => ['language_id'], 'references' => ['languages', 'id'], 'update' => 'cascade', 'delete' => 'setNull', 'length' => []],
+            'FK_thesis_topics_offered_topics' => ['type' => 'foreign', 'columns' => ['offered_topic_id'], 'references' => ['offered_topics', 'id'], 'update' => 'cascade', 'delete' => 'setNull', 'length' => []],
             'FK_thesis_topics_starting_year' => ['type' => 'foreign', 'columns' => ['starting_year_id'], 'references' => ['years', 'id'], 'update' => 'cascade', 'delete' => 'setNull', 'length' => []],
             'FK_thesis_topics_students' => ['type' => 'foreign', 'columns' => ['student_id'], 'references' => ['students', 'id'], 'update' => 'cascade', 'delete' => 'cascade', 'length' => []],
             'FK_thesis_topics_thesis_topic_statuses' => ['type' => 'foreign', 'columns' => ['thesis_topic_status_id'], 'references' => ['thesis_topic_statuses', 'id'], 'update' => 'cascade', 'delete' => 'setNull', 'length' => []],
@@ -98,14 +100,14 @@ class ThesisTopicsFixture extends TestFixture
                 'internal_consultant_grade' => 1,
                 'first_thesis_subject_failed_suggestion' => 'Lorem ipsum dolor sit amet, aliquet feugiat. Convallis morbi fringilla gravida, phasellus feugiat dapibus velit nunc, pulvinar eget sollicitudin venenatis cum nullam, vivamus ut a sed, mollitia lectus. Nulla vestibulum massa neque ut et, id hendrerit sit, feugiat in taciti enim proin nibh, tempor dignissim, rhoncus duis vestibulum nunc mattis convallis.',
                 'cause_of_rejecting_thesis_supplements' => 'Lorem ipsum dolor sit amet, aliquet feugiat. Convallis morbi fringilla gravida, phasellus feugiat dapibus velit nunc, pulvinar eget sollicitudin venenatis cum nullam, vivamus ut a sed, mollitia lectus. Nulla vestibulum massa neque ut et, id hendrerit sit, feugiat in taciti enim proin nibh, tempor dignissim, rhoncus duis vestibulum nunc mattis convallis.',
-                'modifiable' => 1,
                 'deleted' => 1,
-                'created' => '2019-02-22 12:43:57',
-                'modified' => '2019-02-22 12:43:57',
+                'created' => '2019-02-24 19:40:49',
+                'modified' => '2019-02-24 19:40:49',
                 'internal_consultant_id' => 1,
                 'language_id' => 1,
                 'student_id' => 1,
-                'thesis_topic_status_id' => 1
+                'thesis_topic_status_id' => 1,
+                'offered_topic_id' => 1
             ],
         ];
         parent::init();

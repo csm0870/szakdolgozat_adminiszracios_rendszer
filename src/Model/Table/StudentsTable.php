@@ -187,7 +187,7 @@ class StudentsTable extends Table
         $can_add_topic = true;
         foreach($thesisTopics as $thesisTopic){
             //Ha csak elutasított témája van
-            if(!in_array($thesisTopic->thesis_topic_status_id, [3, 5, 7, 10])){
+            if(!in_array($thesisTopic->thesis_topic_status_id, [3, 5, 7, 9, 11, 14])){
                 $can_add_topic = false;
                 break;
             }
@@ -197,10 +197,10 @@ class StudentsTable extends Table
     }
     
     /**
-     * Megnézi, hogy az adott hallgató adhat-e le új témát
+     * Megnézi, hogy az adott hallgató módosíthatja-e az adatait
      * 
      * @param type $student_id Hallgató azonosítója
-     * @return boolean Adhat-e hozzá témát
+     * @return boolean Módosíthatja-e az adatait
      */
     public function canModifyData($student_id = null){
         if(empty($student_id)) return false;
@@ -212,7 +212,7 @@ class StudentsTable extends Table
         $can_modify_data = true;
         foreach($thesisTopics as $thesisTopic){
             //Ha csak elutasított témája van vagy véglegesítésre váró
-            if(!in_array($thesisTopic->thesis_topic_status_id, [1, 3, 5, 7, 10])){
+            if(!in_array($thesisTopic->thesis_topic_status_id, [1,2, 3, 4, 5, 7, 9, 11, 14])){
                 $can_modify_data = false;
                 break;
             }

@@ -31,6 +31,7 @@ class ThesisTopicsTableTest extends TestCase
         'app.languages',
         'app.students',
         'app.thesis_topic_statuses',
+        'app.offered_topics',
         'app.consultations',
         'app.reviews',
         'app.thesis_supplements'

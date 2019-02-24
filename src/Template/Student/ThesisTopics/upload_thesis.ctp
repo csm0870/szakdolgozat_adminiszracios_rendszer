@@ -65,6 +65,7 @@
 </div>
 <script>
     $(function(){
+        $('#topics_menu_item').addClass('active');
         $('#thesis_topics_index_menu_item').addClass('active');
         
         /**

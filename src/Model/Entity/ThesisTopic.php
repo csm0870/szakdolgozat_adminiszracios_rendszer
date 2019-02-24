@@ -26,7 +26,6 @@ use Cake\ORM\Entity;
  * @property int|null $internal_consultant_grade
  * @property string|null $first_thesis_subject_failed_suggestion
  * @property string|null $cause_of_rejecting_thesis_supplements
- * @property bool|null $modifiable
  * @property bool|null $deleted
  * @property \Cake\I18n\FrozenTime|null $created
  * @property \Cake\I18n\FrozenTime|null $modified
@@ -34,6 +33,7 @@ use Cake\ORM\Entity;
  * @property int|null $language_id
  * @property int|null $student_id
  * @property int|null $thesis_topic_status_id
+ * @property int|null $offered_topic_id
  *
  * @property \App\Model\Entity\Year $starting_year
  * @property \App\Model\Entity\Year $expected_ending_year
@@ -41,6 +41,7 @@ use Cake\ORM\Entity;
  * @property \App\Model\Entity\Language $language
  * @property \App\Model\Entity\Student $student
  * @property \App\Model\Entity\ThesisTopicStatus $thesis_topic_status
+ * @property \App\Model\Entity\OfferedTopic $offered_topic
  * @property \App\Model\Entity\Consultation[] $consultations
  * @property \App\Model\Entity\Review[] $reviews
  * @property \App\Model\Entity\ThesisSupplement[] $thesis_supplements
@@ -77,7 +78,6 @@ class ThesisTopic extends Entity
         'internal_consultant_grade' => true,
         'first_thesis_subject_failed_suggestion' => true,
         'cause_of_rejecting_thesis_supplements' => true,
-        'modifiable' => true,
         'deleted' => true,
         'created' => true,
         'modified' => true,
@@ -85,12 +85,14 @@ class ThesisTopic extends Entity
         'language_id' => true,
         'student_id' => true,
         'thesis_topic_status_id' => true,
+        'offered_topic_id' => true,
         'starting_year' => true,
         'expected_ending_year' => true,
         'internal_consultant' => true,
         'language' => true,
         'student' => true,
         'thesis_topic_status' => true,
+        'offered_topic' => true,
         'consultations' => true,
         'reviews' => true,
         'thesis_supplements' => true

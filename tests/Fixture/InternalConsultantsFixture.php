@@ -53,8 +53,8 @@ class InternalConsultantsFixture extends TestFixture
             [
                 'id' => 1,
                 'name' => 'Lorem ipsum dolor sit amet',
-                'created' => '2019-01-13 13:01:22',
-                'modified' => '2019-01-13 13:01:22',
+                'created' => '2019-02-22 17:20:59',
+                'modified' => '2019-02-22 17:20:59',
                 'department_id' => 1,
                 'internal_consultant_position_id' => 1,
                 'user_id' => 1

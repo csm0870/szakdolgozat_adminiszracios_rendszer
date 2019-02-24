@@ -9,8 +9,17 @@
                 <li class="nav-item" id="student_data_menu_item">
                     <a class="nav-link" href="<?= $this->Url->build(['controller' => 'Students', 'action' => 'edit']) ?>"><?= __('Hallgatói adatok') ?></a>
                 </li>
+                <li class="nav-item dropdown" id="topics_menu_item">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <?= __('Témák kezelése') ?>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" id="thesis_topics_index_menu_item" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'index']) ?>"><?= __('Témaengedélyezők') ?></a>
+                        <a class="dropdown-item" id="offered_topics_index_menu_item" href="<?= $this->Url->build(['controller' => 'OfferedTopics', 'action' => 'index']) ?>"><?= __('Témaajánlatok') ?></a>
+                    </div>
+                </li>
                 <li class="nav-item" id="thesis_topics_index_menu_item">
-                    <a class="nav-link" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'index']) ?>"><?= __('Témaengedélyezők') ?></a>
+                    <a class="nav-link" href=""><?= __('Témaengedélyezők') ?></a>
                 </li>
                 <li class="nav-item" id="final_exam_subjects_index_menu_item">
                     <a class="nav-link" href="<?= $this->Url->build(['controller' => 'FinalExamSubjects', 'action' => 'index']) ?>"><?= __('Záróvizsga-tárgyak') ?></a>

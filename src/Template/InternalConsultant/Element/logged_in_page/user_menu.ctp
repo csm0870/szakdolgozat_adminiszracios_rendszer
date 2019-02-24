@@ -6,8 +6,14 @@
                 <li class="nav-item" id="dashboard_menu_item">
                     <a class="nav-link" href="<?= $this->Url->build(['controller' => 'Pages', 'action' => 'dashboard'], true) ?>"><?= __('Dashboard') ?></a>
                 </li>
-                <li class="nav-item" id="thesis_topic_index_menu_item">
-                    <a class="nav-link" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'index']) ?>"><?= __('Leadott témák') ?></a>
+                <li class="nav-item dropdown" id="topics_menu_item">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <?= __('Témák kezelése') ?>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" id="thesis_topics_index_menu_item" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'index']) ?>"><?= __('Leadott témák') ?></a>
+                        <a class="dropdown-item" id="offered_topics_index_menu_item" href="<?= $this->Url->build(['controller' => 'OfferedTopics', 'action' => 'index']) ?>"><?= __('Témakiírás') ?></a>
+                    </div>
                 </li>
                 <li class="nav-item" id="reviewers_index_menu_item">
                     <a class="nav-link" href="<?= $this->Url->build(['controller' => 'Reviewers', 'action' => 'index']) ?>"><?= __('Bírálók') ?></a>

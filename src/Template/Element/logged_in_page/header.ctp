@@ -3,8 +3,15 @@
         <?= $this->Html->link($this->Html->image('szechenyi-istvan-egyetem.png', ['class' => 'img-fluid szechenyi-img']),
                               'https://uni.sze.hu/kezdolap', ['target' => '_blank', 'escape' => false]) ?>
     </div>
-    <div class="col-12 col-sm-6 col-md-7 text-center title-container">
-        <span class="title"><?= __('Szakdolgozat adminisztrációs rendszer') ?></span>
+    <div class="col-12 col-sm-6 col-md-7 title-container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <span class="title"><?= __('Szakdolgozat adminisztrációs rendszer') ?></span>
+            </div>
+            <div class="col-12 text-right">
+                <?= __('Bejelentkezve, mint') . ' ' . h($logged_in_user->email) ?>
+            </div>
+        </div>
     </div>
     <div class="logout-container">
         <?= $this->Html->link('<i class="fas fa-sign-out-alt fa-3x"></i>', '#', ['escape' => false, 'class' => 'logoutBtn']) ?>

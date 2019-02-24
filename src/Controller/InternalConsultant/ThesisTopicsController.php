@@ -25,7 +25,7 @@ class ThesisTopicsController extends AppController
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         //Csak a véglegesített és a hozzá tartozó témákat látja
         $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['internal_consultant_id' => ($user->has('internal_consultant') ? $user->internal_consultant->id : null),
-                                                                           'deleted !=' => true, 'thesis_topic_status_id !=' => 1 /* Már biztosan véglegesített*/],
+                                                                           'deleted !=' => true, 'thesis_topic_status_id NOT IN' => [1, 2, 3, 4, 5] /* Még nincs leadva */],
                                                           'contain' => ['Students', 'ThesisTopicStatuses'], 'order' => ['ThesisTopics.modified' => 'DESC']]);
 
         $this->set(compact('thesisTopics'));
@@ -54,7 +54,7 @@ class ThesisTopicsController extends AppController
         }elseif($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : '')){ //Nem ehhez a belső konzulenshez tartozik
             $this->Flash->error(__('A témát nem törölheti.') . ' ' . __('A témának nem Ön a belső konzulense.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [3, 5, 7, 8, 10, 11])){ //Ha bírálati folyamatban van
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [1, 2, 3, 4, 5, 6, 8, 10, 13])){ //Ha nincs bírálati folyamatban van
             $this->Flash->error(__('A témát nem törölheti.') . ' ' . __('Az bírálata még folyamatban van.'));
             return $this->redirect(['action' => 'index']);
         }
@@ -91,7 +91,7 @@ class ThesisTopicsController extends AppController
         }elseif($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : '')){ //Nem ehhez a belső konzulenshez tartozik
             $this->Flash->error(__('A téma részletei nem elérhetők.') . ' ' . __('A témának nem Ön a belső konzulense.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [8, 9, 10, 11, 12])){ //Nem "A téma nem elfogadott", nem "Diplomakurzus sikertelen, tanaszékvezető döntésére vár", nem "Első diplomakurzus teljesítve", vagy nem "Elutsítva (első diplomakurzus sikertelen)" státuszban van
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [12, 13, 14, 15, 16, 17, 18, 19, 20])){ //Nem "A téma nem elfogadott", nem "Diplomakurzus sikertelen, tanaszékvezető döntésére vár", nem "Első diplomakurzus teljesítve", vagy nem "Elutsítva (első diplomakurzus sikertelen)" státuszban van
             $this->Flash->error(__('A téma részletei nem elérhetők.') . ' ' . __('A téma'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.');
             $ok = false;
         }
@@ -130,7 +130,7 @@ class ThesisTopicsController extends AppController
             }elseif($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : -1)){ ////Nem ehhez a belső konzulenshez tartozik
                 $error_msg = __('A témáról nem dönthet.') . ' ' . __('A témának nem Ön a belső konzulense.');
                 $no_thesis_topic = true;
-            }elseif($thesisTopic->thesis_topic_status_id != 2){ //Nem "A téma belső konzulensi döntésre vár" státuszban van
+            }elseif($thesisTopic->thesis_topic_status_id != 6){ //Nem "A téma belső konzulensi döntésre vár" státuszban van
                 $error_msg = __('A témáról nem dönthet.') . ' ' . __('A téma'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.';
                 $no_thesis_topic = true;
             }
@@ -140,7 +140,7 @@ class ThesisTopicsController extends AppController
                 return $this->redirect(['action' => 'index']);
             }
             
-            $thesisTopic->thesis_topic_status_id = $accepted == 0 ? 3 : 4;
+            $thesisTopic->thesis_topic_status_id = $accepted == 0 ? 7 : 8;
 
             if($this->ThesisTopics->save($thesisTopic)){
                 $this->Flash->success(__('Mentés sikeres!!'));

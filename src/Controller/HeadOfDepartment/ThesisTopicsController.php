@@ -84,7 +84,7 @@ class ThesisTopicsController extends AppController
         if(empty($thesisTopic)){ //Nem létezik a téma
             $this->Flash->error(__('A téma részletei nem elérhetők.') . ' ' . __('Nem létező téma.'));
             $ok = false;
-        }elseif($thesisTopic->modifiable === true || $thesisTopic->thesis_topic_status_id === 1){ //Véglegesítésre vár
+        }elseif($thesisTopic->thesis_topic_status_id == 1){ //Véglegesítésre vár
             $this->Flash->error(__('A téma részletei nem elérhetők.') . ' ' . __('A téma még nem véglegesített.'));
             $ok = false;
         }elseif(!in_array($thesisTopic->thesis_topic_status_id, [8, 9, 10])){ //Nem elfogadott, vagy nem diplomakurzus sikertelen státuszban van
@@ -114,7 +114,7 @@ class ThesisTopicsController extends AppController
         if(empty($thesisTopic)){ //Nem létezik a téma
             $error_msg = __('Nem dönthet.') . ' ' . __('Nem létező téma.');
             $no_thesis_topic = true;
-        }elseif($thesisTopic->modifiable === true || $thesisTopic->thesis_topic_status_id === 1){ //Véglegesítésre vár
+        }elseif($thesisTopic->thesis_topic_status_id == 1){ //Véglegesítésre vár
             $error_msg = __('Nem dönthet.') . ' ' . __('A téma még nem véglegesített.');
             $no_thesis_topic = true;
         }elseif($thesisTopic->thesis_topic_status_id != 9){ //Nem "Első diplomakurzus sikertelen, tanszékvezető döntésére vár" státuszban van

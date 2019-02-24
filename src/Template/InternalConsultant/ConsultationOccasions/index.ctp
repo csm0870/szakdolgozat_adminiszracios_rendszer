@@ -70,7 +70,8 @@
 <?php } ?>
 <script>
     $(function(){
-        $('#thesis_topic_index_menu_item').addClass('active');
+        $('#topics_menu_item').addClass('active');
+        $('#thesis_topics_index_menu_item').addClass('active');
         <?php if($consultation->accepted === null && $consultation->current === true){ //Még nincs véglegesítve a konzultációs csoport és a jelenlegi szakdolgozathoz tartozik ?>
         //Tartalom lekeérése a hozzáadáshoz
         $.ajax({

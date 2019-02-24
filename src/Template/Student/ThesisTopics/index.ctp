@@ -6,58 +6,58 @@
         <?= $this->Flash->render() ?>
         <div class="col-12">
             <div class="row thesisTopics-index-body">
-                    <div class="col-12">
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-hover topics-table">
+                <div class="col-12">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover topics-table">
+                            <tr>
+                                <th><?= __('Téma címe') ?></th>
+                                <th><?= __('Állapot') ?></th>
+                                <th><?= __('Műveletek') ?></th>
+                            </tr>
+                            <?php foreach($thesisTopics as $thesisTopic){ ?>
                                 <tr>
-                                    <th><?= __('Téma címe') ?></th>
-                                    <th><?= __('Állapot') ?></th>
-                                    <th><?= __('Műveletek') ?></th>
-                                </tr>
-                                <?php foreach($thesisTopics as $thesisTopic){ ?>
-                                    <tr>
-                                        <td>
-                                            <?= h($thesisTopic->title) .
-                                                (in_array($thesisTopic->thesis_topic_status_id, [12, 13, 15]) ? ('<br/>' . $this->Html->link(__('Diplomamunka/szakdolgozat feltöltése') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'uploadThesis', $thesisTopic->id])) : '') .
-                                                (in_array($thesisTopic->thesis_topic_status_id, [14, 16]) ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '')
-                                            ?>
-                                        </td>
-                                        <td>
-                                            <?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '' ?>
-                                        </td>
-                                        <td class="text-center">
-                                            <?php
-                                                if($thesisTopic->modifiable == true && $thesisTopic->thesis_topic_status_id == 1){
-                                                    //Ha kitöltési időszak van, csak akkor lehet véglegesíteni
-                                                    if(!empty($can_fill_in_topic) && $can_fill_in_topic === true){
-                                                        echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary edit-btn border-radius-45px']);
-                                                        echo $this->Html->link(__('Téma véglegesítés'), '#', ['class' => 'btn btn-success finalize-thesis-topic-btn border-radius-45px', 'data-id' => $thesisTopic->id]);
-                                                    }else{
-                                                        echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary edit-btn border-radius-45px']);
-                                                    }
-                                                    
-                                                    echo '<br/>';
+                                    <td>
+                                        <?= h($thesisTopic->title) .
+                                            (in_array($thesisTopic->thesis_topic_status_id, [16, 17, 19]) ? ('<br/>' . $this->Html->link(__('Diplomamunka/szakdolgozat feltöltése') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'uploadThesis', $thesisTopic->id])) : '') .
+                                            (in_array($thesisTopic->thesis_topic_status_id, [18, 20]) ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '')
+                                        ?>
+                                    </td>
+                                    <td>
+                                        <?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '' ?>
+                                    </td>
+                                    <td class="text-center">
+                                        <?php
+                                            if(in_array($thesisTopic->thesis_topic_status_id, [1, 4])){
+                                                //Ha kitöltési időszak van, csak akkor lehet véglegesíteni
+                                                if(!empty($can_fill_in_topic) && $can_fill_in_topic === true){
+                                                    echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary edit-btn border-radius-45px']);
+                                                    echo $this->Html->link(__('Téma véglegesítés'), '#', ['class' => 'btn btn-success finalize-thesis-topic-btn border-radius-45px', 'data-id' => $thesisTopic->id]);
+                                                }else{
+                                                    echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary edit-btn border-radius-45px']);
                                                 }
-                                                
-                                                echo $this->Html->link(__('PDF'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px', 'target' => '_blank']);
-                                                if($thesisTopic->encrypted) echo '<br/>' . $this->Html->link(__('Titkosítási kérelem'), ['controller' => 'ThesisTopics', 'action' => 'encyptionRegulationDoc', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info enrcyption-doc-btn border-radius-45px', 'target' => '_blank']);
-                                            ?>
-                                        </td>
-                                    </tr>
-                                <?php } ?>
-                            </table>
-                        </div>
+
+                                                echo '<br/>';
+                                            }
+
+                                            echo $this->Html->link(__('PDF'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px', 'target' => '_blank']);
+                                            if($thesisTopic->encrypted) echo '<br/>' . $this->Html->link(__('Titkosítási kérelem'), ['controller' => 'ThesisTopics', 'action' => 'encyptionRegulationDoc', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info enrcyption-doc-btn border-radius-45px', 'target' => '_blank']);
+                                        ?>
+                                    </td>
+                                </tr>
+                            <?php } ?>
+                        </table>
                     </div>
+                </div>
             </div>
             <div class="row">
                 <div class="col-12">
-                    <?php 
+                    <?php
                         if(!empty($can_fill_in_topic) && $can_fill_in_topic === true){
                             if(!empty($can_add_topic) && $can_add_topic === true)
                                 echo $this->Html->link(__('Új téma hozzáadása'), ['controller' => 'ThesisTopics', 'action' => 'add'], ['class' => 'btn btn-outline-secondary btn-block border-radius-45px']);
                         }else{ ?>
                             <h5 style="color: red"><?= __('Nincs kitöltési időszak!') ?></h5>
-                        <?php } ?>
+                    <?php } ?>
                 </div>
             </div>
         </div>
@@ -65,6 +65,7 @@
 </div>
 <script>
     $(function(){
+        $('#topics_menu_item').addClass('active');
         $('#thesis_topics_index_menu_item').addClass('active');
         
         /**

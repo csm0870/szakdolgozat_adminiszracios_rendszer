@@ -21,7 +21,7 @@ class ThesisTopicsController extends AppController
      * Szakdolgozatkezelő témalista(szakdolgozatlista)
      */
     public function index(){
-        $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['deleted !=' => true, 'modifiable' => false, 'thesis_topic_status_id IN' => [14, 15, 16]],
+        $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['deleted !=' => true, 'thesis_topic_status_id IN' => [14, 15, 16]],
                                                           'contain' => ['Students', 'InternalConsultants', 'ThesisTopicStatuses'], 'order' => ['ThesisTopics.modified' => 'DESC']]);
 
         $this->set(compact('thesisTopics'));

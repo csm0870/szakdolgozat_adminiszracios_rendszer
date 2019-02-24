@@ -54,7 +54,8 @@
 </div>
 <script>
     $(function(){
-        $('#thesis_topic_index_menu_item').addClass('active');
+        $('#topics_menu_item').addClass('active');
+        $('#thesis_topics_index_menu_item').addClass('active');
         
         //Tartalom lekeérése a "diplomakurzus első félévének teljesítésének rögzítése" modalba
         $.ajax({

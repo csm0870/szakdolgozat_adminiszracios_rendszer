@@ -1,22 +1,22 @@
 <?php
 namespace App\Test\TestCase\Model\Table;
 
-use App\Model\Table\InternalConsultantsTable;
+use App\Model\Table\OfferedTopicsTable;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 
 /**
- * App\Model\Table\InternalConsultantsTable Test Case
+ * App\Model\Table\OfferedTopicsTable Test Case
  */
-class InternalConsultantsTableTest extends TestCase
+class OfferedTopicsTableTest extends TestCase
 {
 
     /**
      * Test subject
      *
-     * @var \App\Model\Table\InternalConsultantsTable
+     * @var \App\Model\Table\OfferedTopicsTable
      */
-    public $InternalConsultants;
+    public $OfferedTopics;
 
     /**
      * Fixtures
@@ -24,11 +24,8 @@ class InternalConsultantsTableTest extends TestCase
      * @var array
      */
     public $fixtures = [
-        'app.internal_consultants',
-        'app.departments',
-        'app.internal_consultant_positions',
-        'app.users',
         'app.offered_topics',
+        'app.internal_consultants',
         'app.thesis_topics'
     ];
 
@@ -40,8 +37,8 @@ class InternalConsultantsTableTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $config = TableRegistry::getTableLocator()->exists('InternalConsultants') ? [] : ['className' => InternalConsultantsTable::class];
-        $this->InternalConsultants = TableRegistry::getTableLocator()->get('InternalConsultants', $config);
+        $config = TableRegistry::getTableLocator()->exists('OfferedTopics') ? [] : ['className' => OfferedTopicsTable::class];
+        $this->OfferedTopics = TableRegistry::getTableLocator()->get('OfferedTopics', $config);
     }
 
     /**
@@ -51,7 +48,7 @@ class InternalConsultantsTableTest extends TestCase
      */
     public function tearDown()
     {
-        unset($this->InternalConsultants);
+        unset($this->OfferedTopics);
 
         parent::tearDown();
     }
@@ -82,6 +79,16 @@ class InternalConsultantsTableTest extends TestCase
      * @return void
      */
     public function testBuildRules()
+    {
+        $this->markTestIncomplete('Not implemented yet.');
+    }
+
+    /**
+     * Test beforeSave method
+     *
+     * @return void
+     */
+    public function testBeforeSave()
     {
         $this->markTestIncomplete('Not implemented yet.');
     }

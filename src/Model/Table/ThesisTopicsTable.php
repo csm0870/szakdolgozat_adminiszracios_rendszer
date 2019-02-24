@@ -15,6 +15,7 @@ use Cake\Validation\Validator;
  * @property \App\Model\Table\LanguagesTable|\Cake\ORM\Association\BelongsTo $Languages
  * @property \App\Model\Table\StudentsTable|\Cake\ORM\Association\BelongsTo $Students
  * @property \App\Model\Table\ThesisTopicStatusesTable|\Cake\ORM\Association\BelongsTo $ThesisTopicStatuses
+ * @property \App\Model\Table\OfferedTopicsTable|\Cake\ORM\Association\BelongsTo $OfferedTopics
  * @property \App\Model\Table\ConsultationsTable|\Cake\ORM\Association\HasMany $Consultations
  * @property \App\Model\Table\ReviewsTable|\Cake\ORM\Association\HasMany $Reviews
  * @property \App\Model\Table\ThesisSupplementsTable|\Cake\ORM\Association\HasMany $ThesisSupplements
@@ -68,6 +69,9 @@ class ThesisTopicsTable extends Table
         ]);
         $this->belongsTo('ThesisTopicStatuses', [
             'foreignKey' => 'thesis_topic_status_id'
+        ]);
+        $this->belongsTo('OfferedTopics', [
+            'foreignKey' => 'offered_topic_id'
         ]);
         $this->hasMany('Consultations', [
             'foreignKey' => 'thesis_topic_id'
@@ -167,12 +171,11 @@ class ThesisTopicsTable extends Table
             ->allowEmpty('cause_of_rejecting_thesis_supplements');
 
         $validator
-            ->boolean('modifiable')
-            ->allowEmpty('modifiable');
-
-        $validator
             ->boolean('deleted')
             ->allowEmpty('deleted');
+        
+        $validator
+            ->notEmpty('student_id', __('A hallgató megadása kötelező.'));
 
         return $validator;
     }
@@ -192,6 +195,7 @@ class ThesisTopicsTable extends Table
         $rules->add($rules->existsIn(['language_id'], 'Languages'));
         $rules->add($rules->existsIn(['student_id'], 'Students'));
         $rules->add($rules->existsIn(['thesis_topic_status_id'], 'ThesisTopicStatuses'));
+        $rules->add($rules->existsIn(['offered_topic_id'], 'OfferedTopics'));
 
         return $rules;
     }
@@ -211,7 +215,7 @@ class ThesisTopicsTable extends Table
             if(empty($entity->external_consultant_name)){
                 $entity->setError('external_consultant_name', __('Külső konzulens nevének megadása kötelező.'));
                 $ok = false;
-}
+            }
             if(empty($entity->external_consultant_workplace)){
                 $entity->setError('external_consultant_workplace', __('Külső konzulens munkahelyének megadása kötelező.'));
                 $ok = false;

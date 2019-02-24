@@ -15,7 +15,9 @@ use Cake\ORM\Entity;
  * @property int|null $user_id
  *
  * @property \App\Model\Entity\Department $department
+ * @property \App\Model\Entity\InternalConsultantPosition $internal_consultant_position
  * @property \App\Model\Entity\User $user
+ * @property \App\Model\Entity\OfferedTopic[] $offered_topics
  * @property \App\Model\Entity\ThesisTopic[] $thesis_topics
  */
 class InternalConsultant extends Entity
@@ -38,7 +40,9 @@ class InternalConsultant extends Entity
         'internal_consultant_position_id' => true,
         'user_id' => true,
         'department' => true,
+        'internal_consultant_position' => true,
         'user' => true,
+        'offered_topics' => true,
         'thesis_topics' => true
     ];
 }
