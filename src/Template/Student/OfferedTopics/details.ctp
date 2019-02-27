@@ -9,7 +9,7 @@
             <?php
                 echo $this->Form->control('title', ['class' => 'form-control', 'label' => ['text' => __('Cím')], 'value' => $offeredTopic->title, 'readonly' => true]);
                 echo $this->Form->control('description', ['type' => 'textarea' ,'class' => 'form-control', 'label' => ['text' => __('Leírás')], 'value' => $offeredTopic->description, 'readonly' => true]);
-                if($offeredTopic->has_external_consultant === false) echo $this->Form->control('has_external_consultant', ['class' => 'form-control', 'options' => [__('Nincs'), __('Van')] ,'label' => ['text' => __('Van-e külső konzulens')], 'value' => $offeredTopic->has_external_consultant, 'disabled' => true]);
+                if($offeredTopic->has_external_consultant === false) echo $this->Form->control('has_external_consultant', ['class' => 'form-control', 'options' => [__('Nincs'), __('Van')] ,'label' => ['text' => __('Van-e külső konzulens jelölt')], 'value' => $offeredTopic->has_external_consultant, 'disabled' => true]);
                 elseif($offeredTopic->has_external_consultant === true){
                     echo $this->Form->control('external_consultant_name', ['class' => 'form-control', 'label' => ['text' => __('Külső konzulens neve')], 'value' => $offeredTopic->external_consultant_name, 'readonly' => true]);
                     echo $this->Form->control('external_consultant_workplace', ['class' => 'form-control', 'label' => ['text' => __('Külső konzulens munkahelye')], 'value' => $offeredTopic->external_consultant_workplace, 'readonly' => true]);

@@ -36,7 +36,6 @@ class ThesisTopicsController extends AppController
      *
      * @param string|null $id Thesis Topic id.
      * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
     public function delete($id = null){
         $this->request->allowMethod(['post', 'delete']);
@@ -121,31 +120,27 @@ class ThesisTopicsController extends AppController
 
             $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesisTopic_id], 'contain' => ['ThesisTopicStatuses']])->first();
 
-            $error_msg = '';
-            $no_thesis_topic = false;
+            $ok = false;
             
             if(empty($thesisTopic)){ //Nem létezik a téma
-                $error_msg = __('A témáról nem dönthet.') . ' ' . __('Nem létező téma.');
-                $no_thesis_topic = true;
+                $ok = false;
+                $this->Flash->error(__('A témáról nem dönthet.') . ' ' . __('Nem létező téma.'));
             }elseif($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : -1)){ ////Nem ehhez a belső konzulenshez tartozik
-                $error_msg = __('A témáról nem dönthet.') . ' ' . __('A témának nem Ön a belső konzulense.');
-                $no_thesis_topic = true;
+                $ok = false;
+                $this->Flash->error(__('A témáról nem dönthet.') . ' ' . __('A témának nem Ön a belső konzulense.'));
             }elseif($thesisTopic->thesis_topic_status_id != 6){ //Nem "A téma belső konzulensi döntésre vár" státuszban van
-                $error_msg = __('A témáról nem dönthet.') . ' ' . __('A téma'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.';
-                $no_thesis_topic = true;
+                $ok = false;
+                $this->Flash->error(__('A témáról nem dönthet.') . ' ' . __('A téma'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.');
             }
             
-            if($no_thesis_topic){
-                $this->Flash->error($error_msg);
-                return $this->redirect(['action' => 'index']);
-            }
+            if($ok === false) return $this->redirect(['action' => 'index']);
             
             $thesisTopic->thesis_topic_status_id = $accepted == 0 ? 7 : 8;
 
             if($this->ThesisTopics->save($thesisTopic)){
-                $this->Flash->success(__('Mentés sikeres!!'));
+                $this->Flash->success(__(($accepted == 0 ? 'Elutasítás' : 'Elfogadás') . ' sikeres.'));
             }else{
-                $this->Flash->error(__('Hiba történt. Próbálja újra!'));
+                $this->Flash->error(__(($accepted == 0 ? 'Elutasítás' : 'Elfogadás') . ' sikeretlen. Próbálja újra!'));
             }
         }
         

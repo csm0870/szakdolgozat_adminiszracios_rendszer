@@ -88,7 +88,7 @@ class FinalExamSubjectsController extends AppController
                 $this->Flash->error(__('A záróvizsga-tárgyak nem véglegesíthetők.') . ' ' . __('A hallgató záróvizsga-tárgyai nem Önhöz tartoznak.'));
             }elseif($student->course_id != 1){ //Ha nem mérnökinformatikus
                 $ok = false;
-               $this->Flash->error(__('A záróvizsga-tárgyak nem véglegesíthetők.') . ' ' . __('Csak mérnökinformatikus hallgatónak lehetnek záróvizsga-tárgyai.'));
+                $this->Flash->error(__('A záróvizsga-tárgyak nem véglegesíthetők.') . ' ' . __('Csak mérnökinformatikus hallgatónak lehetnek záróvizsga-tárgyai.'));
             }elseif(count($student->final_exam_subjects) != 3){ //Ha nem három ZV-tárgy van
                 $ok = false;
                 $this->Flash->error(__('A záróvizsga-tárgyak nem véglegesíthetők.') . ' ' . __('Három záróvizsga-tárgyat kell választani.'));

@@ -22,16 +22,24 @@
                                             if($offeredTopic->has('thesis_topic')){
                                                 echo __('Jelentkezett halgató') . ': ' . h($offeredTopic->thesis_topic->student->name);
                                                 
-                                                if($offeredTopic->thesis_topic->thesis_topic_status_id == 2){
-                                                    echo '<br/>' . $this->Html->link(__('Foglalás kezelése') . '&nbsp;->', ['controller' => 'OfferedTopics', 'action' => 'acceptBooking', $offeredTopic->id], ['escape' => false]);
+                                                echo '<br/><strong>' . __('Foglalás állapota') . ': ' . '</strong>';
+                                                if(in_array($offeredTopic->thesis_topic->thesis_topic_status_id, [2, 4])){
+                                                    if($offeredTopic->thesis_topic->has('thesis_topic_status')) echo h($offeredTopic->thesis_topic->thesis_topic_status->name);
+                                                    echo '<br/>' . $this->Html->link(__('Részletek') . '&nbsp;->', ['controller' => 'OfferedTopics', 'action' => 'details', $offeredTopic->id], ['escape' => false]);
+                                                }else{
+                                                    echo __('A témafoglalás lezárult.') . ' ' . __('A részleteket a leadott témák menüpont alatt találja meg.');
                                                 }
                                             }else echo __('Nincs jelentkezett hallgató');
                                         ?>
                                     </td>
                                     <td class="text-center">
-                                        <?= $this->Html->link(__('Szerkesztés'), ['controller' => 'OfferedTopics', 'action' => 'edit', $offeredTopic->id], ['class' => 'btn btn-primary border-radius-45px']) ?>
-                                        <?= $this->Html->link('<i class="fas fa-trash fa-lg"></i>', '#', ['escape' => false, 'title' => __('Törlés'), 'class' => 'iconBtn deleteBtn', 'data-id' => $offeredTopic->id]) ?>
-                                        <?= $this->Form->postLink('', ['action' => 'delete', $offeredTopic->id], ['style' => 'display: none', 'id' => 'deleteOfferedTopic_' . $offeredTopic->id]) ?>
+                                        <?php
+                                            if(($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id == 2) || !$offeredTopic->has('thesis_topic')){
+                                                echo $this->Html->link(__('Szerkesztés'), ['controller' => 'OfferedTopics', 'action' => 'edit', $offeredTopic->id], ['class' => 'btn btn-primary border-radius-45px']);
+                                                echo $this->Html->link('<i class="fas fa-trash fa-lg"></i>', '#', ['escape' => false, 'title' => __('Törlés'), 'class' => 'iconBtn deleteBtn', 'data-id' => $offeredTopic->id]);
+                                                echo $this->Form->postLink('', ['action' => 'delete', $offeredTopic->id], ['style' => 'display: none', 'id' => 'deleteOfferedTopic_' . $offeredTopic->id]);
+                                            }
+                                        ?>
                                     </td>
                                 </tr>
                             <?php } ?>

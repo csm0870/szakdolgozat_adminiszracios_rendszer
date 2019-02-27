@@ -22,7 +22,7 @@ class OfferedTopicsController extends AppController
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         
         $offeredTopics = $this->OfferedTopics->find('all', ['conditions' => ['OfferedTopics.internal_consultant_id' => ($user->has('internal_consultant') ? $user->internal_consultant->id : '-1')],
-                                                            'contain' => ['ThesisTopics' => ['Students']]]);
+                                                            'contain' => ['ThesisTopics' => ['Students', 'ThesisTopicStatuses']]]);
         $this->set(compact('offeredTopics'));
     }
 
@@ -74,7 +74,7 @@ class OfferedTopicsController extends AppController
         }elseif($user->internal_consultant->id != $offeredTopic->internal_consultant_id){ //Ha nem az adott belső konzulenshez tartozik
             $ok = false;
             $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A téma nem Önhöz tartozik.'));
-        }elseif($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id == 5){ //Ha téma foglalva van és a hallgató véglegesítésére vár
+        }elseif($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id == 4){ //Ha téma foglalva van és a hallgató véglegesítésére vár
             $ok = false;
             $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A téma foglalásának véglegesítését még nem tette meg a hallgató.'));
         }
@@ -110,10 +110,13 @@ class OfferedTopicsController extends AppController
         $this->loadModel('Users');
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         
-        if($user->internal_consultant->id != $offeredTopic->internal_consultant_id){
-            $this->Flash->error(__('A téma nem Önhöz tartozik.'));
+        if(empty($offeredTopic)){ //Ha nem létezik a téma
+            $ok = false;
+            $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A téma nem létezik.'));
+        }elseif($user->internal_consultant->id != $offeredTopic->internal_consultant_id){
+            $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A téma nem Önhöz tartozik.'));
             return $this->redirect(['action' => 'index']);
-        }elseif($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id == 5){ //Ha téma foglalva van és a hallgató véglegesítésére vár
+        }elseif($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id == 4){ //Ha téma foglalva van és a hallgató véglegesítésére vár
             $ok = false;
             $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A téma foglalásának véglegesítését még nem tette meg a hallgató.'));
         }
@@ -133,17 +136,72 @@ class OfferedTopicsController extends AppController
         return $this->redirect(['action' => 'index']);
     }
     
-    public function acceptBooking($id = null){
+    public function details($id = null){
         $offeredTopic = $this->OfferedTopics->find('all', ['conditions' => ['OfferedTopics.id' => $id],
-                                                           'contain' => ['ThesisTopics']])->first();
+                                                           'contain' => ['ThesisTopics' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels']]]])->first();
+        
+        $this->loadModel('Users');
+        $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         
         $ok = true;
-        if($user->internal_consultant->id != $offeredTopic->internal_consultant_id){ //Ha nem az adott belső konzulenshez tartozik
+        if(empty($offeredTopic)){ //Ha nem létezik a téma
+            $ok = false;
+            $this->Flash->error(__('A téma nem fogadható el.') . ' ' . __('A téma nem létezik.'));
+        }elseif($user->internal_consultant->id != $offeredTopic->internal_consultant_id){ //Ha nem az adott belső konzulenshez tartozik
             $ok = false;
             $this->Flash->error(__('A téma nem fogadható el.') . ' ' . __('A téma nem Önhöz tartozik.'));
-        }elseif($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id != 2){ //Ha téma belső konzulensi elfogadásra vár
-            $ok = false;
-            $this->Flash->error(__('A téma nem fogadható el.') . ' ' . __('A téma foglalása nem belső konzulensi elfogadásra vár.'));
         }
+        
+        if($ok === false) return $this->redirect(['action' => 'index']);
+        
+        $this->set(compact('offeredTopic'));
+    }
+    
+    public function acceptBooking(){
+        if($this->getRequest()->is('post')){
+            $offered_topic_id = $this->getRequest()->getData('offered_topic_id');
+            $accepted = $this->getRequest()->getData('accepted');
+
+            if(isset($accepted) && !in_array($accepted, [0, 1])){
+                $this->Flash->error(__('Helytelen kérés. Próbálja újra!'));
+                return $this->redirect(['action' => 'index']);
+            }
+
+            $this->loadModel('Users');
+            $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
+
+            $offeredTopic = $this->OfferedTopics->find('all', ['conditions' => ['OfferedTopics.id' => $offered_topic_id],
+                                                               'contain' => ['ThesisTopics']])->first();
+
+            $ok = true;
+            
+            if(empty($offeredTopic)){ //Nem létezik a téma
+                $ok = false;
+                $this->Flash->error(__('A témáról nem dönthet.') . ' ' . __('Nem létező téma.'));
+            }elseif($offeredTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : -1)){ ////Nem ehhez a belső konzulenshez tartozik
+                $ok = false;
+                $this->Flash->error(__('A témáról nem dönthet.') . ' ' . __('A témának nem Önhöz tartozik.'));
+            }elseif($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id != 2){ //Nem "A témafoglalás belső konzulensi döntésre vár" státuszban van
+                $ok = false;
+                $this->Flash->error(__('A témáról nem dönthet.') . ' ' . __('Nem belső konzulens döntésére vár.'));
+            }
+            
+            if($ok === false) return $this->redirect(['action' => 'index']);
+            
+            if($accepted == 0){
+                $offeredTopic->thesis_topic->thesis_topic_status_id = 3;
+                $offeredTopic->thesis_topic->offered_topic_id = null;
+            }else{
+                $offeredTopic->thesis_topic->thesis_topic_status_id = 4;
+            }
+
+            if($this->OfferedTopics->ThesisTopics->save($offeredTopic->thesis_topic)){
+                $this->Flash->success(__(($accepted == 0 ? 'Elutasítás' : 'Elfogadás') . ' sikeres.'));
+            }else{
+                $this->Flash->error(__(($accepted == 0 ? 'Elutasítás' : 'Elfogadás') . ' sikeretlen. Próbálja újra!'));
+            }
+        }
+        
+        return $this->redirect(['action' => 'index']);
     }
 }

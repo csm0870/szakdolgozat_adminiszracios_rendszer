@@ -51,8 +51,8 @@
                 }*/
             ?>
             <?= $this->Form->create($thesisTopic, ['id' => 'thesisTopicEditForm']) ?>
-            <?= $this->Form->control('title', ['class' => 'form-control', 'label' => ['text' => __('Cím')]]) ?>
-            <?= $this->Form->control('description', ['class' => 'form-control', 'label' => ['text' => __('Leírás') . ' (' . __('feladatok részletezése') . ')'], 'placeholder' => __('A leírással együtt az adatlap férjen rá egyetlen oldalra!')]) ?>
+            <?= $this->Form->control('title', ['class' => 'form-control', 'label' => ['text' => __('Cím')], 'readonly' => !empty($thesisTopic->offered_topic_id)]) ?>
+            <?= $this->Form->control('description', ['class' => 'form-control', 'label' => ['text' => __('Leírás') . ' (' . __('feladatok részletezése') . ')'], 'placeholder' => __('A leírással együtt az adatlap férjen rá egyetlen oldalra!'), 'readonly' => !empty($thesisTopic->offered_topic_id)]) ?>
             <?= $this->Form->control('starting_year_id', ['class' => 'form-control', 'options' => $years, 'label' => ['text' => __('Kezdési tanév')]]) ?>
             <?= $this->Form->control('starting_semester', ['class' => 'form-control', 'type' => 'select', 'options' => [__('Ősz'), __('Tavasz')], 'label' => ['text' => __('Kezdési félév')]]) ?>
             <?= $this->Form->control('expected_ending_year_id', ['class' => 'form-control', 'options' => $years, 'label' => ['text' => __('Várható leadási tanév')]]) ?>
@@ -60,23 +60,39 @@
             <?= $this->Form->control('language_id', ['class' => 'form-control', 'options' => $languages, 'label' => ['text' => __('Nyelv')]]) ?>
             <?= $this->Form->control('encrypted', ['label' => ['text' => __('Titkos')], 'templates' => ['nestingLabel' => '{{hidden}}<label{{attrs}}>{{text}}</label>&nbsp;{{input}}']]) ?>
             <?= $this->Form->control('internal_consultant_id', ['class' => 'form-control', 'label' => ['text' => __('Belső konzulens'), 'options' => $internalConsultants]]) ?>
-            <?= $this->Form->control('has_external_consultant', ['id' => 'has_external_consultant', 'class' => 'form-control', 'type' => 'select', 'value' => $thesisTopic->cause_of_no_external_consultant === null ? 1 : 0, 'empty' => false, 'options' => [__('Nincs'), __('Van')], 'label' => ['text' => __('Külső konzulens')]]) ?>
+            <?php
+                $value = $thesisTopic->cause_of_no_external_consultant === null ? 1 : 0;
+                if($thesisTopic->has('offered_topic')){
+                    $has_external_consultant = false;
+                    if($thesisTopic->offered_topic->has_external_consultant === true){
+                        $has_external_consultant = true;
+                    }
+                }
+            ?>
+            <?= $this->Form->control('has_external_consultant', ['id' => 'has_external_consultant', 'class' => 'form-control', 'type' => 'select', 'value' => (($thesisTopic->has('offered_topic') && $thesisTopic->offered_topic->has_external_consultant === true) ? 1 : $value), 'empty' => false, 'options' => [__('Nincs'), __('Van')], 'label' => ['text' => __('Külső konzulens')],
+                                                                 'disabled' => ($thesisTopic->has('offered_topic') && $thesisTopic->offered_topic->has_external_consultant === true)]) ?>
             <?= $this->Form->control('external_consultant_name', ['class' => 'form-control', 'label' => ['text' => __('Külső konzulens neve')],
+                                                                  'readonly' => ($thesisTopic->has('offered_topic') && $thesisTopic->offered_topic->has_external_consultant === true),
                                                                   'templates' => ['inputContainer' => '<div class="form-group external-consultants-data-field">{{content}}</div>',
                                                                                   'inputContainerError' => '<div class="form-group external-consultants-data-field">{{content}}{{error}}</div>']]) ?>
             <?= $this->Form->control('external_consultant_workplace', ['class' => 'form-control external-consultants-data-field', 'label' => ['text' => __('Külő konzulens munkahelye')],
+                                                                       'readonly' => ($thesisTopic->has('offered_topic') && $thesisTopic->offered_topic->has_external_consultant === true),
                                                                        'templates' => ['inputContainer' => '<div class="form-group external-consultants-data-field">{{content}}</div>',
                                                                                        'inputContainerError' => '<div class="form-group external-consultants-data-field">{{content}}{{error}}</div>']]) ?>
             <?= $this->Form->control('external_consultant_position', ['class' => 'form-control external-consultants-data-field', 'label' => ['text' => __('Külső konzulens poziciója')],
+                                                                      'readonly' => ($thesisTopic->has('offered_topic') && $thesisTopic->offered_topic->has_external_consultant === true),
                                                                       'templates' => ['inputContainer' => '<div class="form-group external-consultants-data-field">{{content}}</div>',
                                                                                       'inputContainerError' => '<div class="form-group external-consultants-data-field">{{content}}{{error}}</div>']]) ?>
             <?= $this->Form->control('external_consultant_address', ['class' => 'form-control external-consultants-data-field', 'label' => ['text' => __('Külső konzulens címe')],
+                                                                     'readonly' => ($thesisTopic->has('offered_topic') && $thesisTopic->offered_topic->has_external_consultant === true),
                                                                      'templates' => ['inputContainer' => '<div class="form-group external-consultants-data-field">{{content}}</div>',
                                                                                       'inputContainerError' => '<div class="form-group external-consultants-data-field">{{content}}{{error}}</div>']]) ?>
             <?= $this->Form->control('external_consultant_phone_number', ['class' => 'form-control external-consultants-data-field', 'label' => ['text' => __('Külső konzulens telefonszáma')],
+                                                                          'readonly' => ($thesisTopic->has('offered_topic') && $thesisTopic->offered_topic->has_external_consultant === true),
                                                                           'templates' => ['inputContainer' => '<div class="form-group external-consultants-data-field">{{content}}</div>',
                                                                                       'inputContainerError' => '<div class="form-group external-consultants-data-field">{{content}}{{error}}</div>']]) ?>
             <?= $this->Form->control('external_consultant_email', ['type' => 'email', 'class' => 'form-control external-consultants-data-field', 'label' => ['text' => __('Külső konzulens email címe')], 'placeholer' => __('+36701234567 formátumban.'),
+                                                                   'readonly' => ($thesisTopic->has('offered_topic') && $thesisTopic->offered_topic->has_external_consultant === true),
                                                                    'templates' => ['inputContainer' => '<div class="form-group external-consultants-data-field">{{content}}</div>',
                                                                                       'inputContainerError' => '<div class="form-group external-consultants-data-field">{{content}}{{error}}</div>']]) ?>
             <?= $this->Form->control('cause_of_no_external_consultant', ['class' => 'form-control', 'label' => ['text' => __('Külső konzulens kijelölésétől való eltekintés indoklása')],

@@ -144,8 +144,8 @@ class ThesisTopicsController extends AppController
             return $this->redirect(['controller' => 'Students', 'action' => 'edit', $data['student_id']]);
         }
 
-        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['id' => $id]])->first();
-        $student = $this->ThesisTopics->Students->find('all',['conditions' => ['Students.user_id' => $this->Auth->user('id')]])->first();
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id], 'contain' => ['OfferedTopics']])->first();
+        $student = $this->ThesisTopics->Students->find('all', ['conditions' => ['Students.user_id' => $this->Auth->user('id')]])->first();
         
         $ok = true;
         if(empty($thesisTopic)){
@@ -154,35 +154,58 @@ class ThesisTopicsController extends AppController
         }elseif($thesisTopic->student_id != (empty($student) ? 'null' : $student->id)){ //Nem a bejelntkezett hallgató szakdolgozata
             $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A téma nem Önhöz tartozik.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_id, [1, 4])){ //Nem véglegesítésre vár
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [1, 4])){ //Nem véglegesítésre vár
             $this->Flash->error(__('A szakdolgozat állapota alapján nem módosítható.'));
             $ok = false;
         }
         
         if(!$ok) return $this->redirect(['action' => 'index']);
 
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $thesisTopic = $this->ThesisTopics->patchEntity($thesisTopic, $this->request->getData());
+        if ($this->request->is(['patch', 'post', 'put'])){
+            $request_data = $this->getRequest()->getData();
+            $can_change_external_consultant = true;
+            //Ha témaájánlatok közül választott témáról van szó, akkor a megfelelő mezőket, amiket nem módosíthat, "töröljük"
+            if($thesisTopic->has('offered_topic')){
+                unset($request_data['title']);
+                unset($request_data['description']);
+                
+                //Ha a témaajánlathoz tartozik külső konzulens
+                if($thesisTopic->offered_topic->has_external_consultant === true){
+                    unset($request_data['external_consultant_name']);
+                    unset($request_data['external_consultant_position']);
+                    unset($request_data['external_consultant_workplace']);
+                    unset($request_data['external_consultant_email']);
+                    unset($request_data['external_consultant_phone_number']);
+                    unset($request_data['external_consultant_address']);
+                    unset($request_data['cause_of_no_external_consultant']);
+                    $thesisTopic->cause_of_no_external_consultant = null;
+                    $can_change_external_consultant = false;
+                }
+            }
+            
+            $thesisTopic = $this->ThesisTopics->patchEntity($thesisTopic, $request_data);
             $thesisTopic->student_id = $data['student_id'];
             $has_external_consultant = $this->getRequest()->getData('has_external_consultant');
-
-            //Külső konzulensi mezők beállítása
-            if(empty($has_external_consultant) || $has_external_consultant != 1){
-                $thesisTopic->external_consultant_name = null;
-                $thesisTopic->external_consultant_position = null;
-                $thesisTopic->external_consultant_workplace = null;
-                $thesisTopic->external_consultant_email = null;
-                $thesisTopic->external_consultant_phone_number = null;
-                $thesisTopic->external_consultant_address = null;
-            }else{
-                $thesisTopic->cause_of_no_external_consultant = null;
+            
+            if($can_change_external_consultant === true){
+                //Külső konzulensi mezők beállítása
+                if(empty($has_external_consultant) || $has_external_consultant != 1){
+                    $thesisTopic->external_consultant_name = null;
+                    $thesisTopic->external_consultant_position = null;
+                    $thesisTopic->external_consultant_workplace = null;
+                    $thesisTopic->external_consultant_email = null;
+                    $thesisTopic->external_consultant_phone_number = null;
+                    $thesisTopic->external_consultant_address = null;
+                }else{
+                    $thesisTopic->cause_of_no_external_consultant = null;
+                }
             }
-
+            
             if($this->ThesisTopics->save($thesisTopic)){
                 $this->Flash->success(__('Mentés sikeres.'));
                 return $this->redirect(['action' => 'index']);
             }
-
+            
             $this->Flash->error(__('Hiba történt. Próbálja újra!'));
         }
 
@@ -215,10 +238,10 @@ class ThesisTopicsController extends AppController
         if(empty($thesisTopic)){
             $this->Flash->error(__('A téma nem véglegesíthető.') . ' ' . __('A téma nem létezik.'));
             $ok = false;
-        }elseif($thesisTopic->student_id != (empty($student) ? 'null' : $student->id)){ //Nem a bejelntkezett hallgató szakdolgozata
+        }elseif($thesisTopic->student_id != (empty($student) ? 'null' : $student->id)){ //Nem a bejelentkezett hallgató szakdolgozata
             $this->Flash->error(__('A téma nem véglegesíthető.') . ' ' . __('A téma nem Önhöz tartozik.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_id, [1, 4])){ //Nem véglegesítésre vár
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [1, 4])){ //Nem véglegesítésre vár
             $this->Flash->error(__('A téma nem véglegesíthető.') . ' ' . __('A téma nem véglegesíthető állapotban van.'));
             $ok = false;
         }
@@ -227,9 +250,53 @@ class ThesisTopicsController extends AppController
         
         //Belső konzulensi döntésre vár
         $thesisTopic->thesis_topic_status_id = 6;
-
-        if ($this->ThesisTopics->save($thesisTopic)) $this->Flash->success(__('Véglegesítve'));
-        else $this->Flash->error(__('Hiba történt. Próbálja újra!'));
+        
+        //Mezők ellenőrzése, mentés előtt (valamiért nem ellenőriz rendesen mindent)
+        if(empty($thesisTopic->title)) $thesisTopic->setError('title', __('Cím megadása kötelező.'));
+        if(empty($thesisTopic->description)) $thesisTopic->setError('description', __('Leírás megadása kötelező.'));
+        if($thesisTopic->is_thesis === null) $thesisTopic->setError('is_thesis', __('Dolgozat típusának megadása kötelező.'));
+        if($thesisTopic->encrypted === null) $thesisTopic->setError('encrypted', __('Titkosítottság megadása kötelező.'));
+        if($thesisTopic->starting_semester === null) $thesisTopic->setError('starting_semester', __('Kezdési félév megadása kötelező.'));
+        if($thesisTopic->expected_ending_semester === null) $thesisTopic->setError('expected_ending_semester', __('Kezdési tanév megadása kötelező.'));
+        if($thesisTopic->cause_of_no_external_consultant === null){ //Ha van külső konzulens
+            //Külső konzulens adatainak ellenőrzése: nem lehetnek üresek
+            if(empty($thesisTopic->external_consultant_name)) $thesisTopic->setError('external_consultant_name', __('Külső konzulens nevének megadása kötelező.'));
+            if(empty($thesisTopic->external_consultant_workplace)) $thesisTopic->setError('external_consultant_workplace', __('Külső konzulens munkahelyének megadása kötelező.'));
+            if(empty($thesisTopic->external_consultant_position)) $thesisTopic->setError('external_consultant_position', __('Külső konzulens poziciójának megadása kötelező.'));
+            if(empty($thesisTopic->external_consultant_email)) $thesisTopic->setError('external_consultant_email', __('Külső konzulens e-mail címének megadása kötelező.'));
+            elseif(\Cake\Validation\Validation::email($thesisTopic->external_consultant_email) === false) $thesisTopic->setError('external_consultant_email', __('Külső konzulens e-mail cím nem megfelelő formátumú.'));
+            if(empty($thesisTopic->external_consultant_phone_number)) $thesisTopic->setError('external_consultant_phone_number', __('Külső konzulens telefonszámának megadása kötelező.'));
+            if(empty($thesisTopic->external_consultant_address)) $entity->setError('external_consultant_address', __('Külső konzulens címének megadása kötelező.'));
+        }elseif(empty($thesisTopic->cause_of_no_external_consultant)){
+            //Ha nincs külső konzulens, akkor annak indoklása kötelező
+            $thesisTopic->setError('cause_of_no_external_consultant', __('Külső konzulenstől való eltekintés indoklása kötelező.'));
+        }
+        
+        if(empty($thesisTopic->internal_consultant_id)) $thesisTopic->setError('internal_consultant_id', __('Belső konzulens megadása kötelező.'));
+        if(empty($thesisTopic->language_id)) $thesisTopic->setError('language_id', __('Nyelv megadása kötelező.'));
+        if(empty($thesisTopic->student_id)) $thesisTopic->setError('student_id', __('Hallgató megadása kötelező.'));
+        if(empty($thesisTopic->starting_year_id)) $thesisTopic->setError('starting_year_id', __('Kezdési tanév megadása kötelező.'));
+        if(empty($thesisTopic->expected_ending_year_id)) $thesisTopic->setError('expected_ending_year_id', __('Várható leadási tanév megadása kötelező.'));
+        
+        if($this->ThesisTopics->save($thesisTopic)) $this->Flash->success(__('Véglegesítve'));
+        else{
+            $error_msg = __('Hiba történt. Próbálja újra!');
+            
+            $errors = $thesisTopic->getErrors();
+            if(!empty($errors)){
+                foreach($errors as $error){
+                    if(is_array($error)){
+                        foreach($error as $err){
+                            $error_msg.= ' ' . $err;
+                        }
+                    }else{
+                        $error_msg.= ' ' . $error;
+                    }
+                }
+            }
+            
+            $this->Flash->error($error_msg);
+        }
 
         return $this->redirect(['action' => 'index']);
     }
@@ -402,5 +469,41 @@ class ThesisTopicsController extends AppController
         if(!$ok) return $this->redirect(['action' => 'index']);
         
         $this->set(compact('thesisTopic'));
+    }
+    
+    /**
+     * Foglalás visszavonása
+     * 
+     * @param type $id
+     */
+    public function cancelBooking($id = null){
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['id' => $id]])->first();
+        $student = $this->ThesisTopics->Students->find('all', ['conditions' => ['Students.user_id' => $this->Auth->user('id')]])->first();
+        
+        $ok = true;
+        //Megnézzük, hogy megfelelő-e a téma a diplomamunka/szakdolgozat feltöltéséhez
+        if(empty($thesisTopic)){ //Nem létezik a téma
+            $this->Flash->error(__('A foglalás nem vonható vissza.') . ' ' . __('Nem létezik a téma.'));
+            $ok = false;
+        }elseif($thesisTopic->student_id != (empty($student) ? 'null' : $student->id)){ //Nem a bejelntkezett hallgató szakdolgozata
+            $this->Flash->error(__('A foglalás nem vonható vissza.') . ' ' . __('A téma nem Önhöz tartozik.'));
+            $ok = false;
+        }elseif($thesisTopic->offered_topic_id === null){ //Nincs foglalás a témához
+            $this->Flash->error(__('A foglalás nem vonható vissza.') . ' ' . __('A téma nem témafoglalás.'));
+            $ok = false;
+        }elseif($thesisTopic->thesis_topic_status_id != 4){ //A témafoglalás nem a hallgató véglegesítésére vár
+            $this->Flash->error(__('A foglalás nem vonható vissza.') . ' ' . __('A foglalás nem a hallgató véglegesítésére vár.'));
+            $ok = false;
+        }
+        
+        if($ok === true){
+            $thesisTopic->thesis_topic_status_id = 5;
+            $thesisTopic->offered_topic_id = null;
+
+            if ($this->ThesisTopics->save($thesisTopic)) $this->Flash->success(__('Visszavonás sikeres.'));
+            else $this->Flash->error(__('Hiba történt. Próbálja újra!'));
+        }
+        
+        return $this->redirect(['action' => 'index']);
     }
 }

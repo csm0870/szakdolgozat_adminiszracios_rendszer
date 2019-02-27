@@ -26,7 +26,6 @@ class OfferedTopicsController extends AppController
             return $this->redirect(['controller' => 'Students', 'action' => 'edit', $data['student_id']]);
         }
         
-        
         $offeredTopics = $this->OfferedTopics->find('all',['contain' => ['InternalConsultants']])
                                              ->notMatching('ThesisTopics', function($q){ //Azon témák, amelyekhez nem tartozik foglalás
                                                  return $q->where(['ThesisTopics.id IS NOT' => null]);
@@ -38,7 +37,7 @@ class OfferedTopicsController extends AppController
     /**
      * Témaajánlat részletei
      * 
-     * @param type $id
+     * @param type $id OfferedTopic azonosító
      * @return type
      */
     public function details($id = null){
@@ -77,7 +76,7 @@ class OfferedTopicsController extends AppController
     /**
      * Téma lefoglalása
      * 
-     * @param type $id
+     * @param type $id OfferedTopic azonosító
      * @return type
      */
     public function book($id = null){
@@ -133,7 +132,7 @@ class OfferedTopicsController extends AppController
             $thesisTopic->external_consultant_email = $offeredTopic->external_consultant_email;
             $thesisTopic->external_consultant_phone_number = $offeredTopic->external_consultant_phone_number;
         }else{
-            $thesisTopic->cause_of_no_external_consultant = __('A belső konzulenst nem választott külső konzulens, de adható hozzá.');
+            $thesisTopic->cause_of_no_external_consultant = __('A belső konzulens nem jelölt ki külső konzulenst, de adható hozzá.');
         }
         
         $thesisTopic->thesis_topic_status_id = 2;
@@ -141,7 +140,7 @@ class OfferedTopicsController extends AppController
         $thesisTopic->student_id = $data['student_id'];
 
         if($this->ThesisTopics->save($thesisTopic)){
-            $this->Flash->success(__('Lefoglalás sikeres.') );
+            $this->Flash->success(__('Lefoglalás sikeres.'));
             return $this->redirect(['action' => 'index']);
         }
         

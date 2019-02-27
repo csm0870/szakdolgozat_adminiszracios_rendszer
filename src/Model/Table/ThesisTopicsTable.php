@@ -175,7 +175,19 @@ class ThesisTopicsTable extends Table
             ->allowEmpty('deleted');
         
         $validator
-            ->notEmpty('student_id', __('A hallgató megadása kötelező.'));
+            ->notEmpty('internal_consultant_id', __('Belső konzulens megadása kötelező.'));
+        
+        $validator
+            ->notEmpty('language_id', __('Nyelv megadása kötelező.'));
+        
+        $validator
+            ->notEmpty('student_id', __('Hallgató megadása kötelező.'));
+        
+        $validator
+            ->notEmpty('starting_year_id', __('Kezdési tanév megadása kötelező.'));
+        
+        $validator
+            ->notEmpty('expected_ending_year_id', __('Várható leadási tanév megadása kötelező.'));
 
         return $validator;
     }
@@ -208,10 +220,24 @@ class ThesisTopicsTable extends Table
      * @param type $options
      */
     public function beforeSave($event, $entity, $options){
+        $ok = true;
+        
+        //Annak a vizsgálata, hogy a kezdési tanév nem lehet nagyobb a várható leadási tanévnél
+        if(!empty($entity->starting_year_id) && !empty($entity->expected_ending_year_id)){
+            $starting_year = $this->StartingYears->find('all', ['conditions' => ['id' => $entity->starting_year_id]])->first();
+            $ending_year = $this->StartingYears->find('all', ['conditions' => ['id' => $entity->expected_ending_year_id]])->first();
+            
+            if(!empty($starting_year) && !empty($ending_year)){
+                if($starting_year->year > $ending_year->year){
+                    $entity->setError('starting_year_id', __('A kezdési tanév nem lehet nagyobb, mint a várhat leadási tanév.'));
+                    $ok = false;
+                }
+            }
+        }
+        
         if($entity->cause_of_no_external_consultant === null){ //Ha van külső konzulens
             //Külső konzulens adatainak ellenőrzése: nem lehetnek üresek
             
-            $ok = true;
             if(empty($entity->external_consultant_name)){
                 $entity->setError('external_consultant_name', __('Külső konzulens nevének megadása kötelező.'));
                 $ok = false;
@@ -236,15 +262,13 @@ class ThesisTopicsTable extends Table
                 $entity->setError('external_consultant_address', __('Külső konzulens címének megadása kötelező.'));
                 $ok = false;
             }
-            
-            return $ok;
         }elseif(empty($entity->cause_of_no_external_consultant)){
             //Ha nincs külső konzulens, akkor annak indoklása kötelező
             $entity->setError('cause_of_no_external_consultant', __('Külső konzulenstől való eltekintés indoklása kötelező.'));
-            return false;
+            $ok = false;
         }
         
-        return true;
+        return $ok;
     }
     
     /**
