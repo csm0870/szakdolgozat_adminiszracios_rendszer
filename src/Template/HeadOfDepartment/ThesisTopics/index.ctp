@@ -18,7 +18,7 @@
                                 </tr>
                                 <?php foreach($thesisTopics as $thesisTopic){ ?>
                                     <tr>
-                                        <td><?= h($thesisTopic->title) . (in_array($thesisTopic->thesis_topic_status_id, [8, 9, 10]) ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '') ?></td>
+                                        <td><?= h($thesisTopic->title) . (in_array($thesisTopic->thesis_topic_status_id, [1, 2, 3, 4, 5, 6, 7]) ? '' : ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id]))) ?></td>
                                         <td><?= $thesisTopic->has('internal_consultant') ? h($thesisTopic->internal_consultant->name) : '' ?></td>
                                         <td><?= $thesisTopic->has('student') ? (h($thesisTopic->student->name) . (empty($thesisTopic->student->neptun) ? '' : ('<br/>(' . h($thesisTopic->student->neptun) . ')'))) : '' ?></td>
                                         <td>
@@ -29,7 +29,7 @@
                                                 echo $this->Html->link(__('PDF'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info btn-pdf border-radius-45px', 'target' => '_blank']);
                                                 
                                                 //Tanaszékvezetői döntésre vár
-                                                if($thesisTopic->thesis_topic_status_id == 4){
+                                                if($thesisTopic->thesis_topic_status_id == 8){
                                                     echo '<br/>';
                                                     echo $this->Form->create(null, ['id' => 'acceptThesisTopicForm', 'style' => 'display: inline-block', 'url' => ['action' => 'accept']]);
                                                     echo $this->Form->button(__('Elfogadás'), ['type' => 'submit', 'class' => 'btn btn-success btn-accept border-radius-45px']);
@@ -55,7 +55,7 @@
 </div>
 <script>
     $(function(){
-        $('#thesis_topic_index_menu_item').addClass('active');
+        $('#thesis_topics_index_menu_item').addClass('active');
         
         //Confirmation modal elfogadás előtt
         $('.headOfDepartment-thesisTopics-index .btn-accept').on('click', function(e){

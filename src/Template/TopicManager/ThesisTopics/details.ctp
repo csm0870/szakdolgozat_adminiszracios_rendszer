@@ -80,47 +80,14 @@
                             <strong><?= __('Képzés típusa') . ': ' ?></strong><?= $thesisTopic->has('student') ? ($thesisTopic->student->has('course_type') ? h($thesisTopic->student->course_type->name) : '') : ''?>
                         </p>
                     </fieldset>
-                    <?php if($thesisTopic->thesis_topic_status_id == 13){ ?> <!-- Első diplomakurzus sikertelen, tanszékvezető döntése a folytatásról -->
-                        <p>
-                            <strong><?= __('Diplomakurzus első félévét nem teljesítette') . ': ' ?></strong>
-                            <?= $this->Html->link(__('Döntés a folytatásról'), '#', ['class' => 'decideToContinueAfterFailedFirstThesisSubjectBtn']) ?>
-                        </p>
-                    <?php } ?>
                 </div>
-                <!--<div class="col-12 col-md-6 text-center">
-                </div>-->
             </div>
         </div>
     </div>
 </div>
-<!-- Diplomakurzus első félévének teljesítésének rögzítése modal -->
-<div class="modal fade" id="decideToContinueAfterFailedFirstThesisSubjectModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-body">
-                <div id="decide_to_continue_after_failed_first_thesis_subject_container">
-
-                </div>
-            </div>
-        </div>
-  </div>
-</div>
 <script>
     $(function(){
+        $('#topics_menu_item').addClass('active');
         $('#thesis_topics_index_menu_item').addClass('active');
-        
-        //Tartalom lekeérése a "diplomakurzus első félévének teljesítésének rögzítése" modalba
-        $.ajax({
-            url: '<?= $this->Url->build(['action' => 'decideToContinueAfterFailedFirstThesisSubject', $thesisTopic->id], true) ?>',
-            cache: false
-        })
-        .done(function( response ) {
-            $('#decide_to_continue_after_failed_first_thesis_subject_container').html(response.content);
-        });
-        
-        $('.headOfDepartment-thesisTopics-details .decideToContinueAfterFailedFirstThesisSubjectBtn').on('click', function(e){
-            e.preventDefault();
-            $('#decideToContinueAfterFailedFirstThesisSubjectModal').modal('show');
-        });
     });
 </script>

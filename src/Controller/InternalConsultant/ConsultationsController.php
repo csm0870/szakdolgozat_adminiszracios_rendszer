@@ -37,7 +37,7 @@ class ConsultationsController extends AppController
             $this->Flash->error(__('A téma konzultációi nem elérhetők.') . ' ' .  __('A témának nem Ön a belső konzulense.'));
             $ok = false;
         //Nem "A téma nem elfogadott", nem "Diplomakurzus sikertelen, tanaszékvezető döntésére vár", nem "Első diplomakurzus teljesítve", nem "Elutsítva (első diplomakurzus sikertelen)", vagy nem "A szakdolgozat/diplomamunka a formai követelményeknek megfelelt, feltölthető" státuszban van
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [8, 9, 10, 11, 12])){
+        }elseif(in_array($thesisTopic->thesis_topic_status_id, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])){
             $this->Flash->error(__('A téma konzultációi nem elérhetők.') . ' ' .  __('A téma'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.');
             $ok = false;
         }
@@ -46,16 +46,16 @@ class ConsultationsController extends AppController
         
         $consultations = $this->Consultations->find('all', ['conditions' => ['thesis_topic_id' => $thesisTopic->id], 'order' => ['current' => 'DESC', 'created' => 'DESC']]);
         
-        $has_current_thesis_consultation = false;
+        $can_add_consultation_group = true;
         foreach($consultations as $consultation){
-            //A jelenlegi szakdolgozathoz már van egy konzultációs csoport
-            if($consultation->current === true){
-                $has_current_thesis_consultation = true;
+            //A jelenlegi szakdolgozathoz már van egy konzultációs csoport és el van fogadva
+            if($consultation->current === true && $consultation->accepted !== false){
+                $can_add_consultation_group = false;
                 break;
             }
         }
         
-        $this->set(compact('consultations', 'thesisTopic', 'has_current_thesis_consultation'));
+        $this->set(compact('consultations', 'thesisTopic', 'can_add_consultation_group'));
     }
     
     /**
@@ -77,7 +77,7 @@ class ConsultationsController extends AppController
         }elseif($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : '')){ //Nem ehhez a belső konzulenshez tartozik
             $this->Flash->error(__('A témához nem adhat hozzá konzultációs csoportot.') . ' ' .  __('A témának nem Ön a belső konzulense.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [8, 11])){ //Nem "A téma nem elfogadott", nem "Diplomakurzus sikertelen, tanaszékvezető döntésére vár", nem "Első diplomakurzus teljesítve", vagy nem "Elutsítva (első diplomakurzus sikertelen)" státuszban van
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [12, 15])){ //Nem "A téma nem elfogadott", nem "Első diplomakurzus teljesítve" státuszban van
             $this->Flash->error(__('A témához nem adhat hozzá konzultációs csoportot.') . ' ' .  __('A téma'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.');
             $ok = false;
         }
@@ -87,7 +87,7 @@ class ConsultationsController extends AppController
         $consultations = $this->Consultations->find('all', ['conditions' => ['thesis_topic_id' => $thesisTopic->id]]);
         foreach($consultations as $consultation){
             //A jelenlegi szakdolgozathoz már van egy konzultációs csoport
-            if($consultation->current === true){
+            if($consultation->current === true && $consultation->accepted !== false){
                 $this->Flash->error(__('Nem adhat hozzá konzultációs csoportot. A jelenlegi szakdolgozat már rendelkezik eggyel.'));
                 return $this->redirect(['action' => 'index', $thesisTopic->id]);
             }
@@ -95,8 +95,19 @@ class ConsultationsController extends AppController
         
         $consultation = $this->Consultations->newEntity();
         $consultation->thesis_topic_id = $thesisTopic->id;
+        $consultation->current = true;
         
-        if ($this->Consultations->save($consultation)) $this->Flash->success(__('Mentés sikeres.'));
+        if ($this->Consultations->save($consultation)){
+            $this->Flash->success(__('Mentés sikeres.'));
+            $consultations = $this->Consultations->find('all', ['conditions' => ['Consultations.thesis_topic_id' => $thesisTopic->id]]);
+            //Az eddigi csoportok "régivé tétele"
+            foreach($consultations as $consultation_){
+                if($consultation_->id != $consultation->id){
+                    $consultation_->current = false;
+                    $this->Consultations->save($consultation_);
+                }
+            }
+        }
         else $this->Flash->error(__('Mentés sikertelen. Próbálja újra!'));
 
         return $this->redirect(['action' => 'index', $thesisTopic->id]);
@@ -128,7 +139,6 @@ class ConsultationsController extends AppController
         
         if(!$ok) return $this->redirect($this->referer(null, true));
         
-        
         $this->loadModel('Users');
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         
@@ -140,18 +150,15 @@ class ConsultationsController extends AppController
         }elseif($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : '')){ //Nem ehhez a belső konzulenshez tartozik
             $this->Flash->error(__('A témához nem adhat hozzá konzultációs csoportot.') . ' ' .  __('A témának nem Ön a belső konzulense.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [8, 11])){ //Nem "A téma nem elfogadott", nem "Diplomakurzus sikertelen, tanaszékvezető döntésére vár", nem "Első diplomakurzus teljesítve", vagy nem "Elutsítva (első diplomakurzus sikertelen)" státuszban van
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [12, 15])){ //Nem "A téma nem elfogadott", nem "Első diplomakurzus teljesítve" státuszban van
             $this->Flash->error(__('A témához nem adhat hozzá konzultációs csoportot.') . ' ' .  __('A téma'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.');
             $ok = false;
         }
         
         if(!$ok) return $this->redirect($this->referer(null, true));
         
-        if ($this->Consultations->delete($consultation)) {
-            $this->Flash->success(__('Törlés sikeres.'));
-        } else {
-            $this->Flash->error(__('Törlés sikertelen. Próbálja újra!'));
-        }
+        if($this->Consultations->delete($consultation)) $this->Flash->success(__('Törlés sikeres.'));
+        else $this->Flash->error(__('Törlés sikertelen. Próbálja újra!'));
 
         return $this->redirect(['action' => 'index', $consultation->thesis_topic_id]);
     }
@@ -190,7 +197,6 @@ class ConsultationsController extends AppController
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         
         $thesisTopic = $this->Consultations->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $consultation->thesis_topic_id], 'contain' => ['ThesisTopicStatuses']])->first();
-
         
         if(empty($thesisTopic)){ //Nem létezik a téma
             $error_msg = __('A konzultációs csoportot nem véglegesítheti.') . ' ' .  __('A téma, amelyhez tartozik nem létezik.');
@@ -198,7 +204,7 @@ class ConsultationsController extends AppController
         }elseif($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : -1)){ ////Nem ehhez a belső konzulenshez tartozik
             $error_msg = __('A konzultációs csoportot nem véglegesítheti.') . ' ' .  __('A témának, amelyhez tartozik, nem Ön a belső konzulense.');
             $ok = false;
-        }elseif($thesisTopic->thesis_topic_status_id != 11){ //Nem "Az első diplimakurzus teljesítve" státuszban van
+        }elseif($thesisTopic->thesis_topic_status_id != 15){ //Nem "Az első diplimakurzus teljesítve" státuszban van
             $error_msg = __('A konzultációs csoportot nem véglegesítheti.') . ' ' .  __('A téma'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.';
             $ok = false;
         }
@@ -227,7 +233,7 @@ class ConsultationsController extends AppController
                 $this->Flash->success(__('Mentés sikeres!'));
                 //Ha a "jelenlegi" szakdolgozathoz tartozik a konzultációs csoport és el lett fogadva
                 if($consultation->current === true && $consultation->accepted === true){
-                    $thesisTopic->thesis_topic_status_id = 12; //A szakdolgozat/diplomamunka a formai követelményeknek megfelelt, feltölthető
+                    $thesisTopic->thesis_topic_status_id = 16; //A szakdolgozat/diplomamunka a formai követelményeknek megfelelt, feltölthető
                     if(!$this->Consultations->ThesisTopics->save($thesisTopic)){
                         $saved = false;
                         $error_ajax = __('Mentés sikertelen. Próbálja újra!');

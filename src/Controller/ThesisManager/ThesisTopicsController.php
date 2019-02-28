@@ -21,7 +21,7 @@ class ThesisTopicsController extends AppController
      * Szakdolgozatkezelő témalista(szakdolgozatlista)
      */
     public function index(){
-        $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['deleted !=' => true, 'thesis_topic_status_id IN' => [14, 15, 16]],
+        $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['deleted !=' => true, 'thesis_topic_status_id IN' => [18, 19, 20]],
                                                           'contain' => ['Students', 'InternalConsultants', 'ThesisTopicStatuses'], 'order' => ['ThesisTopics.modified' => 'DESC']]);
 
         $this->set(compact('thesisTopics'));
@@ -35,14 +35,14 @@ class ThesisTopicsController extends AppController
      * @return type
      */
     public function details($id = null){
-        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id], 'contain' => ['ThesisSupplements', 'ThesisTopicStatuses', 'Students' => ['Courses', 'CourseLevels', 'CourseTypes'], 'InternalConsultants']])->first();
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id], 'contain' => ['ThesisSupplements', 'ThesisTopicStatuses', 'Students' => ['Courses', 'CourseLevels', 'CourseTypes'], 'InternalConsultants', 'StartingYears', 'ExpectedEndingYears', 'Languages']])->first();
         
         $ok = true;
         //Megnézzük, hogy megfelelő-e a téma a diplomamunka/szakdolgozat feltöltéséhez
         if(empty($thesisTopic)){ //Nem létezik a téma
             $this->Flash->error(__('Részeletek nem elérhetőek.') . ' ' . __('Nem létezik a téma.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [14, 15, 16])){ //A szakdolgozati feltöltés nincs véglegesítve
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [18, 19, 20])){ //A szakdolgozati feltöltés nincs véglegesítve
             $this->Flash->error(__('Részeletek nem elérhetőek.') . ' ' . __('A szakdolgozat felöltése még nincs véglegesítve.'));
             $ok = false;
         }
@@ -69,7 +69,7 @@ class ThesisTopicsController extends AppController
         if(empty($thesisTopic)){
             $ok = false;
             $error_msg = __('A mellékletek nem bírálhatóak.') . ' ' . __('A téma nem létezik.');
-        }elseif($thesisTopic->thesis_topic_status_id != 14){ //A szakdolgozati feltöltés nincs véglegesítve
+        }elseif($thesisTopic->thesis_topic_status_id != 18){ //A szakdolgozati feltöltés nincs véglegesítve
             $ok = false;
             $error_msg = __('A mellékletek nem bírálhatóak.') . ' ' . __('A szakdolgozat felöltése még nincs véglegesítve.');
         }
@@ -91,7 +91,7 @@ class ThesisTopicsController extends AppController
                 return;
             }
             
-            $thesisTopic->thesis_topic_status_id = $accepted == 0 ? 15 : 16;
+            $thesisTopic->thesis_topic_status_id = $accepted == 0 ? 19 : 20;
             $thesisTopic->cause_of_rejecting_thesis_supplements = $this->getRequest()->getData('cause_of_rejecting_thesis_supplements');
             if($this->ThesisTopics->save($thesisTopic)){
                 $this->Flash->success(__(($accepted == 0 ? 'Elutasítás' : 'Elfogadás') . ' sikeres.'));

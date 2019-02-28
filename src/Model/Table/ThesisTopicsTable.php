@@ -141,7 +141,7 @@ class ThesisTopicsTable extends Table
             ->allowEmpty('external_consultant_position');
 
         $validator
-            ->email('external_consultant_email', __('Nem megfelelő e-mail cím formátum.'))
+            ->email('external_consultant_email', false, __('Nem megfelelő e-mail cím formátum.'))
             ->maxLength('external_consultant_email', 60)
             ->allowEmpty('external_consultant_email');
 

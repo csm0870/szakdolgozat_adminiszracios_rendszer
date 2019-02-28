@@ -18,9 +18,6 @@
                         <a class="dropdown-item" id="offered_topics_index_menu_item" href="<?= $this->Url->build(['controller' => 'OfferedTopics', 'action' => 'index']) ?>"><?= __('Témaajánlatok') ?></a>
                     </div>
                 </li>
-                <li class="nav-item" id="thesis_topics_index_menu_item">
-                    <a class="nav-link" href=""><?= __('Témaengedélyezők') ?></a>
-                </li>
                 <li class="nav-item" id="final_exam_subjects_index_menu_item">
                     <a class="nav-link" href="<?= $this->Url->build(['controller' => 'FinalExamSubjects', 'action' => 'index']) ?>"><?= __('Záróvizsga-tárgyak') ?></a>
                 </li>

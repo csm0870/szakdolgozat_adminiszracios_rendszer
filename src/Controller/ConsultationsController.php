@@ -61,9 +61,6 @@ class ConsultationsController extends AppController
         }elseif($this->Auth->user('group_id') == 2 && $thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : '')){ //Nem ehhez a belső konzulenshez tartozik
             $this->Flash->error(__('Nem exportálható PDF-be.') . ' ' . __('A témának, amelyhez tartozik, nem Ön a belső konzulense.'));
             $ok = false;
-        }elseif($thesisTopic->thesis_topic_status_id != 12){ //Nem "A téma nem elfogadott", nem "Diplomakurzus sikertelen, tanaszékvezető döntésére vár", nem "Első diplomakurzus teljesítve", vagy nem "Elutsítva (első diplomakurzus sikertelen)" státuszban van
-            $this->Flash->error(__('Nem exportálható PDF-be.') . ' ' . __('A téma, amelyhez tartozik,'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.');
-            $ok = false;
         }
         
         if($prefix == false) $this->Flash->error(__('Ismeretlen felhasználótípus. Ki lettél jelentkeztetve.'));

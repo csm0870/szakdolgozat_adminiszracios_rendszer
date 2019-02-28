@@ -68,7 +68,7 @@ class ReviewersTable extends Table
             ->notEmpty('name', __('Név megadása kötelező.'));
 
         $validator
-            ->email('email', __('Helytelen email formátum.'))
+            ->email('email', false, __('Helytelen email formátum.'))
             ->notEmpty('email', __('Email megadása kötelező.'));
 
         $validator

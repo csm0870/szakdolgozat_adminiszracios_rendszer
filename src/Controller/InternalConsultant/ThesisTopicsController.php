@@ -53,8 +53,8 @@ class ThesisTopicsController extends AppController
         }elseif($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : '')){ //Nem ehhez a belső konzulenshez tartozik
             $this->Flash->error(__('A témát nem törölheti.') . ' ' . __('A témának nem Ön a belső konzulense.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [1, 2, 3, 4, 5, 6, 8, 10, 13])){ //Ha nincs bírálati folyamatban van
-            $this->Flash->error(__('A témát nem törölheti.') . ' ' . __('Az bírálata még folyamatban van.'));
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [7, 9, 11, 12, 14, 15, 16, 17, 18, 19, 20])){
+            $this->Flash->error(__('A témát nem törölheti.') . ' ' . __('A bírálata még folyamatban van.'));
             return $this->redirect(['action' => 'index']);
         }
 
@@ -64,7 +64,7 @@ class ThesisTopicsController extends AppController
         if ($this->ThesisTopics->save($thesisTopic)) {
             $this->Flash->success(__('Törlés sikeres.'));
         } else {
-            $this->Flash->error(__('Törlés sikertelen. Kérem próbálja újra!'));
+            $this->Flash->error(__('Törlés sikertelen. Próbálja újra!'));
         }
         
         return $this->redirect(['action' => 'index']);
@@ -80,7 +80,7 @@ class ThesisTopicsController extends AppController
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         
         $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id],
-                                                         'contain' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels'], 'ThesisTopicStatuses']])->first();
+                                                         'contain' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels'], 'ThesisSupplements' ,'ThesisTopicStatuses', 'StartingYears', 'ExpectedEndingYears', 'Languages']])->first();
     
         $ok = true;
         
@@ -90,7 +90,7 @@ class ThesisTopicsController extends AppController
         }elseif($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : '')){ //Nem ehhez a belső konzulenshez tartozik
             $this->Flash->error(__('A téma részletei nem elérhetők.') . ' ' . __('A témának nem Ön a belső konzulense.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [12, 13, 14, 15, 16, 17, 18, 19, 20])){ //Nem "A téma nem elfogadott", nem "Diplomakurzus sikertelen, tanaszékvezető döntésére vár", nem "Első diplomakurzus teljesítve", vagy nem "Elutsítva (első diplomakurzus sikertelen)" státuszban van
+        }elseif(in_array($thesisTopic->thesis_topic_status_id, [1, 2, 3, 4, 5])){ //Nem "A téma nem elfogadott", nem "Diplomakurzus sikertelen, tanaszékvezető döntésére vár", nem "Első diplomakurzus teljesítve", vagy nem "Elutsítva (első diplomakurzus sikertelen)" státuszban van
             $this->Flash->error(__('A téma részletei nem elérhetők.') . ' ' . __('A téma'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.');
             $ok = false;
         }
@@ -120,7 +120,7 @@ class ThesisTopicsController extends AppController
 
             $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesisTopic_id], 'contain' => ['ThesisTopicStatuses']])->first();
 
-            $ok = false;
+            $ok = true;
             
             if(empty($thesisTopic)){ //Nem létezik a téma
                 $ok = false;
@@ -169,7 +169,7 @@ class ThesisTopicsController extends AppController
         }elseif($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : -1)){ ////Nem ehhez a belső konzulenshez tartozik
             $error_msg = __('A diplomakurzus első félévének teljesítésének rögzítését nem teheti meg.') . ' ' . __('A témának nem Ön a belső konzulense.');
             $ok = false;
-        }elseif($thesisTopic->thesis_topic_status_id != 8){ //Nem "A téma elfogadott" státuszban van
+        }elseif($thesisTopic->thesis_topic_status_id != 12){ //Nem "A téma elfogadott" státuszban van
             $error_msg = __('A diplomakurzus első félévének teljesítésének rögzítését nem teheti meg.') . ' ' . __('A téma'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.';
             $ok = false;
         }
@@ -191,9 +191,9 @@ class ThesisTopicsController extends AppController
                 $thesisTopic->setError('custom', __('A döntésnek "0"(nem) vagy "1"(igen) értéket kell felvennie!'));
             }else{
                 if($first_thesis_subject_completed == 0){ //Első diplomakurzus sikertelen
-                    $thesisTopic->thesis_topic_status_id = 9; //Téma elutasítva (első diplomakurzus sikertelen)
+                    $thesisTopic->thesis_topic_status_id = 13; //Téma elutasítva (első diplomakurzus sikertelen)
                 }else{ //Első diplomakurzus sikeres
-                    $thesisTopic->thesis_topic_status_id = 11; //Első diplomakurzus teljesítve
+                    $thesisTopic->thesis_topic_status_id = 15; //Első diplomakurzus teljesítve
                     $thesisTopic->first_thesis_subject_failed_suggestion = null; // Javaslat nullázása
                 }
             }

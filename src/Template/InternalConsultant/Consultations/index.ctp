@@ -48,7 +48,7 @@
                         </table>
                     </div>
                 </div>
-                <?php if(!$has_current_thesis_consultation){ ?>
+                <?php if($can_add_consultation_group){ ?>
                     <div class="col-12 text-center">
                         <?= $this->Html->link(__('Új csoport hozzáadása') . '&nbsp;&nbsp;&nbsp;<span class="circle-btn add-btn">' . $this->Html->image('plus_icon.png') . '</span>', ['action' => 'add', $thesisTopic->id], ['class' => 'add-new-consultation', 'escape' => false]) ?>
                     </div>
@@ -57,7 +57,7 @@
         </div>
     </div>
 </div>
-<?php if($has_current_thesis_consultation){ ?>
+<?php if(!$can_add_consultation_group){ ?>
     <!-- Konzultációs csoport Véglegesítés modal -->
     <div class="modal fade" id="finalizeConsultationModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
@@ -75,7 +75,7 @@
     $(function(){
         $('#topics_menu_item').addClass('active');
         $('#thesis_topics_index_menu_item').addClass('active');
-        <?php if($has_current_thesis_consultation){ ?>
+        <?php if(!$can_add_consultation_group){ ?>
             $('.internalConsultant-consultations-index .finalizeBtn').on('click', function(e){
                 e.preventDefault();
 

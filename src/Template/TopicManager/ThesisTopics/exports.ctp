@@ -17,7 +17,8 @@
 </div>
 <script>
     $(function(){
-        $('#thesis_topic_exports').addClass('active');
+        $('#topics_menu_item').addClass('active');
+        $('#thesis_topics_exports').addClass('active');
         
         $('#year_select, #semester_select').on('change', function(){
             var year_id = $('#year_select').val();

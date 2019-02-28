@@ -24,8 +24,11 @@ class ThesisSupplementsController extends AppController
             return;
         }
         
+        $this->loadModel('Users');
+        $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['Students']]);
+        
         $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['id' => $thesisSupplement->thesis_topic_id]])->first();
-        if($thesisTopic->student_id != $this->Auth->user('id')){
+        if($thesisTopic->student_id != ($user->has('student') ? $user->student->id : '-1')){
             $this->Flash->error(__('A szakdolgozat/diplomamunka nem Önhöz tartozik.'));
             return;
         }
@@ -53,10 +56,16 @@ class ThesisSupplementsController extends AppController
         }
         
         $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['id' => $thesisSupplement->thesis_topic_id]])->first();
+        $ok = true;
         if($thesisTopic->student_id != $this->Auth->user('id')){
-            $this->Flash->error(__('A szakdolgozat/diplomamunka nem Önhöz tartozik.'));
-            return $this->redirect($this->referer(null, true));
+            $ok = false;
+            $this->Flash->error(__('A melléklet nem törölhető.') . ' ' . __('A szakdolgozat/diplomamunka nem Önhöz tartozik.'));
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [16, 17, 19])){
+            $ok = false;
+            $this->Flash->error(__('A melléklet nem törölhető.') . ' ' . __('A szakdolgozat/diplomamunka állapota alapján már nem változtathatók a mellékletek.'));
         }
+        
+        if($ok === false) return $this->redirect($this->referer(null, true));
         
         if ($this->ThesisSupplements->delete($thesisSupplement)) {
             $this->Flash->success(__('Törlés sikeres.'));
