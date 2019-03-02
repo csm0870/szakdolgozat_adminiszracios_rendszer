@@ -21,9 +21,8 @@
                                         <td><?= h($student->neptun) ?></td>
                                         <td>
                                             <?php
-                                                if($student->final_exam_subjects_status === 2) echo __('Véglegesítve. Ellenőrzésre vár.');
+                                                if($student->final_exam_subjects_status === 2) echo __('Hallgató véglegesítette. Ellenőrzésre vár.');
                                                 elseif($student->final_exam_subjects_status === 3) echo __('Elfogadva.');
-                                                elseif($student->final_exam_subjects_status === 4) echo __('Elutasítva.');
                                             ?>
                                         </td>
                                         <td class="text-center">

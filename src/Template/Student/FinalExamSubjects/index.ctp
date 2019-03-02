@@ -9,7 +9,7 @@
                 <?php  
                     $this->Form->templates(['inputContainer' => '<div class="form-group">{{content}}</div>',
                                             'inputContainerError' => '<div class="form-group">{{content}}{{error}}</div>']);
-                    echo in_array($student->final_exam_subjects_status, [2, 3]) ? '' : $this->Form->create(null, ['id' => 'saveFinalExamSubjectsForm', 'type' => 'file', 'class' => 'row']);
+                    echo in_array($student->final_exam_subjects_status, [2, 3]) ? '' : $this->Form->create(null, ['id' => 'saveFinalExamSubjectsForm', 'class' => 'row']);
                 ?>
                 <div class="col-12 mb-4">
                     <?php
@@ -19,7 +19,6 @@
                         elseif($student->final_exam_subjects_status === 1) echo __('Kiválasztva. Véglegesíthető.');
                         elseif($student->final_exam_subjects_status === 2) echo __('Véglegesítve. Ellenőrzésre vár.');
                         elseif($student->final_exam_subjects_status === 3) echo __('Elfogadva.');
-                        elseif($student->final_exam_subjects_status === 4) echo __('Elutasítva.')
                     ?>
                 </div>
                 <div class="col-12 mb-4">
@@ -127,7 +126,7 @@
                     <?= in_array($student->final_exam_subjects_status, [2, 3]) ? '' : $this->Form->button(__('Mentés'), ['type' => 'submit', 'class' => 'btn btn-primary border-radius-45px submitBtn']) ?>
                 </div>
                 <div class="col-12 col-sm-6  text-center">
-                    <?= in_array($student->final_exam_subjects_status, [1, 4]) ? $this->Form->button(__('Tárgyak véglegesítése'), ['type' => 'button', 'role' => 'button', 'class' => 'btn btn-success border-radius-45px finalizeBtn']) : '' ?>
+                    <?= in_array($student->final_exam_subjects_status, [1, 4]) ? $this->Form->button(__('Javaslat véglegesítése'), ['type' => 'button', 'role' => 'button', 'class' => 'btn btn-success border-radius-45px finalizeBtn']) : '' ?>
                 </div>
                 <div class="col-12 text-center">
                     <?= $student->final_exam_subjects_status == 3 ? $this->Html->link(__('Záróvizsga-tárgy kérelem letöltése'), ['controller' => 'FinalExamSubjects', 'action' => 'exportDoc', $student->id, 'prefix' => false], ['target' => '_blank', 'class' => 'btn btn-primary border-radius-45px']) : '' ?>
@@ -147,6 +146,12 @@
     $(function(){
         $('#final_exam_subjects_index_menu_item').addClass('active');
         <?php if($ok === true){ ?>
+                
+            /**
+            * Form mezőinek ellenőrzése
+            * 
+            * @return {undefined}
+            */
             function validateForm(){
                 $('#saveFinalExamSubjectsForm input').each(function(){
                     var id = $(this).data('id');

@@ -44,7 +44,7 @@
                 <td><span class="field">Nyelv:</span>&nbsp;<?= $thesisTopic->has('language') ? h($thesisTopic->language->name) : '' ?></td>
             </tr>
             <tr>
-                <td><span class="field">Típus:</span>&nbsp;<?= $thesisTopic->encrypted ? 'titkos' : 'nyilvános' ?></td>
+                <td><span class="field">Típus:</span>&nbsp;<?= $thesisTopic->confidential === true ? 'titkos' : 'nyilvános' ?></td>
             </tr>
             <tr>
                 <td><span class="field">Rövid leírás, részfeladatok:</span></td>

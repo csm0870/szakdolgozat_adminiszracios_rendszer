@@ -21,7 +21,7 @@ class ThesisSupplementsController extends AppController
         $thesisSupplement = $this->ThesisSupplements->find('all', ['conditions' => ['id' => $thesis_supplement_id]])->first();
         if(empty($thesisSupplement) || empty($thesisSupplement->file)){
             $this->Flash->error(__('Melléklet nem létezik.'));
-            return;
+            return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);
         }
         
         $this->loadModel('Users');
@@ -30,7 +30,7 @@ class ThesisSupplementsController extends AppController
         $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['id' => $thesisSupplement->thesis_topic_id]])->first();
         if($thesisTopic->student_id != ($user->has('student') ? $user->student->id : '-1')){
             $this->Flash->error(__('A szakdolgozat/diplomamunka nem Önhöz tartozik.'));
-            return;
+            return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);
         }
         
         $response = $this->getResponse()->withFile(ROOT . DS . 'files' . DS . 'thesis_supplements' . DS . $thesisSupplement->file,
@@ -55,9 +55,12 @@ class ThesisSupplementsController extends AppController
             return $this->redirect($this->referer(null, true));
         }
         
+        $this->loadModel('Users');
+        $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['Students']]);
+        
         $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['id' => $thesisSupplement->thesis_topic_id]])->first();
         $ok = true;
-        if($thesisTopic->student_id != $this->Auth->user('id')){
+        if($thesisTopic->student_id != ($user->has('student') ? $user->student->id : '-1')){
             $ok = false;
             $this->Flash->error(__('A melléklet nem törölhető.') . ' ' . __('A szakdolgozat/diplomamunka nem Önhöz tartozik.'));
         }elseif(!in_array($thesisTopic->thesis_topic_status_id, [16, 17, 19])){
@@ -65,7 +68,7 @@ class ThesisSupplementsController extends AppController
             $this->Flash->error(__('A melléklet nem törölhető.') . ' ' . __('A szakdolgozat/diplomamunka állapota alapján már nem változtathatók a mellékletek.'));
         }
         
-        if($ok === false) return $this->redirect($this->referer(null, true));
+        if($ok === false) return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);
         
         if ($this->ThesisSupplements->delete($thesisSupplement)) {
             $this->Flash->success(__('Törlés sikeres.'));

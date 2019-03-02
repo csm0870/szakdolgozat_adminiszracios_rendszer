@@ -110,8 +110,8 @@ class ThesisTopicsTable extends Table
             ->notEmpty('is_thesis', __('Dolgozat típusának megadása kötelező.'));
 
         $validator
-            ->boolean('encrypted')
-            ->notEmpty('encrypted', __('Titkosítottság megadása kötelező.'));
+            ->boolean('confidential')
+            ->notEmpty('confidential', __('Titkosítottság megadása kötelező.'));
 
         $validator
             ->boolean('starting_semester')
@@ -173,7 +173,7 @@ class ThesisTopicsTable extends Table
         $validator
             ->boolean('deleted')
             ->allowEmpty('deleted');
-        
+
         $validator
             ->notEmpty('internal_consultant_id', __('Belső konzulens megadása kötelező.'));
         

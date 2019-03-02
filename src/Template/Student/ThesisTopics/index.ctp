@@ -12,41 +12,14 @@
                             <tr>
                                 <th><?= __('Téma címe') ?></th>
                                 <th><?= __('Állapot') ?></th>
-                                <th><?= __('Műveletek') ?></th>
                             </tr>
                             <?php foreach($thesisTopics as $thesisTopic){ ?>
                                 <tr>
                                     <td>
-                                        <?= h($thesisTopic->title) .
-                                            (in_array($thesisTopic->thesis_topic_status_id, [16, 17, 19]) ? ('<br/>' . $this->Html->link(__('Diplomamunka/szakdolgozat feltöltése') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'uploadThesis', $thesisTopic->id])) : '') .
-                                            (in_array($thesisTopic->thesis_topic_status_id, [18, 20]) ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '')
-                                        ?>
+                                        <?= h($thesisTopic->title) . '<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id]) ?>
                                     </td>
                                     <td>
                                         <?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '' ?>
-                                    </td>
-                                    <td class="text-center">
-                                        <?php
-                                            if(in_array($thesisTopic->thesis_topic_status_id, [1, 4])){
-                                                //Ha kitöltési időszak van, csak akkor lehet véglegesíteni
-                                                if(!empty($can_fill_in_topic) && $can_fill_in_topic === true){
-                                                    echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary edit-btn border-radius-45px']);
-                                                    echo $this->Html->link(__('Téma véglegesítése'), '#', ['class' => 'btn btn-success finalize-thesis-topic-btn border-radius-45px', 'data-id' => $thesisTopic->id]);
-                                                }else{
-                                                    echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary edit-btn border-radius-45px']);
-                                                }
-
-                                                echo '<br/>';
-                                                
-                                                if($thesisTopic->thesis_topic_status_id == 4){
-                                                    echo $this->Html->link(__('Foglalás visszavonása'), '#', ['class' => 'btn btn-danger cancel-booking-btn border-radius-45px', 'style' => 'margin-bottom: 8px', 'data-id' => $thesisTopic->id]);
-                                                    echo "<br/>";
-                                                }
-                                            }
-
-                                            echo $this->Html->link(__('PDF'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px', 'target' => '_blank']);
-                                            if($thesisTopic->encrypted) echo '<br/>' . $this->Html->link(__('Titkosítási kérelem'), ['controller' => 'ThesisTopics', 'action' => 'encyptionRegulationDoc', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info enrcyption-doc-btn border-radius-45px', 'target' => '_blank']);
-                                        ?>
                                     </td>
                                 </tr>
                             <?php } ?>
@@ -72,51 +45,5 @@
     $(function(){
         $('#topics_menu_item').addClass('active');
         $('#thesis_topics_index_menu_item').addClass('active');
-        
-        /**
-        * Confirmation modal megnyitása submit előtt
-        */
-        $('.student-thesisTopics-index .finalize-thesis-topic-btn').on('click', function(e){
-            e.preventDefault();
-
-            $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan véglegesíted?') ?>');
-            $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
-            //Save gomb eventjeinek resetelése cserével
-            $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-            $('#confirmationModal .msg').html('<?= __('Téma véglegesítése. Véglegesítés után a téma adatai nem módosíthatóak.<br/>A véglegesítés után a hallgatói adatok sem módosíthatóak, csak ha elutasíják a témát.') ?>');
-
-            $('#confirmationModal').modal('show');
-            
-            var thesis_topic_id = $(this).data('id');
-            
-            $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
-                e.preventDefault();
-                $('#confirmationModal').modal('hide');
-                location.href = '<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'finalizeThesisTopic'], true) ?>' + '/' + thesis_topic_id;
-            });
-        });
-        
-        /**
-        * Confirmation modal megnyitása submit előtt
-        */
-        $('.student-thesisTopics-index .cancel-booking-btn').on('click', function(e){
-            e.preventDefault();
-
-            $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan visszautasítod a foglalást?') ?>');
-            $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Igen') ?>').css('background-color', 'red');
-            //Save gomb eventjeinek resetelése cserével
-            $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-            $('#confirmationModal .msg').html('<?= __('Foglalás visszautasítása.') ?>');
-
-            $('#confirmationModal').modal('show');
-            
-            var thesis_topic_id = $(this).data('id');
-            
-            $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
-                e.preventDefault();
-                $('#confirmationModal').modal('hide');
-                location.href = '<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'cancelBooking'], true) ?>' + '/' + thesis_topic_id;
-            });
-        });
     });
 </script>

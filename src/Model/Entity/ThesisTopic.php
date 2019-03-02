@@ -10,7 +10,7 @@ use Cake\ORM\Entity;
  * @property string|null $title
  * @property string|null $description
  * @property bool|null $is_thesis
- * @property bool|null $encrypted
+ * @property bool|null $confidential
  * @property int|null $starting_year_id
  * @property bool|null $starting_semester
  * @property int|null $expected_ending_year_id
@@ -62,7 +62,7 @@ class ThesisTopic extends Entity
         'title' => true,
         'description' => true,
         'is_thesis' => true,
-        'encrypted' => true,
+        'confidential' => true,
         'starting_year_id' => true,
         'starting_semester' => true,
         'expected_ending_year_id' => true,

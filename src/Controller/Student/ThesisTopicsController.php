@@ -145,13 +145,12 @@ class ThesisTopicsController extends AppController
         }
 
         $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id], 'contain' => ['OfferedTopics']])->first();
-        $student = $this->ThesisTopics->Students->find('all', ['conditions' => ['Students.user_id' => $this->Auth->user('id')]])->first();
         
         $ok = true;
         if(empty($thesisTopic)){
             $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A téma nem létezik.'));
             $ok = false;
-        }elseif($thesisTopic->student_id != (empty($student) ? 'null' : $student->id)){ //Nem a bejelntkezett hallgató szakdolgozata
+        }elseif($thesisTopic->student_id != $data['student_id']){ //Nem a bejelntkezett hallgató szakdolgozata
             $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A téma nem Önhöz tartozik.'));
             $ok = false;
         }elseif(!in_array($thesisTopic->thesis_topic_status_id, [1, 4])){ //Nem véglegesítésre vár
@@ -217,6 +216,54 @@ class ThesisTopicsController extends AppController
     }
     
     /**
+     * Téma részletek
+     * 
+     * @param type $id
+     * @return type
+     */
+    public function details($id = null){
+        //Hallgatói adatellenőrzés
+        $this->loadModel('Students');
+        $data = $this->Students->checkStundentData($this->Auth->user('id'));
+        if($data['success'] === false){
+            $this->Flash->error(__('Adja meg az adatit a továbblépéshez!'));
+            return $this->redirect(['controller' => 'Students', 'action' => 'edit', $data['student_id']]);
+        }
+
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id], 'contain' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels'], 'ThesisTopicStatuses', 'InternalConsultants', 'ThesisSupplements', 'StartingYears', 'ExpectedEndingYears', 'Languages']])->first();
+        
+        $ok = true;
+        //Megnézzük, hogy megfelelő-e a téma a diplomamunka/szakdolgozat feltöltéséhez
+        if(empty($thesisTopic)){ //Nem létezik a téma
+            $this->Flash->error(__('Részletek nem elérhetőek.') . ' ' . __('Nem létezik a téma.'));
+            $ok = false;
+        }elseif($thesisTopic->student_id != $data['student_id']){ //Nem a bejelntkezett hallgató szakdolgozata
+            $this->Flash->error(__('Részletek nem elérhetőek.') . ' ' . __('A szakdolgozat nem Önhöz tartozik.'));
+            $ok = false;
+        }
+        
+        if(!$ok) return $this->redirect(['action' => 'index']);
+        
+        $can_fill_in_topic = false;
+        $this->loadModel('Information');
+        $info = $this->Information->find('all')->first();
+
+        //Kitöltési időszak ellenőrzése
+        if(!empty($info) && !empty($info->filling_in_topic_form_begin_date) && !empty($info->filling_in_topic_form_end_date)){
+            $today = date('Y-m-d');
+
+            $start_date = $info->filling_in_topic_form_begin_date->i18nFormat('yyyy-MM-dd');
+            $end_date = $info->filling_in_topic_form_end_date->i18nFormat('yyyy-MM-dd');
+
+            if($today >= $start_date && $today <= $end_date){
+                $can_fill_in_topic = true;
+            }
+        }
+        
+        $this->set(compact('thesisTopic', 'can_fill_in_topic'));
+    }
+    
+    /**
      * Téma véglegesítés
      * 
      * @param type $id Téma ID-ja
@@ -232,13 +279,12 @@ class ThesisTopicsController extends AppController
         }
 
         $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['id' => $id]])->first();
-        $student = $this->ThesisTopics->Students->find('all',['conditions' => ['Students.user_id' => $this->Auth->user('id')]])->first();
         
         $ok = true;
         if(empty($thesisTopic)){
             $this->Flash->error(__('A téma nem véglegesíthető.') . ' ' . __('A téma nem létezik.'));
             $ok = false;
-        }elseif($thesisTopic->student_id != (empty($student) ? 'null' : $student->id)){ //Nem a bejelentkezett hallgató szakdolgozata
+        }elseif($thesisTopic->student_id != $data['student_id']){ //Nem a bejelentkezett hallgató szakdolgozata
             $this->Flash->error(__('A téma nem véglegesíthető.') . ' ' . __('A téma nem Önhöz tartozik.'));
             $ok = false;
         }elseif(!in_array($thesisTopic->thesis_topic_status_id, [1, 4])){ //Nem véglegesítésre vár
@@ -255,7 +301,7 @@ class ThesisTopicsController extends AppController
         if(empty($thesisTopic->title)) $thesisTopic->setError('title', __('Cím megadása kötelező.'));
         if(empty($thesisTopic->description)) $thesisTopic->setError('description', __('Leírás megadása kötelező.'));
         if($thesisTopic->is_thesis === null) $thesisTopic->setError('is_thesis', __('Dolgozat típusának megadása kötelező.'));
-        if($thesisTopic->encrypted === null) $thesisTopic->setError('encrypted', __('Titkosítottság megadása kötelező.'));
+        if($thesisTopic->confidential === null) $thesisTopic->setError('confidential', __('Titkosítottság megadása kötelező.'));
         if($thesisTopic->starting_semester === null) $thesisTopic->setError('starting_semester', __('Kezdési félév megadása kötelező.'));
         if($thesisTopic->expected_ending_semester === null) $thesisTopic->setError('expected_ending_semester', __('Kezdési tanév megadása kötelező.'));
         if($thesisTopic->cause_of_no_external_consultant === null){ //Ha van külső konzulens
@@ -316,7 +362,6 @@ class ThesisTopicsController extends AppController
             return $this->redirect(['controller' => 'Students', 'action' => 'edit', $data['student_id']]);
         }
         
-        $student = $this->ThesisTopics->Students->find('all',['conditions' => ['Students.user_id' => $this->Auth->user('id')]])->first();
         $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id],
                                                          'contain' => ['ThesisSupplements', 'ThesisTopicStatuses']])->first(); 
     
@@ -325,7 +370,7 @@ class ThesisTopicsController extends AppController
         if(empty($thesisTopic)){ //Nem létezik a téma
             $this->Flash->error(__('Diplomamunka/Szakdolgozat nem tölthető fel.') . ' ' . __('Nem létezik a téma.'));
             $ok = false;
-        }elseif($thesisTopic->student_id != (empty($student) ? 'null' : $student->id)){ //Nem a bejelntkezett hallgató szakdolgozata
+        }elseif($thesisTopic->student_id != $data['student_id']){ //Nem a bejelntkezett hallgató szakdolgozata
             $this->Flash->error(__('Diplomamunka/Szakdolgozat nem tölthető fel.') . ' ' . __('A szakdolgozat nem Önhöz tartozik.'));
             $ok = false;
         }elseif(!in_array($thesisTopic->thesis_topic_status_id, [16, 17, 19])){ //Nem "A szakdolgozat/diplomamunka a formai követelményeknek megfelelt, feltölthető", vagy nem "Szakdolgozat feltöltve, hallgató véglegesítésére vár",
@@ -439,36 +484,6 @@ class ThesisTopicsController extends AppController
         else $this->Flash->error(__('Hiba történt. Próbálja újra!'));
 
         return $this->redirect(['action' => 'index']);
-    }
-    
-    public function details($id = null){
-        //Hallgatói adatellenőrzés
-        $this->loadModel('Students');
-        $data = $this->Students->checkStundentData($this->Auth->user('id'));
-        if($data['success'] === false){
-            $this->Flash->error(__('Adja meg az adatit a továbblépéshez!'));
-            return $this->redirect(['controller' => 'Students', 'action' => 'edit', $data['student_id']]);
-        }
-
-        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['id' => $id], 'contain' => ['ThesisSupplements']])->first();
-        $student = $this->ThesisTopics->Students->find('all', ['conditions' => ['Students.user_id' => $this->Auth->user('id')]])->first();
-        
-        $ok = true;
-        //Megnézzük, hogy megfelelő-e a téma a diplomamunka/szakdolgozat feltöltéséhez
-        if(empty($thesisTopic)){ //Nem létezik a téma
-            $this->Flash->error(__('Részletek nem elérhetőek.') . ' ' . __('Nem létezik a téma.'));
-            $ok = false;
-        }elseif($thesisTopic->student_id != (empty($student) ? 'null' : $student->id)){ //Nem a bejelntkezett hallgató szakdolgozata
-            $this->Flash->error(__('Részletek nem elérhetőek.') . ' ' . __('A szakdolgozat nem Önhöz tartozik.'));
-            $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [18, 20])){ //A szakdolgozati feltöltés nincs véglegesítve, vagy nincs elfogadva még
-            $this->Flash->error(__('Részletek nem elérhetőek.') . ' ' . __('A szakdolgozat felöltése még nincs véglegesítve, vagy még nins elfogadva.'));
-            $ok = false;
-        }
-        
-        if(!$ok) return $this->redirect(['action' => 'index']);
-        
-        $this->set(compact('thesisTopic'));
     }
     
     /**

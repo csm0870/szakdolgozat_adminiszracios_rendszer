@@ -18,6 +18,21 @@ class FinalExamSubjectsController extends AppController
      * @param type $student_id Hallgató azonosítója
      */
     public function exportDoc($student_id = null){
+        if($this->Auth->user('group_id') == 6){
+            //Hallgatói adatellenőrzés
+            $this->loadModel('Students');
+            $data = $this->Students->checkStundentData($this->Auth->user('id'));
+            if($data['success'] === false){
+                $this->Flash->error(__('Adja meg az adatit a továbblépéshez!'));
+                return $this->redirect(['controller' => 'Students', 'action' => 'edit', $data['student_id'], 'prefix' => 'student']);
+            }
+            
+            if($student_id != $data['student_id']){
+                $this->Flash->error(__('A záróvizsga-tárgyak nem Önhöz tartoznak.'));
+                return $this->redirect(['controller' => 'FinalExamSubjects', 'action' => 'index', 'prefix' => 'student']);
+            }
+        }
+        
         $student = $this->FinalExamSubjects->Students->find('all', ['conditions' => ['Students.id' => $student_id],
                                                                     'contain' => ['FinalExamSubjects', 'FinalExamSubjectsInternalConsultants',
                                                                                   'CourseTypes', 'CourseLevels']])->first();
@@ -37,7 +52,7 @@ class FinalExamSubjectsController extends AppController
         //Még azt is meg lehetne nézni, hogy van-e olyan téma, amely már abban az állapotban van, hogy egyáltalán meg lehetett adni a ZV tárgyakat,
         // itt érdekes lehet, hogy ha esetleg egy téma visszaesik a korábbi állapotba, akkor mi legyen, így még egyenlőre nem szűrünk erre
         
-        if(!$ok) return;
+        if(!$ok) return $this->redirect($this->referer(null, false));
         
         $phpWord = new \PhpOffice\PhpWord\PhpWord();
         

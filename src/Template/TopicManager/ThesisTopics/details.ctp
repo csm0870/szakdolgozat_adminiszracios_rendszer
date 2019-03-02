@@ -26,6 +26,9 @@
                             <strong><?= __('Nyelv') . ': ' ?></strong><?= $thesisTopic->has('language') ? h($thesisTopic->language->name) : '' ?>
                         </p>
                         <p class="mb-1">
+                            <strong><?= __('Titkos') . ': ' ?></strong><?= $thesisTopic->confidential === true ? __('Igen') : __('Nem') ?>
+                        </p>
+                        <p class="mb-1">
                             <strong><?= __('Kezdési tanév') . ': ' ?></strong><?= $thesisTopic->has('starting_year') ? h($thesisTopic->starting_year->year) : '' ?>
                         </p>
                         <p class="mb-1">
@@ -81,6 +84,31 @@
                         </p>
                     </fieldset>
                 </div>
+                <div class="col-12 mt-1">
+                    <fieldset class="border-1-grey p-3 text-center">
+                        <legend class="w-auto"><?= __('Műveletek') ?></legend>
+                        <?php
+                                                                            
+                            //Ha van külső konzulens, akkor elfogadhatja annak aláírását
+                            if($thesisTopic->cause_of_no_external_consultant === null && $thesisTopic->thesis_topic_status_id == 10){
+                                echo $this->Form->create(null, ['id' => 'acceptThesisTopicForm', 'style' => 'display: inline-block', 'url' => ['action' => 'accept']]);
+                                echo $this->Form->button(__('Téma elfogadás'), ['type' => 'submit', 'class' => 'btn btn-success btn-accept border-radius-45px mb-2']);
+                                echo $this->Form->input('thesis_topic_id', ['type' => 'hidden', 'value' => $thesisTopic->id]);
+                                echo $this->Form->input('accepted', ['type' => 'hidden', 'value' => 1]);
+                                echo $this->Form->end();
+                                echo "&nbsp;&nbsp;";
+                                echo $this->Form->create(null, ['id' => 'rejectThesisTopicForm', 'style' => 'display: inline-block', 'url' => ['action' => 'accept']]);
+                                echo $this->Form->button(__('Téma elutasítás'), ['type' => 'submit', 'class' => 'btn btn-danger btn-reject border-radius-45px mb-2']);
+                                echo $this->Form->input('thesis_topic_id', ['type' => 'hidden', 'value' => $thesisTopic->id]);
+                                echo $this->Form->input('accepted', ['type' => 'hidden', 'value' => 0]);
+                                echo $this->Form->end();
+                                echo '<br/>';
+                            }
+                            
+                            echo $this->Html->link(__('Témaengedélyező PDF letöltése'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px mb-2', 'target' => '_blank']) . '<br/>';
+                        ?>
+                    </fieldset>
+                </div>
             </div>
         </div>
     </div>
@@ -89,5 +117,45 @@
     $(function(){
         $('#topics_menu_item').addClass('active');
         $('#thesis_topics_index_menu_item').addClass('active');
+        
+        <?php if($thesisTopic->cause_of_no_external_consultant === null && $thesisTopic->thesis_topic_status_id == 10){ ?>
+            //Confirmation modal elfogadás előtt
+            $('.headOfDepartment-thesisTopics-details .btn-accept').on('click', function(e){
+                e.preventDefault();
+
+                $('#confirmationModal .header').text('<?= __('Biztosan elfogadod?') ?>');
+                $('#confirmationModal .msg').text('<?= __('Téma elfogadása.') ?>');
+                $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Elfogadás') ?>').css('background-color', '#71D0BD');
+                //Save gomb eventjeinek resetelése cserével
+                $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
+
+                $('#confirmationModal').modal('show');
+
+                $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
+                    e.preventDefault();
+                    $('#confirmationModal').modal('hide');
+                    $('#acceptThesisTopicForm').trigger('submit');
+                });
+            });
+
+            //Confirmation modal elutasítás előtt
+            $('.headOfDepartment-thesisTopics-details .btn-reject').on('click', function(e){
+                e.preventDefault();
+
+                $('#confirmationModal .header').text('<?= __('Biztosan elutasítod?') ?>');
+                $('#confirmationModal .msg').text('<?= __('Téma elutasítása.') ?>');
+                $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Elutasítás') ?>').css('background-color', 'red');
+                //Save gomb eventjeinek resetelése cserével
+                $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
+
+                $('#confirmationModal').modal('show');
+
+                $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
+                    e.preventDefault();
+                    $('#confirmationModal').modal('hide');
+                    $('#rejectThesisTopicForm').trigger('submit');
+                });
+            });
+        <?php } ?>
     });
 </script>

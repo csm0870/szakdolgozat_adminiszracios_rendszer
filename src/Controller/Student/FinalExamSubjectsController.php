@@ -31,7 +31,7 @@ class FinalExamSubjectsController extends AppController
         
         $student = $this->FinalExamSubjects->Students->find('all', ['conditions' => ['Students.id' => $data['student_id']], 'contain' => ['FinalExamSubjects']])->first();
         //Olyan témák száma, amivel már lehet ZV tárgyak megadni
-        $thesisTopics = $this->FinalExamSubjects->Students->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.thesis_topic_status_id IN' => [11, 12, 13, 14, 15, 16], 'deleted' => false]]);
+        $thesisTopics = $this->FinalExamSubjects->Students->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.thesis_topic_status_id IN' => [15, 16, 17, 18, 19, 20], 'deleted' => false, 'student_id' => $student->id]]);
         
         if($student->course_id != 1){ //Ha nem mérnökinformatikus
             $ok = false;

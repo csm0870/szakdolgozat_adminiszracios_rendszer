@@ -11,9 +11,8 @@
                     <p class="mb-4">
                         <strong><?= __('Záróvizsga-tárgy kérelem állapota') . ': ' ?></strong>
                         <?php
-                            if($student->final_exam_subjects_status === 2) echo __('Véglegesítve. Ellenőrzésre vár.');
+                            if($student->final_exam_subjects_status === 2) echo __('Hallgató véglegesítette. Ellenőrzésre vár.');
                             elseif($student->final_exam_subjects_status === 3) echo __('Elfogadva.');
-                            elseif($student->final_exam_subjects_status === 4) echo __('Elutasítva.');
                         ?>
                     </p>
                     <p>
@@ -33,6 +32,11 @@
                     </p>
                 </div>
                 <div class="col-12">
+                    <?php
+                        $this->Form->templates(['inputContainer' => '<div class="form-group">{{content}}</div>',
+                                                'inputContainerError' => '<div class="form-group">{{content}}{{error}}</div>']);
+                        echo $this->Form->create(null, ['id' => 'saveFinalExamSubjectsForm']);
+                    ?>
                     <div id="accordion">
                         <?php 
                             $i = 1;
@@ -54,10 +58,11 @@
 
                                     <div id="finalExamSubjectCollapse_<?= $i ?>" class="collapse" aria-labelledby="heading_<?= $i ?>" data-parent="#accordion">
                                         <div class="card-body">
-                                            <?= $this->Form->control("final_exam_subjects[{$i}][name]", ['label' => ['text' => __('Tárgy neve')], 'class' => 'form-control', 'value' => $subject->name, 'data-id' => $i, 'readonly' => true]) ?>
-                                            <?= $this->Form->control("final_exam_subjects[{$i}][teachers]", ['label' => ['text' => __('Tanár(ok)')], 'class' => 'form-control', 'value' => $subject->teachers, 'data-id' => $i, 'readonly' => true]) ?>
-                                            <?= $this->Form->control("final_exam_subjects[{$i}][year_id]", ['options' => $years, 'label' => ['text' => __('Tanév, amikor tanulta')], 'class' => 'form-control', 'value' => $subject->year_id, 'data-id' => $i, 'disabled' => true]) ?>
-                                            <?= $this->Form->control("final_exam_subjects[{$i}][semester]", ['options' => [__('Ősz'), __('Tavasz')], 'label' => ['text' => __('Félév, amikor tanulta')], 'class' => 'form-control', 'required' => true, 'value' => $subject->semester, 'data-id' => $i, 'disabled' => true]) ?>
+                                            <?= $this->Form->control("final_exam_subjects[{$i}][id]", ['type' => 'hidden', 'value' => $subject->id]) ?>
+                                            <?= $this->Form->control("final_exam_subjects[{$i}][name]", ['label' => ['text' => __('Tárgy neve')], 'class' => 'form-control', 'required' => true, 'value' => $subject->name, 'data-id' => $i]) ?>
+                                            <?= $this->Form->control("final_exam_subjects[{$i}][teachers]", ['label' => ['text' => __('Tanár(ok)')], 'class' => 'form-control', 'required' => true, 'value' => $subject->teachers, 'data-id' => $i]) ?>
+                                            <?= $this->Form->control("final_exam_subjects[{$i}][year_id]", ['options' => $years, 'label' => ['text' => __('Tanév, amikor tanulta')], 'class' => 'form-control', 'required' => true, 'value' => $subject->year_id, 'data-id' => $i]) ?>
+                                            <?= $this->Form->control("final_exam_subjects[{$i}][semester]", ['options' => [__('Ősz'), __('Tavasz')], 'label' => ['text' => __('Félév, amikor tanulta')], 'class' => 'form-control', 'required' => true, 'value' => $subject->semester, 'data-id' => $i]) ?>
                                         </div>
                                     </div>
                                 </div>
@@ -82,27 +87,12 @@
                                 </script>
                         <?php $i++; } ?>
                 </div>
+                    <?php 
+                        echo $this->Form->button(__('Tárgyak mentése'), ['type' => 'submit', 'class' => 'btn btn-success submitBtn border-radius-45px']);
+                        echo $this->Form->input('student_id', ['type' => 'hidden', 'value' => $student->id]);
+                        echo $this->Form->end();
+                    ?>
                 </div>
-                <?php if($student->final_exam_subjects_status == 2){ ?>
-                    <div class="col-12 col-sm-6 text-center">
-                        <?php
-                            echo $this->Form->create(null, ['id' => 'acceptFinalExamSubjects', 'style' => 'display: inline-block', 'url' => ['action' => 'accept']]);
-                            echo $this->Form->button(__('Tárgyak elfogadása'), ['type' => 'submit', 'class' => 'btn btn-success acceptBtn border-radius-45px']);
-                            echo $this->Form->input('student_id', ['type' => 'hidden', 'value' => $student->id]);
-                            echo $this->Form->input('accepted', ['type' => 'hidden', 'value' => 1]);
-                            echo $this->Form->end();
-                        ?>
-                    </div>
-                    <div class=" col-12 col-sm-6 text-center">
-                        <?php
-                            echo $this->Form->create(null, ['id' => 'rejectFinalExamSubjects', 'style' => 'display: inline-block', 'url' => ['action' => 'accept']]);
-                            echo $this->Form->button(__('Tárgyak elutasítása'), ['type' => 'submit', 'class' => 'btn btn-danger rejectBtn border-radius-45px']);
-                            echo $this->Form->input('student_id', ['type' => 'hidden', 'value' => $student->id]);
-                            echo $this->Form->input('accepted', ['type' => 'hidden', 'value' => 0]);
-                            echo $this->Form->end();
-                        ?>
-                    </div>
-                <?php } ?>
             </div>
         </div>
     </div>
@@ -111,12 +101,32 @@
     $(function(){
         $('#final_exam_subjects_index_menu_item').addClass('active');
         
+        /**
+         * Form mezőinek ellenőrzése
+         * 
+         * @return {undefined}
+         */
+        function validateForm(){
+            $('#saveFinalExamSubjectsForm input').each(function(){
+                var id = $(this).data('id');
+                if(this.checkValidity() === false){
+                    $('#finalExamSubjectCollapse_' + id).collapse('show');
+                    return;
+                }
+            });
+        }
+        
         //Confirmation modal elfogadás előtt
-        $('.acceptBtn').on('click', function(e){
+        $('#saveFinalExamSubjectsForm .submitBtn').on('click', function(e){
             e.preventDefault();
             
-            $('#confirmationModal .header').text('<?= __('Biztosan elfogadod?') ?>');
-            $('#confirmationModal .msg').text('<?= __('Záróvizsga-tárgyak elfogadása.') ?>');
+            validateForm();
+            
+            //Formvalidáció manuális meghívása
+            if($('#saveFinalExamSubjectsForm')[0].reportValidity() === false) return;
+            
+            $('#confirmationModal .header').text('<?= __('Biztosan véglegesítése?') ?>');
+            $('#confirmationModal .msg').text('<?= __('Záróvizsga-tárgyak mentése. Az adatok mentés után is bármikor módosíthatók.') ?>');
             $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Elfogadás') ?>').css('background-color', '#71D0BD');
             //Save gomb eventjeinek resetelése cserével
             $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
@@ -126,27 +136,14 @@
             $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
                 e.preventDefault();
                 $('#confirmationModal').modal('hide');
-                $('#acceptFinalExamSubjects').trigger('submit');
+                $('#saveFinalExamSubjectsForm').trigger('submit');
             });
         });
         
-        //Confirmation modal elutasítás előtt
-        $('.rejectBtn').on('click', function(e){
-            e.preventDefault();
-            
-            $('#confirmationModal .header').text('<?= __('Biztosan elutasítod?') ?>');
-            $('#confirmationModal .msg').text('<?= __('Záróvizsga-tárgyak elutasítása.') ?>');
-            $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Elutasítás') ?>').css('background-color', 'red');
-            //Save gomb eventjeinek resetelése cserével
-            $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-                        
-            $('#confirmationModal').modal('show');
-            
-            $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
-                e.preventDefault();
-                $('#confirmationModal').modal('hide');
-                $('#rejectFinalExamSubjects').trigger('submit');
-            });
-        });
+        <?php if(isset($final_exam_subject_error_number)){ ?> // Ha van hiba, akkor azt a collapse-ot kinyitjuk, ahol a hiba van
+            $('#final_exam_subject_arrow_up_<?= $final_exam_subject_error_number ?>').removeClass('d-none');
+            $('#final_exam_subject_arrow_down_<?= $final_exam_subject_error_number ?>').addClass('d-none');
+            $('#finalExamSubjectCollapse_<?= $final_exam_subject_error_number ?>').collapse('show');
+        <?php } ?>
     });
 </script>
