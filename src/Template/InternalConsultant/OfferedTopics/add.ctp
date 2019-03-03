@@ -14,7 +14,7 @@
                 
                 echo $this->Form->create($offeredTopic, ['id' => 'offeredTopicAddForm']);
                 echo $this->Form->control('title', ['class' => 'form-control', 'label' => ['text' => __('Cím')]]);
-                echo $this->Form->control('description', ['class' => 'form-control', 'label' => ['text' => __('Leírás')]]);
+                echo $this->Form->control('description', ['class' => 'form-control tinymce', 'required'  => false, 'label' => ['text' => __('Leírás')]]);
                 echo $this->Form->control('has_external_consultant', ['class' => 'form-control', 'id' => 'has_external_consultant_select', 'options' => [__('Nincs'), __('Van')] ,'label' => ['text' => __('Van-e külső konzulens jelölt')]]);
                 echo $this->Form->control('external_consultant_name', ['class' => 'form-control', 'label' => ['text' => __('Külső konzulens neve')],
                                                                        'templates' => ['inputContainer' => '<div class="form-group external-consultants-data-field">{{content}}</div>',
@@ -89,5 +89,19 @@
                 $('#offeredTopicAddForm').trigger('submit');
             });
         });
+        
+        tinymce.remove();
+        tinymce.init({ selector:'.tinymce',
+                       forced_root_block : false,
+                       language : 'hu_HU',
+                       entity_encoding : 'raw',
+                       branding: false,
+                       menubar: false,
+                       plugins: [
+                                    "autoresize advlist lists link textcolor colorpicker",
+                                    "insertdatetime media table contextmenu paste wordcount"
+                                ],
+                       toolbar : ['undo redo | fontsizeselect | fontselect | styleselect | bold italic underline | alignleft aligncenter alignright alignjustify',
+                                  'bullist numlist | link unlink | forecolor backcolor | table']});
     });
 </script>

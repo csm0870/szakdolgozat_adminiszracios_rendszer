@@ -52,7 +52,16 @@
             ?>
             <?= $this->Form->create($thesisTopic, ['id' => 'thesisTopicEditForm']) ?>
             <?= $this->Form->control('title', ['class' => 'form-control', 'label' => ['text' => __('Cím')], 'readonly' => !empty($thesisTopic->offered_topic_id)]) ?>
-            <?= $this->Form->control('description', ['class' => 'form-control', 'label' => ['text' => __('Leírás') . ' (' . __('feladatok részletezése') . ')'], 'placeholder' => __('A leírással együtt az adatlap férjen rá egyetlen oldalra!'), 'readonly' => !empty($thesisTopic->offered_topic_id)]) ?>
+            <?php if(!empty($thesisTopic->offered_topic_id)){ ?>
+                <label class="mt-3">Leírás</label>
+                <div class="offered-topic-description mb-3">
+                    <?= $thesisTopic->description ?>
+                </div>
+            <?php
+                }else{
+                    echo $this->Form->control('description', ['class' => 'form-control tinymce', 'required' => false, 'label' => ['text' => __('Leírás') . ' (' . __('feladatok részletezése') . ')'], 'placeholder' => __('A leírással együtt az adatlap férjen rá egyetlen oldalra!')]);
+                }
+            ?>
             <?= $this->Form->control('starting_year_id', ['class' => 'form-control', 'options' => $years, 'label' => ['text' => __('Kezdési tanév')]]) ?>
             <?= $this->Form->control('starting_semester', ['class' => 'form-control', 'type' => 'select', 'options' => [__('Ősz'), __('Tavasz')], 'label' => ['text' => __('Kezdési félév')]]) ?>
             <?= $this->Form->control('expected_ending_year_id', ['class' => 'form-control', 'options' => $years, 'label' => ['text' => __('Várható leadási tanév')]]) ?>
@@ -155,5 +164,19 @@
                 $('#thesisTopicEditForm').trigger('submit');
             });
         });
+        
+        tinymce.remove();
+        tinymce.init({ selector:'.tinymce',
+                       forced_root_block : false,
+                       language : 'hu_HU',
+                       entity_encoding : 'raw',
+                       branding: false,
+                       menubar: false,
+                       plugins: [
+                                    "autoresize advlist lists link textcolor colorpicker",
+                                    "insertdatetime media table contextmenu paste wordcount"
+                                ],
+                       toolbar : ['undo redo | fontsizeselect | fontselect | styleselect | bold italic underline | alignleft aligncenter alignright alignjustify',
+                                  'bullist numlist | link unlink | forecolor backcolor | table']});
     });
 </script>

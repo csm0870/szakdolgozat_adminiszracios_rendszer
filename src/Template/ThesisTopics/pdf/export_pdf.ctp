@@ -51,7 +51,7 @@
             </tr>
         </table>
         <div class="thesis-description text-justify">
-            <?= h($thesisTopic->description) ?>
+            <?= $thesisTopic->description ?>
         </div>
     </div>
     <div class="data-group consultant-data">

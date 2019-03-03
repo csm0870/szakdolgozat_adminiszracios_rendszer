@@ -17,9 +17,10 @@
                 <p class="mb-1">
                     <strong><?= __('Téma címe') . ': ' ?></strong><?= h($thesisTopic->title) ?>
                 </p>
-                <p class="mb-1">
-                    <strong><?= __('Téma leírása') . ':<br/>' ?></strong><?= $thesisTopic->description ?>
-                </p>
+                <div class="mb-1">
+                    <strong><?= __('Téma leírása') . ':' ?></strong><br/>
+                    <?= $thesisTopic->description ?>
+                </div>
                 <p class="mb-1">
                     <strong><?= __('Nyelv') . ': ' ?></strong><?= $thesisTopic->has('language') ? h($thesisTopic->language->name) : '' ?>
                 </p>
@@ -109,6 +110,9 @@
                                         }
                                     ?>
                                 </ul>
+                                <div>
+                                    <?= $this->Html->link(__('Mellékletek letöltése ZIP-ben'), ['controller' => 'ThesisSupplements', 'action' => 'downloadSupplementInZip', $thesisTopic->id], ['class' => 'btn btn-info border-radius-45px' ,'target' => '_blank']) ?>
+                                </div>
                             </div>
                         </div>
                     </div>

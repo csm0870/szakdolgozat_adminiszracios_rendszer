@@ -20,6 +20,7 @@
         <?= $this->Html->script('/datepicker/locales/bootstrap-datepicker.hu.min.js') ?>
         <?= $this->Html->script('/fontawesome-free-5.6.1-web/js/all.min') ?>
         <?= $this->Html->script('/bootstrap_v4.1/js/bootstrap.min.js') ?>
+        <?= $this->Html->script('/tinymce/tinymce.min') ?>
 
         <?= $this->fetch('meta') ?>
         <?= $this->fetch('css') ?>

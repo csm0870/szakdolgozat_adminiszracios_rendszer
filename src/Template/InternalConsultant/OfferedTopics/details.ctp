@@ -13,9 +13,10 @@
                         <p class="mb-1">
                             <strong><?= __('Téma címe') . ': ' ?></strong><?= h($offeredTopic->title) ?>
                         </p>
-                        <p class="mb-1">
-                            <strong><?= __('Téma leírása') . ': ' ?></strong><?= h($offeredTopic->description) ?>
-                        </p>
+                        <div class="mb-1">
+                            <strong><?= __('Téma leírása') . ':' ?></strong><br/>
+                            <?= $offeredTopic->description ?>
+                        </div>
                         <?php if($offeredTopic->has_external_consultant === true){ ?>
                             <p class="mb-1">
                                 <strong><?= __('Külső konzulens neve') . ': ' ?></strong><?= h($offeredTopic->external_consultant_name) ?>

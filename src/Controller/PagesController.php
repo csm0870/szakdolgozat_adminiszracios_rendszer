@@ -40,11 +40,7 @@ class PagesController extends AppController
      * 
      * @param type $type
      */
-    public function home($type = null){
-        $administrators = false;
-        if($type == 'administrators') $administrators = true;
-        
-        $this->set(compact('administrators'));
+    public function home(){
     }
     
     /**

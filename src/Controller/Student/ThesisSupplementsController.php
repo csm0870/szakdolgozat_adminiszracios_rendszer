@@ -40,6 +40,50 @@ class ThesisSupplementsController extends AppController
     }
     
     /**
+     * Szakdolgozat/Diplomamunka Mellékletek letöltése egy ZIP-bem
+     * 
+     * @param type $thesis_topic_id
+     * @return type
+     */
+    public function downloadSupplementInZip($thesis_topic_id = null){
+        $this->loadModel('Users');
+        $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['Students']]);
+        
+        $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['id' => $thesis_topic_id],
+                                                                            'contain' => ['ThesisSupplements']])->first();
+        
+        $ok = true;
+        if(empty($thesisTopic)){
+            $ok = false;
+            $this->Flash->error(__('A szakdolgozat/diplomamunka mellékletek nem elérhezőek.') . ' ' . __('A szakdolgozat/diplomamunka nem létezik.'));
+        }elseif($thesisTopic->student_id != ($user->has('student') ? $user->student->id : '-1')){
+            $ok = false;
+            $this->Flash->error(__('A szakdolgozat/diplomamunka mellékletek nem elérhezőek.') . ' ' . __('A szakdolgozat/diplomamunka nem Önhöz tartozik.'));
+        }
+        
+        if($ok === false) return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);
+        
+        # create a new zipstream object
+        $zip = new \ZipStream\ZipStream(($user->has('student') ? ($user->student->neptun == '' ? '' : $user->student->neptun . '_') : '' ) . 'mellekletek.zip');
+
+        $i = 0;
+        foreach($thesisTopic->thesis_supplements as $supplement){
+            if(!empty($supplement->file)){
+                $i++;
+                $zip->addFileFromPath($supplement->file, ROOT . DS . 'files' . DS . 'thesis_supplements' . DS . $supplement->file);
+            }
+        }
+        
+        if($i < 1){//Ha nem volt melléklet
+            $this->Flash->error(__('A szakdolgozat/diplomamunka mellékletek nem elérhezőek.') . ' ' . __('A szakdolgozathou/diplomamunkához nem tartoznak mellékletek.'));
+            return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);            
+        }
+
+        # finish the zip stream
+        $zip->finish();
+    }
+    
+    /**
      * Delete method
      *
      * @param string|null $id Thesis Supplement id.

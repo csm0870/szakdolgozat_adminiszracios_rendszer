@@ -280,7 +280,7 @@ class ThesisTopicsController extends AppController
         $section->addText('Kivonat a kari Záróvizsga Szabályzatból', $subTitleFont, $subTitlePara);
         
         
-        //Szabálytat beszúrása
+        //Szabályzat beszúrása
         $this->loadModel('Information');
         $info = $this->Information->find('all')->first();
         

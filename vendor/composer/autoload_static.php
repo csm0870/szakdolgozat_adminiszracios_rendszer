@@ -29,6 +29,7 @@ class ComposerStaticInit4267271a2c1965b05732744859498c97
     public static $prefixLengthsPsr4 = array (
         'Z' => 
         array (
+            'ZipStream\\' => 10,
             'Zend\\Escaper\\' => 13,
             'Zend\\Diactoros\\' => 15,
         ),
@@ -122,6 +123,10 @@ class ComposerStaticInit4267271a2c1965b05732744859498c97
     );
 
     public static $prefixDirsPsr4 = array (
+        'ZipStream\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/maennchen/zipstream-php/src',
+        ),
         'Zend\\Escaper\\' => 
         array (
             0 => __DIR__ . '/..' . '/zendframework/zend-escaper/src',

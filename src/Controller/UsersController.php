@@ -118,23 +118,19 @@ class UsersController extends AppController
         return $this->redirect(['action' => 'index']);
     }
     
-    public function login($group_id = null){
-        if(!in_array($group_id, [1, 2, 3, 4, 5, 6])){
-            $this->Flash->error(__('Nem létező felhasználótípus!'));
+    public function login($group_type = null){
+        if(!in_array($group_type, [1, 2])){
+            $this->Flash->error(__('Nem létező belépési típus.!'));
             return $this->redirect(['controller' => 'Pages', 'action' => 'home']);
         }
         
         $group_name = "";
-        if($group_id == 1) $group_name = __('Adminisztrátori');
-        elseif($group_id == 2) $group_name = __('Belső konzulensi');
-        elseif($group_id == 3) $group_name = __('Tanszékvezetői');
-        elseif($group_id == 4) $group_name = __('Témakezelői');
-        elseif($group_id == 5) $group_name = __('Szakdolgozatkezelői');
-        elseif($group_id == 6) $group_name = __('Hallgatói');
+        if($group_type == 1) $group_name = __('Hallgatói');
+        elseif($group_type == 2) $group_name = __('Oktatói');
         
         $this->set(compact('group_name'));
         
-        $this->_doLogin($group_id);
+        $this->_doLogin($group_type);
     }
     
     public function logout() {
@@ -144,23 +140,26 @@ class UsersController extends AppController
         return $this->redirect($logout_redirect);
     }
     
-    private function _doLogin($group_id = null){
+    private function _doLogin($group_type = null){
         if ($this->request->is('post')) {
             $user = $this->Auth->identify();
-            if (!empty($user) && $user['group_id'] == $group_id) {
+            //A csoport típusának megfelelő felhasználótípusok ID-jai
+            $group_ids = ($group_type == 1 ? [6] : [1, 2, 3, 4, 5, 7, 8]);
+            
+            if (!empty($user) && in_array($user['group_id'], $group_ids)){
                 $this->Auth->setUser($user);
                 
-                if($group_id == 1) // Admin
+                if($user['group_id'] == 1) // Admin
                     return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'admin']);
-                elseif($group_id == 2) // Belső konzulens
+                elseif($user['group_id'] == 2) // Belső konzulens
                     return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'internal_consultant']);
-                elseif($group_id == 3) // Tanszékvezető
+                elseif($user['group_id'] == 3) // Tanszékvezető
                     return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'head_of_department']);
-                elseif($group_id == 4) // Témakezelő
+                elseif($user['group_id'] == 4) // Témakezelő
                     return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'topic_manager']);
-                elseif($group_id == 5) // Szakdolgozatkezelő
+                elseif($user['group_id'] == 5) // Szakdolgozatkezelő
                     return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'thesis_manager']);
-                elseif($group_id == 6) // Hallgató
+                elseif($user['group_id'] == 6) // Hallgató
                     return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'student']);
                 
                 return $this->redirect($this->Auth->redirectUrl());
