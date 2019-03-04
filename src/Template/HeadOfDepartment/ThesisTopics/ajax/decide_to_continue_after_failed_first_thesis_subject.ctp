@@ -77,7 +77,7 @@
                 success: function (response, textStatus, jqXHR, $form){
                     if(response.saved == false){
                         $('.overlay-decide_to_continue_after_failed_first_thesis_subject').hide();
-                        $('#set_first_thesis_subject_completed_container').html(response.content);
+                        $('#decide_to_continue_after_failed_first_thesis_subject_container').html(response.content);
                         $('#error_modal_ajax .error-msg').html(response.error_ajax);
                         $('#error_modal_ajax').modal('show');
                     }else{

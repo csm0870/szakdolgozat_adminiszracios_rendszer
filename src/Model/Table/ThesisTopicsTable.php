@@ -76,7 +76,7 @@ class ThesisTopicsTable extends Table
         $this->hasMany('Consultations', [
             'foreignKey' => 'thesis_topic_id'
         ]);
-        $this->hasMany('Reviews', [
+        $this->hasOne('Reviews', [
             'foreignKey' => 'thesis_topic_id'
         ]);
         $this->hasMany('ThesisSupplements', [
@@ -161,7 +161,7 @@ class ThesisTopicsTable extends Table
 
         $validator
             ->allowEmpty('internal_consultant_grade');
-
+            
         $validator
             ->scalar('first_thesis_subject_failed_suggestion')
             ->allowEmpty('first_thesis_subject_failed_suggestion');
@@ -211,7 +211,7 @@ class ThesisTopicsTable extends Table
 
         return $rules;
     }
-    
+     
     /**
      * Mentés előtti callback
      * 
@@ -265,6 +265,11 @@ class ThesisTopicsTable extends Table
         }elseif(empty($entity->cause_of_no_external_consultant)){
             //Ha nincs külső konzulens, akkor annak indoklása kötelező
             $entity->setError('cause_of_no_external_consultant', __('Külső konzulenstől való eltekintés indoklása kötelező.'));
+            $ok = false;
+        }
+        
+        if(!empty($entity->internal_consultant_grade) && !in_array($entity->internal_consultant_grade, [1, 2, 3, 4, 5])){
+            $entity->setError('internal_consultant_grade', __('A jegy csak 1, 2, 3, 4, 5 értéket vehet fel.'));
             $ok = false;
         }
         

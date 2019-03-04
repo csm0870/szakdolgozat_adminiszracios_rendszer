@@ -66,6 +66,34 @@
                             </p>
                         <?php } ?>
                     </fieldset>
+                    <?php if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22])){ ?>
+                        <fieldset class="border-1-grey p-3 mb-3">
+                            <legend class="w-auto"><?= __('Dolgozat értékelése') ?></legend>
+                            <p class="mb-2">
+                                <strong><?= __('Belső konzulens értékelése') . ': ' ?></strong><?= $thesisTopic->internal_consultant_grade === null ? __('még nincs értékelve') : h($thesisTopic->internal_consultant_grade) ?>
+                            </p>
+                            <?php if(in_array($thesisTopic->thesis_topic_status_id, [22]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
+                                <p class="mb-1">
+                                    <?= $this->Html->link(__('Dolgozat bírálója') . '&nbsp;' . '<i class="fas fa-angle-down fa-lg" id="reviewer_details_arrow_down"></i>' . '<i class="fas fa-angle-up fa-lg d-none" id="reviewer_details_arrow_up"></i>',
+                                                          '#', ['id' => 'reviewer_details_link', 'escape' => false]) ?>
+                                </p>
+                                <div id="reviewer_details_container" style="display: none">
+                                    <p class="mb-1">
+                                        <strong><?= __('Név') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->name) ?>
+                                    </p>
+                                    <p class="mb-1">
+                                        <strong><?= __('Email') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->email) ?>
+                                    </p>
+                                    <p class="mb-1">
+                                        <strong><?= __('Munkahely') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->workplace) ?>
+                                    </p>
+                                    <p class="mb-1">
+                                        <strong><?= __('Pozició') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->position) ?>
+                                    </p>
+                                </div>
+                            <?php } ?>
+                        </fieldset>
+                    <?php } ?>
                     <fieldset class="border-1-grey p-3 mb-3">
                         <legend class="w-auto"><?= __('Hallgató adatai') ?></legend>
                         <p class="mb-1">
@@ -91,6 +119,42 @@
                         </p>
                     <?php } ?>
                 </div>
+                <?php if(in_array($thesisTopic->thesis_topic_status_id, [20, 21, 22])){ ?>
+                    <div class="col-12">
+                        <div id="accordion">
+                            <div class="card">
+                                <div class="card-header" id="headingOne">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link" data-toggle="collapse" data-target="#supplementCollapse" aria-expanded="true" aria-controls="collapseOne">
+                                            <?= ($thesisTopic->is_thesis === null ? __('Szakdolgozat') : ($thesisTopic->is_thesis === true) ? __('Szakdolgozat') : __('Diplomamunka')) . '&nbsp;' .  __('mellékletek') ?>
+                                            <i class="fas fa-angle-down fa-lg" id="supplement_arrow_down"></i>
+                                            <i class="fas fa-angle-up fa-lg d-none" id="supplement_arrow_up"></i>
+                                        </button>
+                                    </h5>
+                                </div>
+
+                                <div id="supplementCollapse" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                                    <div class="card-body">
+                                         <ul>
+                                            <?php
+                                                foreach($thesisTopic->thesis_supplements as $supplement){
+                                                    if(!empty($supplement->file)){
+                                                        echo '<li>' .
+                                                                $this->Html->link($supplement->file, ['controller' => 'ThesisSupplements', 'action' => 'downloadFile', $supplement->id, 'prefix' => false], ['target' => '_blank']) .
+                                                             '</li>';
+                                                    }
+                                                }
+                                            ?>
+                                        </ul>
+                                        <div>
+                                            <?= $this->Html->link(__('Mellékletek letöltése ZIP-ben'), ['controller' => 'ThesisSupplements', 'action' => 'downloadSupplementInZip', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px' ,'target' => '_blank']) ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php } ?>
                 <div class="col-12 mt-1">
                     <fieldset class="border-1-grey p-3 text-center">
                         <legend class="w-auto"><?= __('Műveletek') ?></legend>
@@ -110,7 +174,10 @@
                                 echo $this->Form->end();
                                 echo '<br/>';
                             }
-                            echo $this->Html->link(__('Témaengedélyező PDF letöltése'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px mb-2', 'target' => '_blank']) . '<br/>';
+                            
+                            if($thesisTopic->thesis_topic_status_id == 21) echo $this->Html->link(__('Bíráló kijelölése'), ['controller' => 'Reviewers', 'action' => 'setReviewerForThesisTopic', $thesisTopic->id], ['class' => 'btn btn-info setReviewerForThesisTopicBtn border-radius-45px mb-2']) . '<br/>';
+                            
+                            echo $this->Html->link(__('Témaengedélyező PDF letöltése'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px mb-2', 'target' => '_blank']);
                         ?>
                     </fieldset>
                 </div>
@@ -132,6 +199,20 @@
         </div>
     </div>
 <?php } ?>
+<?php if($thesisTopic->thesis_topic_status_id == 21){ ?>
+<!-- Diplomakurzus első félévének teljesítésének rögzítése modal -->
+<div class="modal fade" id="setReviewerForThesisTopicModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div id="set_reviewer_for_thesis_topic_container">
+
+                </div>
+            </div>
+        </div>
+  </div>
+</div>
+<?php } ?>
 <script>
     $(function(){
         $('#thesis_topics_index_menu_item').addClass('active');
@@ -149,6 +230,55 @@
             $('.headOfDepartment-thesisTopics-details .decideToContinueAfterFailedFirstThesisSubjectBtn').on('click', function(e){
                 e.preventDefault();
                 $('#decideToContinueAfterFailedFirstThesisSubjectModal').modal('show');
+            });
+        <?php } ?>
+        
+        <?php if($thesisTopic->thesis_topic_status_id == 21){?>
+            //Tartalom lekeérése a "bíráló személyének kijelölése" modalba
+            $.ajax({
+                url: '<?= $this->Url->build(['controller' => 'Reviewers', 'action' => 'setReviewerForThesisTopic', $thesisTopic->id], true) ?>',
+                cache: false
+            })
+            .done(function( response ) {
+                $('#send_to_review_container').html(response.content);
+            });
+
+            $('.headOfDepartment-thesisTopics-details .setReviewerForThesisTopicBtn').on('click', function(e){
+                e.preventDefault();
+                $('#setReviewerForThesisTopicModal').modal('show');
+            });
+        <?php } ?>
+        
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [20, 21, 22])){ ?>
+            /**
+             * Accordion megjelenítésekor nyíl cseréje
+             */
+            $('#supplementCollapse').on('show.bs.collapse', function () {
+                $('#supplement_arrow_up').removeClass('d-none');
+                $('#supplement_arrow_down').addClass('d-none');
+            });
+
+            /**
+             * Accordion eltüntetésekor nyíl cseréje
+             */
+            $('#supplementCollapse').on('hide.bs.collapse', function () {
+                $('#supplement_arrow_down').removeClass('d-none');
+                $('#supplement_arrow_up').addClass('d-none');
+            });
+        <?php } ?>
+        
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [22]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
+            $('#reviewer_details_link').on('click', function(e){
+                e.preventDefault();
+                if($('#reviewer_details_container').css('display') == 'none'){
+                    $('#reviewer_details_container').slideDown(500);
+                    $('#reviewer_details_arrow_down').addClass('d-none');
+                    $('#reviewer_details_arrow_up').removeClass('d-none');
+                }else{
+                    $('#reviewer_details_container').slideUp(500);
+                    $('#reviewer_details_arrow_down').removeClass('d-none');
+                    $('#reviewer_details_arrow_up').addClass('d-none');
+                }
             });
         <?php } ?>
         

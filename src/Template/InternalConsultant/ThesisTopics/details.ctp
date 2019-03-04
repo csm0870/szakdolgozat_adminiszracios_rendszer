@@ -53,15 +53,43 @@
                             <p class="mb-1">
                                 <strong><?= __('Külső konzulens telefonszáma') . ': ' ?></strong><?= h($thesisTopic->external_consultant_phone_number) ?>
                             </p>
-                            <p class="mb-1">
+                            <p class="mb-3">
                                 <strong><?= __('Külső konzulens címe') . ': ' ?></strong><?= h($thesisTopic->external_consultant_address) ?>
                             </p>
                         <?php }else{ ?>
-                            <p class="mb-1">
+                            <p class="mb-3">
                                 <strong><?= __('Külső konzulenstól való eltekintés indoklása') . ': ' ?></strong><?= h($thesisTopic->cause_of_no_external_consultant) ?>
                             </p>
                         <?php } ?>
                     </fieldset>
+                    <?php if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22])){ ?>
+                        <fieldset class="border-1-grey p-3 mb-3">
+                            <legend class="w-auto"><?= __('Dolgozat értékelése') ?></legend>
+                            <p class="mb-2">
+                                <strong><?= __('Belső konzulens értékelése') . ': ' ?></strong><?= $thesisTopic->internal_consultant_grade === null ? __('még nincs értékelve') : h($thesisTopic->internal_consultant_grade) ?>
+                            </p>
+                            <?php if(in_array($thesisTopic->thesis_topic_status_id, [22]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
+                                <p class="mb-1">
+                                    <?= $this->Html->link(__('Dolgozat bírálója') . '&nbsp;' . '<i class="fas fa-angle-down fa-lg" id="reviewer_details_arrow_down"></i>' . '<i class="fas fa-angle-up fa-lg d-none" id="reviewer_details_arrow_up"></i>',
+                                                          '#', ['id' => 'reviewer_details_link', 'escape' => false]) ?>
+                                </p>
+                                <div id="reviewer_details_container" style="display: none">
+                                    <p class="mb-1">
+                                        <strong><?= __('Név') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->name) ?>
+                                    </p>
+                                    <p class="mb-1">
+                                        <strong><?= __('Email') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->email) ?>
+                                    </p>
+                                    <p class="mb-1">
+                                        <strong><?= __('Munkahely') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->workplace) ?>
+                                    </p>
+                                    <p class="mb-1">
+                                        <strong><?= __('Pozició') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->position) ?>
+                                    </p>
+                                </div>
+                            <?php } ?>
+                        </fieldset>
+                    <?php } ?>
                     <fieldset class="border-1-grey p-3 mb-3">
                         <legend class="w-auto"><?= __('Hallgató adatai') ?></legend>
                         <p class="mb-1">
@@ -81,7 +109,7 @@
                         </p>
                     </fieldset>
                 </div>
-                <?php if(in_array($thesisTopic->thesis_topic_status_id, [20])){ ?>
+                <?php if(in_array($thesisTopic->thesis_topic_status_id, [20, 21, 22])){ ?>
                     <div class="col-12">
                         <div id="accordion">
                             <div class="card">
@@ -108,15 +136,15 @@
                                                 }
                                             ?>
                                         </ul>
+                                        <div>
+                                            <?= $this->Html->link(__('Mellékletek letöltése ZIP-ben'), ['controller' => 'ThesisSupplements', 'action' => 'downloadSupplementInZip', $thesisTopic->id], ['class' => 'btn btn-info border-radius-45px' ,'target' => '_blank']) ?>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 <?php } ?>
-                <div class="col-12 text-center">
-                    
-                </div>
                 <div class="col-12 mt-1">
                     <fieldset class="border-1-grey p-3 text-center">
                         <legend class="w-auto"><?= __('Műveletek') ?></legend>
@@ -136,12 +164,16 @@
                                 echo $this->Form->end();
                                 echo '<br/>';
                             }
-                        
-                            echo $this->Html->link(__('Témaengedélyező PDF letöltése'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px mb-2', 'target' => '_blank']) . '<br/>';
+                            
+                            if($thesisTopic->thesis_topic_status_id == 20) echo $this->Html->link(__('Bíráló személyének kijelölése'), '#', ['class' => 'btn btn-secondary border-radius-45px setReviewerSuggestionBtn mb-2']). '<br/>';
+                                     
+                            if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22]) && $thesisTopic->internal_consultant_grade === null) echo $this->Html->link(__('Dolgozat értékelése'), '#', ['class' => 'btn btn-secondary border-radius-45px setThesisGradeBtn mb-2']). '<br/>';
+                            
+                            if($thesisTopic->thesis_topic_status_id == 12) echo $this->Html->link(__('Diplomakurzus első félévének teljesítésének rögzítése'), '#', ['class' => 'btn btn-secondary border-radius-45px setFirstThesisSubjectCompletedBtn mb-2']). '<br/>';
                             
                             if(!in_array($thesisTopic->thesis_topic_status_id, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])) echo $this->Html->link(__('Konzultációk kezelése'), ['controller' => 'Consultations', 'action' => 'index', $thesisTopic->id], ['class' => 'btn btn-secondary border-radius-45px mb-2']) . '<br/>';
                             
-                            if($thesisTopic->thesis_topic_status_id == 12) echo $this->Html->link(__('Diplomakurzus első félévének teljesítésének rögzítése'), '#', ['class' => 'btn btn-secondary border-radius-45px setFirstThesisSubjectCompletedBtn mb-2']). '<br/>';
+                            echo $this->Html->link(__('Témaengedélyező PDF letöltése'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px mb-2', 'target' => '_blank']) . '<br/>';
                             
                             //Akkor törölheti, ha már nincs bírálati folyamatban
                             if(!in_array($thesisTopic->thesis_topic_status_id, [1, 2, 3, 4, 5, 6, 8, 10, 13])){
@@ -169,6 +201,34 @@
       </div>
     </div>
 <?php } ?>
+<?php if($thesisTopic->thesis_topic_status_id == 20){ ?>
+<!-- Bíráló személyének belső konzulensi javaslata modal -->
+<div class="modal fade" id="setReviewerSuggestionModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div id="set_reviewer_suggestion_container">
+
+                </div>
+            </div>
+        </div>
+  </div>
+</div>
+<?php } ?>
+<?php if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22]) && $thesisTopic->internal_consultant_grade === null){ ?>
+<!-- Diplomakurzus első félévének teljesítésének rögzítése modal -->
+<div class="modal fade" id="setThesisGradeModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div id="set_thesis_grade_container">
+
+                </div>
+            </div>
+        </div>
+  </div>
+</div>
+<?php } ?>
 <script>
     $(function(){
         $('#topics_menu_item').addClass('active');
@@ -187,6 +247,56 @@
             $('.internalConsultant-thesisTopics-details .setFirstThesisSubjectCompletedBtn').on('click', function(e){
                 e.preventDefault();
                 $('#setFirstThesisSubjectCompletedModal').modal('show');
+            });
+        <?php } ?>
+        
+        <?php if($thesisTopic->thesis_topic_status_id == 20){?>
+            //Tartalom lekeérése a "bíráló személyének javaslata" modalba
+            $.ajax({
+                url: '<?= $this->Url->build(['controller' => 'Reviewers', 'action' => 'setReviewerSuggestion', $thesisTopic->id], true) ?>',
+                cache: false
+            })
+            .done(function( response ) {
+                $('#set_reviewer_suggestion_container').html(response.content);
+            });
+
+            $('.internalConsultant-thesisTopics-details .setReviewerSuggestionBtn').on('click', function(e){
+                e.preventDefault();
+                $('#setReviewerSuggestionModal').modal('show');
+            });
+        <?php } ?>
+        
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [20, 21, 22])){ ?>
+            /**
+             * Accordion megjelenítésekor nyíl cseréje
+             */
+            $('#supplementCollapse').on('show.bs.collapse', function () {
+                $('#supplement_arrow_up').removeClass('d-none');
+                $('#supplement_arrow_down').addClass('d-none');
+            });
+
+            /**
+             * Accordion eltüntetésekor nyíl cseréje
+             */
+            $('#supplementCollapse').on('hide.bs.collapse', function () {
+                $('#supplement_arrow_down').removeClass('d-none');
+                $('#supplement_arrow_up').addClass('d-none');
+            });
+        <?php } ?>
+        
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22]) && $thesisTopic->internal_consultant_grade === null){ ?>
+            //Tartalom lekeérése a "dolgozat értékelése" modalba
+            $.ajax({
+                url: '<?= $this->Url->build(['action' => 'setThesisGrade', $thesisTopic->id], true) ?>',
+                cache: false
+            })
+            .done(function( response ) {
+                $('#set_thesis_grade_container').html(response.content);
+            });
+
+            $('.internalConsultant-thesisTopics-details .setThesisGradeBtn').on('click', function(e){
+                e.preventDefault();
+                $('#setThesisGradeModal').modal('show');
             });
         <?php } ?>
         
@@ -248,6 +358,21 @@
                     $('#confirmationModal').modal('hide');
                     $('#rejectThesisTopicForm').trigger('submit');
                 });
+            });
+        <?php } ?>
+        
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [22]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
+            $('#reviewer_details_link').on('click', function(e){
+                e.preventDefault();
+                if($('#reviewer_details_container').css('display') == 'none'){
+                    $('#reviewer_details_container').slideDown(500);
+                    $('#reviewer_details_arrow_down').addClass('d-none');
+                    $('#reviewer_details_arrow_up').removeClass('d-none');
+                }else{
+                    $('#reviewer_details_container').slideUp(500);
+                    $('#reviewer_details_arrow_down').removeClass('d-none');
+                    $('#reviewer_details_arrow_up').addClass('d-none');
+                }
             });
         <?php } ?>
     });

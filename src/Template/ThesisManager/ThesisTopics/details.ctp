@@ -8,11 +8,11 @@
         <div class="col-12">
             <fieldset class="border-1-grey p-3 mb-3">
                     <legend class="w-auto"><?= __('A téma adatai') ?></legend>
-                    <p class="mb-2">
+                    <p class="<?= $thesisTopic->thesis_topic_status_id == 19 ? 'mb-2' : 'mb-4' ?>">
                         <strong><?= __('Állapot') . ': ' ?></strong><?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : ''?>
                     </p>
                     <?php if($thesisTopic->thesis_topic_status_id == 19){ ?>
-                        <p class="mb-3">
+                        <p class="mb-4">
                             <strong><?= __('Elutasítás oka') . ': ' ?></strong><?= h($thesisTopic->cause_of_rejecting_thesis_supplements) ?>
                         </p>
                     <?php } ?>
@@ -69,6 +69,34 @@
                         </p>
                     <?php } ?>
                 </fieldset>
+                <?php if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22])){ ?>
+                    <fieldset class="border-1-grey p-3 mb-3">
+                        <legend class="w-auto"><?= __('Dolgozat értékelése') ?></legend>
+                        <p class="mb-2">
+                            <strong><?= __('Belső konzulens értékelése') . ': ' ?></strong><?= $thesisTopic->internal_consultant_grade === null ? __('még nincs értékelve') : h($thesisTopic->internal_consultant_grade) ?>
+                        </p>
+                        <?php if(in_array($thesisTopic->thesis_topic_status_id, [22]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
+                            <p class="mb-1">
+                                <?= $this->Html->link(__('Dolgozat bírálója') . '&nbsp;' . '<i class="fas fa-angle-down fa-lg" id="reviewer_details_arrow_down"></i>' . '<i class="fas fa-angle-up fa-lg d-none" id="reviewer_details_arrow_up"></i>',
+                                                      '#', ['id' => 'reviewer_details_link', 'escape' => false]) ?>
+                            </p>
+                            <div id="reviewer_details_container" style="display: none">
+                                <p class="mb-1">
+                                    <strong><?= __('Név') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->name) ?>
+                                </p>
+                                <p class="mb-1">
+                                    <strong><?= __('Email') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->email) ?>
+                                </p>
+                                <p class="mb-1">
+                                    <strong><?= __('Munkahely') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->workplace) ?>
+                                </p>
+                                <p class="mb-1">
+                                    <strong><?= __('Pozició') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->position) ?>
+                                </p>
+                            </div>
+                        <?php } ?>
+                    </fieldset>
+                <?php } ?>
                 <fieldset class="border-1-grey p-3 mb-3">
                     <legend class="w-auto"><?= __('Hallgató adatai') ?></legend>
                     <p class="mb-1">
@@ -88,7 +116,7 @@
                     </p>
                 </fieldset>
         </div>
-        <?php if(in_array($thesisTopic->thesis_topic_status_id, [18, 19, 20])){ ?>
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [18, 19, 20, 21, 22])){ ?>
             <div class="col-12">
                 <div id="accordion">
                     <div class="card">
@@ -115,6 +143,9 @@
                                         }
                                     ?>
                                 </ul>
+                                <div>
+                                    <?= $this->Html->link(__('Mellékletek letöltése ZIP-ben'), ['controller' => 'ThesisSupplements', 'action' => 'downloadSupplementInZip', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px' ,'target' => '_blank']) ?>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -182,5 +213,20 @@
             $('#supplement_arrow_down').removeClass('d-none');
             $('#supplement_arrow_up').addClass('d-none');
         });
+        
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [22]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
+            $('#reviewer_details_link').on('click', function(e){
+                e.preventDefault();
+                if($('#reviewer_details_container').css('display') == 'none'){
+                    $('#reviewer_details_container').slideDown(500);
+                    $('#reviewer_details_arrow_down').addClass('d-none');
+                    $('#reviewer_details_arrow_up').removeClass('d-none');
+                }else{
+                    $('#reviewer_details_container').slideUp(500);
+                    $('#reviewer_details_arrow_down').removeClass('d-none');
+                    $('#reviewer_details_arrow_up').addClass('d-none');
+                }
+            });
+        <?php } ?>
     });
 </script>

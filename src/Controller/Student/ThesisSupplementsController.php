@@ -49,16 +49,16 @@ class ThesisSupplementsController extends AppController
         $this->loadModel('Users');
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['Students']]);
         
-        $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['id' => $thesis_topic_id],
+        $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id],
                                                                             'contain' => ['ThesisSupplements']])->first();
         
         $ok = true;
         if(empty($thesisTopic)){
             $ok = false;
-            $this->Flash->error(__('A szakdolgozat/diplomamunka mellékletek nem elérhezőek.') . ' ' . __('A szakdolgozat/diplomamunka nem létezik.'));
+            $this->Flash->error(__('A szakdolgozat/diplomamunka mellékletek nem elérhetőek.') . ' ' . __('A szakdolgozat/diplomamunka nem létezik.'));
         }elseif($thesisTopic->student_id != ($user->has('student') ? $user->student->id : '-1')){
             $ok = false;
-            $this->Flash->error(__('A szakdolgozat/diplomamunka mellékletek nem elérhezőek.') . ' ' . __('A szakdolgozat/diplomamunka nem Önhöz tartozik.'));
+            $this->Flash->error(__('A szakdolgozat/diplomamunka mellékletek nem elérhetőek.') . ' ' . __('A szakdolgozat/diplomamunka nem Önhöz tartozik.'));
         }
         
         if($ok === false) return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);

@@ -27,7 +27,7 @@
                     echo $this->Form->control('password', ['class' => 'form-control', 'label' => ['text' => __('Jelszó')],
                                                            'required' => true, 'placeholder' => __('Jelszó...')]); ?>
                     <div class="text-center">
-                        <?= $this->Form->button(__('Belépés'), ['type' => 'submit', 'class' => 'submitBtn btn btn-outline-primary']) ?>
+                        <?= $this->Form->button(__('Belépés'), ['type' => 'submit', 'class' => 'submitBtn btn btn-outline-primary border-radius-45px']) ?>
                     </div>
                     <?= $this->Form->end() ?>
             </div>

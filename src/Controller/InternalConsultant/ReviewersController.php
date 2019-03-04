@@ -20,8 +20,7 @@ class ReviewersController extends AppController
     /**
      * Bírálók listája
      */
-    public function index()
-    {
+    public function index(){
         $reviewers = $this->Reviewers->find('all');
         $this->set(compact('reviewers'));
     }
@@ -31,8 +30,7 @@ class ReviewersController extends AppController
      *
      * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
      */
-    public function add()
-    {
+    public function add(){
         $this->getRequest()->allowMethod('ajax');
         $this->viewBuilder()->setClassName('Ajax.Ajax');
         
@@ -73,8 +71,7 @@ class ReviewersController extends AppController
      * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function edit($id = null)
-    {
+    public function edit($id = null){
         $this->getRequest()->allowMethod('ajax');
         $this->viewBuilder()->setClassName('Ajax.Ajax');
         
@@ -116,6 +113,95 @@ class ReviewersController extends AppController
         }
         
         $this->set(compact('reviewer', 'saved', 'error_ajax', 'ok', 'error_msg'));
+        $this->set('_serialize', ['saved', 'error_ajax']);
+    }
+    
+    /**
+     * Bíráló személyének javaslata
+     * 
+     * @param type $thesis_topic_id Téma azonosítója
+     */
+    public function setReviewerSuggestion($thesis_topic_id = null){
+        $this->getRequest()->allowMethod('ajax');
+        $this->viewBuilder()->setClassName('Ajax.Ajax');
+        
+        $this->loadModel('Users');
+        $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
+        $thesisTopic = $this->Reviewers->Reviews->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id]])->first();
+        
+        $error_msg = '';
+        $ok = true;
+        if(empty($thesisTopic)){ //Nem létezik a téma
+            $error_msg = __('Bírálói javaslat tétele nem lehetséges.') . ' ' . __('Nem létező szakdolgozat/diplomamunka.');
+            $ok = false;
+        }elseif($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : -1)){ ////Nem ehhez a belső konzulenshez tartozik
+            $error_msg = __('Bírálói javaslat tétele nem lehetséges.') . ' ' . __('A szakdolgozatnak/diplomamunkának nem Ön a belső konzulense.');
+            $ok = false;
+        }elseif($thesisTopic->thesis_topic_status_id != 20){ //Nem "Bíráló kijelölésére vár státuszban van" státuszban van
+            $error_msg = __('Bírálói javaslat tétele nem lehetséges.') . ' ' . __('A szakdolgozat/diplomamunka nem a belső konzulens általi biráló személyének kijelölésére vár.');
+            $ok = false;
+        }
+        
+        //Ha a feltételeknek megfelelő téma nem található
+        if($ok === false){
+            $this->set(compact('ok', 'error_msg'));
+            return;
+        }
+        
+        $saved = true;
+        $error_ajax = "";
+        if ($this->request->is('post')){
+            $reviewer_id = $this->getRequest()->getData('reviewer_id');
+            
+            if(empty($reviewer_id)){
+                $saved = false;
+                $error_ajax = __('Mentés sikertelen. Próbálja újra!') . ' ' . __('Bírálót kötelező megadni.');
+            }elseif(!$this->Reviewers->exists(['id' => $reviewer_id])){
+                $saved = false;
+                $error_ajax = __('Mentés sikertelen. Próbálja újra!') . ' ' . __('Bíráló nem létezik.');
+            }else{
+                $review = $this->Reviewers->Reviews->newEntity();
+                $review->thesis_topic_id = $thesisTopic->id;
+                $review->reviewer_id = $reviewer_id;
+                
+                $current_review = $this->Reviewers->Reviews->find('all', ['conditions' => ['Reviews.thesis_topic_id' => $thesisTopic->id]])->first();
+                
+                if(!empty($current_review) && !$this->Reviewers->Reviews->delete($current_review)){
+                    $saved = false;
+                    $error_ajax = __('Mentés sikertelen. Próbálja újra!');
+                }else{
+                    if($this->Reviewers->Reviews->save($review)){
+                        $thesisTopic->thesis_topic_status_id = 21; //Bíráló kijelölve
+                        if($this->Reviewers->Reviews->ThesisTopics->save($thesisTopic)){
+                            $this->Flash->success(__('Mentés sikeres.'));
+                        }else{
+                            $saved = false;
+                            $error_ajax = __('Mentés sikertelen. Próbálja újra!');
+                        }
+                    }else{
+                        $saved = false;
+                        $error_ajax = __('Mentés sikertelen. Próbálja újra!');
+
+                        $errors = $review->getErrors();
+                        if(!empty($errors)){
+                            foreach($errors as $error){
+                                if(is_array($error)){
+                                    foreach($error as $err){
+                                        $error_ajax.= '<br/>' . $err;
+                                    }
+                                }else{
+                                    $error_ajax.= '<br/>' . $error;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        $reviewers_list = $this->Reviewers->find('list');
+        $reviewers = $this->Reviewers->find('all');
+        $this->set(compact('reviewers', 'reviewers_list', 'saved', 'error_ajax', 'ok', 'error_msg', 'thesisTopic'));
         $this->set('_serialize', ['saved', 'error_ajax']);
     }
 

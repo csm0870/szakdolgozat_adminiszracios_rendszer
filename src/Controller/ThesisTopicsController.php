@@ -68,6 +68,7 @@ class ThesisTopicsController extends AppController
                                                                        'conditions' => ['ThesisTopics.id' => $id]])->first();
         $group_id = $this->Auth->user('group_id');
         
+        $prefix = '';
         if($group_id == 1){
             $prefix = 'admin';
         }elseif($group_id == 2){

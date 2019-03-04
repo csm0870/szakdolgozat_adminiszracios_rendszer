@@ -77,7 +77,9 @@ class ThesisTopicsController extends AppController
      */
     public function details($id = null){
         $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id],
-                                                         'contain' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels'], 'ThesisTopicStatuses', 'InternalConsultants', 'StartingYears', 'ExpectedEndingYears', 'Languages']])->first();
+                                                         'contain' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels'],
+                                                                       'ThesisTopicStatuses', 'InternalConsultants', 'StartingYears', 'ExpectedEndingYears', 'Languages', 'ThesisSupplements',
+                                                                       'Reviews' => ['Reviewers']]])->first();
     
         $ok = true;
         

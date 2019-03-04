@@ -14,7 +14,7 @@ class ThesisTopicsController extends AppController
 {
     public function beforeFilter(\Cake\Event\Event $event) {
         parent::beforeFilter($event);
-        if($this->getRequest()->getParam('action') == 'setFirstThesisSubjectCompleted') $this->viewBuilder()->setLayout(false);
+        if(in_array($this->getRequest()->getParam('action'), ['setFirstThesisSubjectCompleted', 'setThesisGrade'])) $this->viewBuilder()->setLayout(false);
     }
     
     /**
@@ -80,7 +80,9 @@ class ThesisTopicsController extends AppController
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         
         $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id],
-                                                         'contain' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels'], 'ThesisSupplements' ,'ThesisTopicStatuses', 'StartingYears', 'ExpectedEndingYears', 'Languages']])->first();
+                                                         'contain' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels'],
+                                                                                      'ThesisSupplements' ,'ThesisTopicStatuses', 'StartingYears', 'ExpectedEndingYears', 'Languages',
+                                                                                      'Reviews' => ['Reviewers']]])->first();
     
         $ok = true;
         
@@ -170,7 +172,7 @@ class ThesisTopicsController extends AppController
             $error_msg = __('A diplomakurzus első félévének teljesítésének rögzítését nem teheti meg.') . ' ' . __('A témának nem Ön a belső konzulense.');
             $ok = false;
         }elseif($thesisTopic->thesis_topic_status_id != 12){ //Nem "A téma elfogadott" státuszban van
-            $error_msg = __('A diplomakurzus első félévének teljesítésének rögzítését nem teheti meg.') . ' ' . __('A téma'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.';
+            $error_msg = __('A diplomakurzus első félévének teljesítésének rögzítését nem teheti meg.') . ' ' . __('A téma nem elfogadott státuszban van.');
             $ok = false;
         }
         
@@ -216,6 +218,79 @@ class ThesisTopicsController extends AppController
                         }
                     }
                 }
+            }
+        }
+        
+        $this->set(compact('thesisTopic' ,'ok', 'error_msg', 'saved', 'error_ajax'));
+        $this->set('_serialize', ['saved', 'error_ajax']);
+    }
+    
+    /**
+     * Dolgozat értékelése
+     * 
+     * @param type $id Téma azonosítója
+     */
+    public function setThesisGrade($id = null){
+        $this->getRequest()->allowMethod('ajax');
+        $this->viewBuilder()->setClassName('Ajax.Ajax');
+        
+        $this->loadModel('Users');
+        $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id], 'contain' => ['ThesisTopicStatuses']])->first();
+
+        $error_msg = '';
+        $ok = true;
+        
+        if(empty($thesisTopic)){ //Nem létezik a téma
+            $error_msg = __('A dolgozat értékelését nem teheti meg.') . ' ' . __('Nem létező dolgozat.');
+            $ok = false;
+        }elseif($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : -1)){ ////Nem ehhez a belső konzulenshez tartozik
+            $error_msg = __('A dolgozat értékelését nem teheti meg.') . ' ' . __('A dolgozatnak nem Ön a belső konzulense.');
+            $ok = false;
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22])){ //Nincs legalább "Formai követelményeknek megfelelt" státuszban
+            $error_msg = __('A dolgozat értékelését nem teheti meg.') . ' ' . __('A dolgozat még nincs abban az állapotban, hogy értékelhető legyen.');
+            $ok = false;
+        }elseif($thesisTopic->internal_consultant_grade !== null){ ////Már értékelve van
+            $error_msg = __('A dolgozat értékelését nem teheti meg.') . ' ' . __('A dolgozat már értékelve van.');
+            $ok = false;
+        }
+        
+        //Ha a feltételeknek megfelelő téma nem található
+        if($ok === false){
+            $this->set(compact('ok', 'error_msg'));
+            return;
+        }
+                
+        $saved = true;
+        $error_ajax = "";
+        if($this->getRequest()->is(['post', 'patch', 'put'])){
+            
+            $internal_consultant_grade = $this->getRequest()->getData('internal_consultant_grade');
+            
+            if(isset($internal_consultant_grade)){
+                $thesisTopic->internal_consultant_grade = $internal_consultant_grade;
+                if($this->ThesisTopics->save($thesisTopic)){
+                    $this->Flash->success(__('Mentés sikeres!'));
+                }else{
+                    $saved = false;
+                    $error_ajax = __('Mentés sikertelen. Próbálja újra!');
+
+                    $errors = $thesisTopic->getErrors();
+                    if(!empty($errors)){
+                        foreach($errors as $error){
+                            if(is_array($error)){
+                                foreach($error as $err){
+                                    $error_ajax.= '<br/>' . $err;
+                                }
+                            }else{
+                                $error_ajax.= '<br/>' . $error;
+                            }
+                        }
+                    }
+                }
+            }else{
+                $saved = false;
+                $error_ajax = __('Értékelés megadása kötelező.');
             }
         }
         

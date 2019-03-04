@@ -9,7 +9,7 @@ use Cake\Validation\Validator;
 /**
  * Reviews Model
  *
- * @property |\Cake\ORM\Association\BelongsTo $ThesisTopics
+ * @property \App\Model\Table\ThesisTopicsTable|\Cake\ORM\Association\BelongsTo $ThesisTopics
  * @property \App\Model\Table\ReviewersTable|\Cake\ORM\Association\BelongsTo $Reviewers
  * @property \App\Model\Table\QuestionsTable|\Cake\ORM\Association\HasMany $Questions
  *
@@ -21,6 +21,8 @@ use Cake\Validation\Validator;
  * @method \App\Model\Entity\Review patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
  * @method \App\Model\Entity\Review[] patchEntities($entities, array $data, array $options = [])
  * @method \App\Model\Entity\Review findOrCreate($search, callable $callback = null, $options = [])
+ *
+ * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
 class ReviewsTable extends Table
 {
@@ -38,6 +40,8 @@ class ReviewsTable extends Table
         $this->setTable('reviews');
         $this->setDisplayField('id');
         $this->setPrimaryKey('id');
+
+        $this->addBehavior('Timestamp');
 
         $this->belongsTo('ThesisTopics', [
             'foreignKey' => 'thesis_topic_id'
@@ -84,11 +88,11 @@ class ReviewsTable extends Table
             ->allowEmpty('cause_writing_up_the_topic_point');
 
         $validator
-            ->allowEmpty('practical applicability_point');
+            ->allowEmpty('practical_applicability_point');
 
         $validator
-            ->scalar('cause_of_practical applicability')
-            ->allowEmpty('cause_of_practical applicability');
+            ->scalar('cause_of_practical_applicability')
+            ->allowEmpty('cause_of_practical_applicability');
 
         $validator
             ->scalar('general_comments')

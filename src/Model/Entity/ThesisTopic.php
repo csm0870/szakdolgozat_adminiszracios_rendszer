@@ -94,7 +94,7 @@ class ThesisTopic extends Entity
         'thesis_topic_status' => true,
         'offered_topic' => true,
         'consultations' => true,
-        'reviews' => true,
+        'review' => true,
         'thesis_supplements' => true
     ];
 }

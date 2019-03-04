@@ -21,7 +21,7 @@ class ThesisTopicsController extends AppController
      * Szakdolgozatkezelő témalista(szakdolgozatlista)
      */
     public function index(){
-        $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['deleted !=' => true, 'thesis_topic_status_id IN' => [18, 19, 20]],
+        $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['deleted !=' => true, 'thesis_topic_status_id IN' => [18, 19, 20, 21, 22]],
                                                           'contain' => ['Students', 'InternalConsultants', 'ThesisTopicStatuses'], 'order' => ['ThesisTopics.modified' => 'DESC']]);
 
         $this->set(compact('thesisTopics'));
@@ -35,15 +35,18 @@ class ThesisTopicsController extends AppController
      * @return type
      */
     public function details($id = null){
-        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id], 'contain' => ['ThesisSupplements', 'ThesisTopicStatuses', 'Students' => ['Courses', 'CourseLevels', 'CourseTypes'], 'InternalConsultants', 'StartingYears', 'ExpectedEndingYears', 'Languages']])->first();
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id],
+                                                         'contain' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels'],
+                                                                       'ThesisTopicStatuses', 'InternalConsultants', 'StartingYears', 'ExpectedEndingYears', 'Languages', 'ThesisSupplements',
+                                                                       'Reviews' => ['Reviewers']]])->first();
         
         $ok = true;
         //Megnézzük, hogy megfelelő-e a téma a diplomamunka/szakdolgozat feltöltéséhez
         if(empty($thesisTopic)){ //Nem létezik a téma
             $this->Flash->error(__('Részeletek nem elérhetőek.') . ' ' . __('Nem létezik a téma.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [18, 19, 20])){ //A szakdolgozati feltöltés nincs véglegesítve
-            $this->Flash->error(__('Részeletek nem elérhetőek.') . ' ' . __('A szakdolgozat felöltése még nincs véglegesítve.'));
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [18, 19, 20, 21, 22])){ //A szakdolgozati feltöltés nincs véglegesítve
+            $this->Flash->error(__('Részeletek nem elérhetőek.') . ' ' . __('A dolgozat még nincs abban az állapotban, hogy elérheti.'));
             $ok = false;
         }
         
