@@ -66,13 +66,13 @@
                             </p>
                         <?php } ?>
                     </fieldset>
-                    <?php if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22])){ ?>
+                    <?php if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22, 23])){ ?>
                         <fieldset class="border-1-grey p-3 mb-3">
                             <legend class="w-auto"><?= __('Dolgozat értékelése') ?></legend>
                             <p class="mb-2">
                                 <strong><?= __('Belső konzulens értékelése') . ': ' ?></strong><?= $thesisTopic->internal_consultant_grade === null ? __('még nincs értékelve') : h($thesisTopic->internal_consultant_grade) ?>
                             </p>
-                            <?php if(in_array($thesisTopic->thesis_topic_status_id, [22]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
+                            <?php if(in_array($thesisTopic->thesis_topic_status_id, [22, 23]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
                                 <p class="mb-1">
                                     <?= $this->Html->link(__('Dolgozat bírálója') . '&nbsp;' . '<i class="fas fa-angle-down fa-lg" id="reviewer_details_arrow_down"></i>' . '<i class="fas fa-angle-up fa-lg d-none" id="reviewer_details_arrow_up"></i>',
                                                           '#', ['id' => 'reviewer_details_link', 'escape' => false]) ?>
@@ -90,6 +90,14 @@
                                     <p class="mb-1">
                                         <strong><?= __('Pozició') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->position) ?>
                                     </p>
+                                    <?php if(in_array($thesisTopic->thesis_topic_status_id, [23]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer') && $thesisTopic->review->reviewer->has('user')){ ?>
+                                        <p class="mb-1 mt-4">
+                                            <strong><?= __('Belépési email') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->user->email) ?>
+                                        </p>
+                                        <p class="mb-1">
+                                            <strong><?= __('Belépési jelszó') . ': ' ?></strong><?= $thesisTopic->review->reviewer->user->has('raw_password') ? h($thesisTopic->review->reviewer->user->raw_password->password) : __('nincs jelszó, újra kell menteni') ?>
+                                        </p>
+                                    <?php } ?>
                                 </div>
                             <?php } ?>
                         </fieldset>
@@ -119,7 +127,7 @@
                         </p>
                     <?php } ?>
                 </div>
-                <?php if(in_array($thesisTopic->thesis_topic_status_id, [20, 21, 22])){ ?>
+                <?php if(in_array($thesisTopic->thesis_topic_status_id, [20, 21, 22, 23])){ ?>
                     <div class="col-12">
                         <div id="accordion">
                             <div class="card">
@@ -175,7 +183,9 @@
                                 echo '<br/>';
                             }
                             
-                            if($thesisTopic->thesis_topic_status_id == 21) echo $this->Html->link(__('Bíráló kijelölése'), ['controller' => 'Reviewers', 'action' => 'setReviewerForThesisTopic', $thesisTopic->id], ['class' => 'btn btn-info setReviewerForThesisTopicBtn border-radius-45px mb-2']) . '<br/>';
+                            if($thesisTopic->thesis_topic_status_id == 21) echo $this->Html->link(__('Bíráló kijelölése'), '#', ['class' => 'btn btn-info setReviewerForThesisTopicBtn border-radius-45px mb-2']) . '<br/>';
+                            
+                            if($thesisTopic->thesis_topic_status_id == 22) echo $this->Html->link(__('Bírálatra küldés'), '#', ['class' => 'btn btn-info sendToReviewBtn border-radius-45px mb-2']) . '<br/>';
                             
                             echo $this->Html->link(__('Témaengedélyező PDF letöltése'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px mb-2', 'target' => '_blank']);
                         ?>
@@ -206,6 +216,20 @@
         <div class="modal-content">
             <div class="modal-body">
                 <div id="set_reviewer_for_thesis_topic_container">
+
+                </div>
+            </div>
+        </div>
+  </div>
+</div>
+<?php } ?>
+<?php if($thesisTopic->thesis_topic_status_id == 22){ ?>
+<!-- Diplomakurzus első félévének teljesítésének rögzítése modal -->
+<div class="modal fade" id="sendToReviewModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div id="send_to_review_container">
 
                 </div>
             </div>
@@ -249,7 +273,23 @@
             });
         <?php } ?>
         
-        <?php if(in_array($thesisTopic->thesis_topic_status_id, [20, 21, 22])){ ?>
+        <?php if($thesisTopic->thesis_topic_status_id == 22){?>
+            //Tartalom lekeérése a "bírálatra küldés" modalba
+            $.ajax({
+                url: '<?= $this->Url->build(['controller' => 'Reviewers', 'action' => 'sendToReview', $thesisTopic->id], true) ?>',
+                cache: false
+            })
+            .done(function( response ) {
+                $('#send_to_review_container').html(response.content);
+            });
+
+            $('.headOfDepartment-thesisTopics-details .sendToReviewBtn').on('click', function(e){
+                e.preventDefault();
+                $('#sendToReviewModal').modal('show');
+            });
+        <?php } ?>
+        
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [20, 21, 22, 23])){ ?>
             /**
              * Accordion megjelenítésekor nyíl cseréje
              */
@@ -267,7 +307,7 @@
             });
         <?php } ?>
         
-        <?php if(in_array($thesisTopic->thesis_topic_status_id, [22]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [22, 23]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
             $('#reviewer_details_link').on('click', function(e){
                 e.preventDefault();
                 if($('#reviewer_details_container').css('display') == 'none'){
