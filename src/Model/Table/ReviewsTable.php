@@ -42,6 +42,7 @@ class ReviewsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+        $this->addBehavior('Josegonzalez/Upload.Upload', ['confidentiality_contract' => ['path' =>'files{DS}confidentiality_contracts{DS}']]);
 
         $this->belongsTo('ThesisTopics', [
             'foreignKey' => 'thesis_topic_id'
@@ -102,13 +103,23 @@ class ReviewsTable extends Table
             ->allowEmpty('grade');
 
         $validator
-            ->scalar('confidentiality_contract')
-            ->maxLength('confidentiality_contract', 255)
-            ->allowEmpty('confidentiality_contract');
+            ->allowEmpty('confidentiality_contract')
+            ->add('confidentiality_contract', 'custom', [ //Csak PDF lehet a fájlformátum
+                    'rule' => function($value, $context){
+                        if(!empty($value) && !empty($value['name'])){
+                            $ext = pathinfo($value['name'], PATHINFO_EXTENSION);
+                            if($ext != 'pdf'){
+                                return false;
+                            }
+                        }
+                        
+                        return true;
+                    }, 
+                    'message' => __('Csak PDF a megengedett fájl formátum.')
+                ]);
 
         $validator
-            ->boolean('confidentiality_contract_accepted')
-            ->allowEmpty('confidentiality_contract_accepted');
+            ->allowEmpty('confidentiality_contract_status');
 
         return $validator;
     }

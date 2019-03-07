@@ -305,7 +305,7 @@ class ThesisTopicsController extends AppController
         header("Content-Type: application/vnd.openxmlformats-officedocument.wordprocessing‌​ml.document");
         header('Content-Disposition: attachment; filename='.$filename);
 
-        $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter( $phpWord, "Word2007" );
+        $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, "Word2007");
         $objWriter->save("php://output");
 
         //Kilépés, nehogy a cakephp további dolgokat végezzen, mert akkor a fájl nem menne ki

@@ -18,6 +18,10 @@ html, body{
     padding-bottom: 10px;
 }
 
+.border-radius-45px{
+    border-radius: 45px;
+}
+
 /* Header */
 
 .header{

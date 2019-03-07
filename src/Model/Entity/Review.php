@@ -17,8 +17,8 @@ use Cake\ORM\Entity;
  * @property string|null $cause_of_practical_applicability
  * @property string|null $general_comments
  * @property int|null $grade
- * @property string|null $confidentiality_contract
- * @property bool|null $confidentiality_contract_accepted
+ * @property |null $confidentiality_contract
+ * @property int|null $confidentiality_contract_status
  * @property \Cake\I18n\FrozenTime|null $modified
  * @property \Cake\I18n\FrozenTime|null $created
  * @property int|null $thesis_topic_id
@@ -52,7 +52,7 @@ class Review extends Entity
         'general_comments' => true,
         'grade' => true,
         'confidentiality_contract' => true,
-        'confidentiality_contract_accepted' => true,
+        'confidentiality_contract_status' => true,
         'modified' => true,
         'created' => true,
         'thesis_topic_id' => true,

@@ -55,12 +55,12 @@ Router::prefix('admin',  function ($routes) {
 });
 
 Router::prefix('internal_consultant',  function ($routes) {
-	$routes->connect('/', ['controller' => 'Projects', 'action' => 'index']); 
+	$routes->connect('/', ['controller' => 'Pages', 'action' => 'dashboard']); 
 	$routes->fallbacks(DashedRoute::class);
 });
 
 Router::prefix('head_of_department',  function ($routes) {
-	$routes->connect('/', ['controller' => 'Projects', 'action' => 'index']); 
+	$routes->connect('/', ['controller' => 'Pages', 'action' => 'dashboard']); 
 	$routes->fallbacks(DashedRoute::class);
 });
 
@@ -70,12 +70,17 @@ Router::prefix('topic_manager',  function ($routes) {
 });
 
 Router::prefix('thesis_manager',  function ($routes) {
-	$routes->connect('/', ['controller' => 'Projects', 'action' => 'index']); 
+	$routes->connect('/', ['controller' => 'Pages', 'action' => 'dashboard']); 
 	$routes->fallbacks(DashedRoute::class);
 });
 
 Router::prefix('student',  function ($routes) {
-	$routes->connect('/', ['controller' => 'Projects', 'action' => 'index']); 
+	$routes->connect('/', ['controller' => 'Pages', 'action' => 'dashboard']); 
+	$routes->fallbacks(DashedRoute::class);
+});
+
+Router::prefix('reviewer',  function ($routes) {
+	$routes->connect('/', ['controller' => 'Pages', 'action' => 'dashboard']); 
 	$routes->fallbacks(DashedRoute::class);
 });
 
