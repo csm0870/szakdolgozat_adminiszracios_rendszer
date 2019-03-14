@@ -22,6 +22,21 @@
                                         <td><?= $thesisTopic->has('student') ? (h($thesisTopic->student->name) . (empty($thesisTopic->student->neptun) ? '' : ('<br/>(' . h($thesisTopic->student->neptun) . ')'))) : '' ?></td>
                                         <td>
                                             <?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '' ?>
+                                            <?php
+                                                if($thesisTopic->thesis_topic_status_id == 23 && $thesisTopic->has('review')){
+                                                    if($thesisTopic->confidential === true && $thesisTopic->review->confidentiality_contract_status != 4){
+                                                        if($thesisTopic->review->confidentiality_contract_status == null || $thesisTopic->review->confidentiality_contract_status == 1) echo '(' . __('A titoktartási szerződés feltöltésére vár.') . ')';
+                                                        elseif($thesisTopic->review->confidentiality_contract_status == 2) echo '(' . __('A titoktartási szerződés feltöltve, tanszékvezető ellenőrzésére vár.') . ')';
+                                                        elseif($thesisTopic->review->confidentiality_contract_status == 3) echo '(' . __('A titoktartási szerződés elutasítva, új feltöltésre vár.') . ')';
+                                                    }else{
+                                                        if($thesisTopic->review->review_status == null || $thesisTopic->review->review_status == 1) echo '(' . __('A dolgozat bírálatra vár.') . ')';
+                                                        elseif($thesisTopic->review->review_status == 2) echo '(' . __('A bírálat véglegesítve, bírálati lap feltöltésére vár.') . ')';
+                                                        elseif($thesisTopic->review->review_status == 3) echo '(' . __('A bírálati lap feltöltve, véglegesítésre vár.') . ')';
+                                                        elseif($thesisTopic->review->review_status == 4) echo '(' . __('A bírálati lap feltöltés véglegesítve. Tanszékvezető ellenőrzésére vár.') . ')';
+                                                        elseif($thesisTopic->review->review_status == 5) echo '(' . __('A bírálat elutasítva, a dolgozat ismét bírálható.') . ')';
+                                                    }
+                                                }
+                                            ?>
                                         </td>
                                     </tr>
                                 <?php } ?>

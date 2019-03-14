@@ -62,13 +62,13 @@
                             </p>
                         <?php } ?>
                     </fieldset>
-                    <?php if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22])){ ?>
+                    <?php if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22, 23, 24, 25])){ ?>
                         <fieldset class="border-1-grey p-3 mb-3">
                             <legend class="w-auto"><?= __('Dolgozat értékelése') ?></legend>
                             <p class="mb-2">
                                 <strong><?= __('Belső konzulens értékelése') . ': ' ?></strong><?= $thesisTopic->internal_consultant_grade === null ? __('még nincs értékelve') : h($thesisTopic->internal_consultant_grade) ?>
                             </p>
-                            <?php if(in_array($thesisTopic->thesis_topic_status_id, [22]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
+                            <?php if(in_array($thesisTopic->thesis_topic_status_id, [22, 23, 24, 25]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
                                 <p class="mb-1">
                                     <?= $this->Html->link(__('Dolgozat bírálója') . '&nbsp;' . '<i class="fas fa-angle-down fa-lg" id="reviewer_details_arrow_down"></i>' . '<i class="fas fa-angle-up fa-lg d-none" id="reviewer_details_arrow_up"></i>',
                                                           '#', ['id' => 'reviewer_details_link', 'escape' => false]) ?>
@@ -109,7 +109,7 @@
                         </p>
                     </fieldset>
                 </div>
-                <?php if(in_array($thesisTopic->thesis_topic_status_id, [20, 21, 22])){ ?>
+                <?php if(in_array($thesisTopic->thesis_topic_status_id, [20, 21, 22, 23, 24, 25])){ ?>
                     <div class="col-12">
                         <div id="accordion">
                             <div class="card">
@@ -167,7 +167,7 @@
                             
                             if($thesisTopic->thesis_topic_status_id == 20) echo $this->Html->link(__('Bíráló személyének kijelölése'), '#', ['class' => 'btn btn-secondary border-radius-45px setReviewerSuggestionBtn mb-2']). '<br/>';
                                      
-                            if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22]) && $thesisTopic->internal_consultant_grade === null) echo $this->Html->link(__('Dolgozat értékelése'), '#', ['class' => 'btn btn-secondary border-radius-45px setThesisGradeBtn mb-2']). '<br/>';
+                            if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22, 23, 24]) && $thesisTopic->internal_consultant_grade === null) echo $this->Html->link(__('Dolgozat értékelése'), '#', ['class' => 'btn btn-secondary border-radius-45px setThesisGradeBtn mb-2']). '<br/>';
                             
                             if($thesisTopic->thesis_topic_status_id == 12) echo $this->Html->link(__('Diplomakurzus első félévének teljesítésének rögzítése'), '#', ['class' => 'btn btn-secondary border-radius-45px setFirstThesisSubjectCompletedBtn mb-2']). '<br/>';
                             
@@ -215,7 +215,7 @@
   </div>
 </div>
 <?php } ?>
-<?php if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22]) && $thesisTopic->internal_consultant_grade === null){ ?>
+<?php if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22, 23, 24]) && $thesisTopic->internal_consultant_grade === null){ ?>
 <!-- Diplomakurzus első félévének teljesítésének rögzítése modal -->
 <div class="modal fade" id="setThesisGradeModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -266,7 +266,7 @@
             });
         <?php } ?>
         
-        <?php if(in_array($thesisTopic->thesis_topic_status_id, [20, 21, 22])){ ?>
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [20, 21, 22, 23, 24, 25])){ ?>
             /**
              * Accordion megjelenítésekor nyíl cseréje
              */
@@ -284,7 +284,7 @@
             });
         <?php } ?>
         
-        <?php if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22]) && $thesisTopic->internal_consultant_grade === null){ ?>
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22, 23, 24]) && $thesisTopic->internal_consultant_grade === null){ ?>
             //Tartalom lekeérése a "dolgozat értékelése" modalba
             $.ajax({
                 url: '<?= $this->Url->build(['action' => 'setThesisGrade', $thesisTopic->id], true) ?>',
@@ -361,7 +361,7 @@
             });
         <?php } ?>
         
-        <?php if(in_array($thesisTopic->thesis_topic_status_id, [22]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [22, 23, 24, 25]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
             $('#reviewer_details_link').on('click', function(e){
                 e.preventDefault();
                 if($('#reviewer_details_container').css('display') == 'none'){

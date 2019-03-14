@@ -1,7 +1,7 @@
 <div class="form-modal headOfDepartment-decideToContinueAfterFailedFirstThesisSubject">
     <?= $ok === true ? $this->Form->create(null, ['id' => 'sendToReviewForm']) : '' ?>
     <div class="form-header text-center">
-        <?= __('Első diplomakurzus sikertelen, döntés a folytatásról') ?>
+        <?= __('Bírálatra küldés') ?>
     </div>
     <div class="form-body text-justify">
         <?php if($ok === true){ ?>

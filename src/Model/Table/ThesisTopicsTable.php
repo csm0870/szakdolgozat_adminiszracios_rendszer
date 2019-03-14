@@ -285,5 +285,39 @@ class ThesisTopicsTable extends Table
      * @param type $entity
      * @param type $options
      */
-    public function afterSave($event, $entity, $options){}
+    public function afterSave($event, $entity, $options){
+        //Ha belső konzulens értékelte a dolgozatot, és a bíráló is már bírálta, akkor megvizsgáljuk a két értékelést,
+        //és azoknak megfelelően elfogadott lesz a dolgozat vagy újra második diplomakurzust kell felvennie a hallgatónak
+        if($entity->thesis_topic_status_id == 24 && $entity->internal_consultant_grade !== null){
+            $thesisTopic = $this->find('all', ['conditions' => ['ThesisTopics.id' => $entity->id],
+                                               'contain' => ['Reviews', 'Consultations']])->first();
+            
+            
+            if($thesisTopic->has('review')){
+                $total_points = 0;
+                $grade = 1;
+                
+                //Összpontszám kiszámítása
+                $total_points = (empty($thesisTopic->review->structure_and_style_point) ? 0 : $thesisTopic->review->structure_and_style_point) +
+                            (empty($thesisTopic->review->processing_literature_point) ? 0 : $thesisTopic->review->processing_literature_point) +
+                            (empty($thesisTopic->review->writing_up_the_topic_point) ? 0 : $thesisTopic->review->writing_up_the_topic_point) +
+                            (empty($thesisTopic->review->practical_applicability_point) ? 0 : $thesisTopic->review->practical_applicability_point);
+        
+                //Jegy kiszámítása
+                if(!empty($thesisTopic->review->structure_and_style_point) && !empty($thesisTopic->review->processing_literature_point) &&
+                   !empty($thesisTopic->review->writing_up_the_topic_point) && !empty($thesisTopic->review->practical_applicability_point)){
+
+                    if($total_points >= 45) $grade = 5;
+                    else if($total_points < 45 && $total_points >= 38) $grade = 4;
+                    else if($total_points < 38 && $total_points >= 31) $grade = 3;
+                    else if($total_points < 31 && $total_points >= 26) $grade = 2;
+                }
+                
+                if($grade > 1 && $thesisTopic->internal_consultant_grade > 1) $thesisTopic->thesis_topic_status_id = 25;
+                else $thesisTopic->thesis_topic_status_id = 15;
+                
+                $this->save($thesisTopic);
+            }
+        }
+    }
 }

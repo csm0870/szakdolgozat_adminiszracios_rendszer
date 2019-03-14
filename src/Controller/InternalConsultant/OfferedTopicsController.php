@@ -196,9 +196,9 @@ class OfferedTopicsController extends AppController
             }
 
             if($this->OfferedTopics->ThesisTopics->save($offeredTopic->thesis_topic)){
-                $this->Flash->success(__(($accepted == 0 ? 'Elutasítás' : 'Elfogadás') . ' sikeres.'));
+                $this->Flash->success($accepted == 0 ? __('Elutasítás sikeres.') : __('Elfogadás sikeres.'));
             }else{
-                $this->Flash->error(__(($accepted == 0 ? 'Elutasítás' : 'Elfogadás') . ' sikeretlen. Próbálja újra!'));
+                $this->Flash->error(($accepted == 0 ? __('Elutasítás sikertelen.') : __('Elfogadás sikertelen.')) . ' ' . __('Próbálja újra!'));
             }
         }
         

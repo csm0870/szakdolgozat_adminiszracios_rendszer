@@ -1,5 +1,5 @@
-<div class="form-modal reviewer-uploadConfidentalityContract">
-    <?= $ok ? $this->Form->create(null, ['id' => 'uploadConfidentalityContractForm']) : '' ?>
+<div class="form-modal reviewer-uploadCReviewDoc">
+    <?= $ok ? $this->Form->create(null, ['id' => 'uploadCReviewDocForm']) : '' ?>
     <div class="form-header text-center">
         <?= __('Titoktartási szerződés feltöltése') ?>
     </div>
@@ -12,14 +12,14 @@
             <table>
                 <tr>
                     <td>
-                        <?= $this->Form->control('confidentiality_contract', ['type' => 'file', 'accept' => '.pdf', 'required' => true,
-                                                                              'label' => ['text' => __('Titoktartási szerződés feltöltése') . ': ']]) ?>
+                        <?= $this->Form->control('review_doc', ['type' => 'file', 'accept' => '.pdf', 'required' => true,
+                                                                'label' => ['text' => __('Titoktartási szerződés feltöltése') . ': ']]) ?>
                     </td>
                 </tr>
-                <?php if(!empty($thesisTopic->review->confidentiality_contract)){ ?>
+                <?php if(!empty($thesisTopic->review->review_doc)){ ?>
                     <tr>
                         <td style="padding-top: 15px">
-                            <?= __('Jelenlegi fájl') . ': ' . $this->Html->link($thesisTopic->review->confidentiality_contract, ['action' => 'getUploadedConfidentialityContract', $thesisTopic->id], ['target' => '__blank']) ?>
+                            <?= __('Jelenlegi fájl') . ': ' . $this->Html->link($thesisTopic->review->review_doc, ['action' => 'getReviewDoc', $thesisTopic->id], ['target' => '__blank']) ?>
                         </td>
                     </tr>
                 <?php } ?>
@@ -30,7 +30,7 @@
         <?= $ok === true ? $this->Form->button(__('Mentés'), ['type' => 'button', 'role' => 'button', 'class' => 'btn btn-success submitBtn border-radius-45px']) : '' ?>
     </div>
     <?= $ok === true ? '' : $this->Form->end() ?>
-    <div class="overlay overlay-upload_confidentality_contract" style="display:none">
+    <div class="overlay overlay-upload_review_doc" style="display:none">
         <div class="spinner fa-3x">
             <i class="fas fa-spinner fa-pulse"></i>
         </div>
@@ -43,46 +43,46 @@
             /**
              * Confirmation modal megnyitása submit előtt
              */
-            $('#uploadConfidentalityContractForm .submitBtn').on('click', function(e){
+            $('#uploadCReviewDocForm .submitBtn').on('click', function(e){
                 e.preventDefault();
 
                 //Formvalidáció manuális meghívása
-                if($('#uploadConfidentalityContractForm')[0].reportValidity() === false) return;
-                
+                if($('#uploadCReviewDocForm')[0].reportValidity() === false) return;
+
                 $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan mented?') ?>');
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
                 //Save gomb eventjeinek resetelése cserével
                 $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-                $('#confirmationModal .msg').text('<?= __('Titoktartási szerződés feltöltése.') ?>');
+                $('#confirmationModal .msg').text('<?= __('Bírálati lap feltöltése. Mentés után még megváltoztatható.') ?>');
 
                 $('#confirmationModal').modal('show');
 
                 $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
                     e.preventDefault();
                     $('#confirmationModal').modal('hide');
-                    $('#uploadConfidentalityContractForm').trigger('submit');
+                    $('#uploadCReviewDocForm').trigger('submit');
                 });
             });
 
             //uploadConfidentalityContractForm ajaxform
-            $('#uploadConfidentalityContractForm').ajaxForm({
+            $('#uploadCReviewDocForm').ajaxForm({
                 replaceTarget: false,
                 target: null,
                 beforeSubmit: function(arr, $form, options) {
-                    $('.overlay-upload_confidentality_contract').show();
+                    $('.overlay-upload_review_doc').show();
                 },
                 success: function (response, textStatus, jqXHR, $form){
                     if(response.saved == false){
-                        $('.overlay-upload_confidentality_contract').hide();
-                        $('#upload_confidentiality_contract_container').html(response.content);
+                        $('.overlay-upload_review_doc').hide();
+                        $('#upload_review_doc_container').html(response.content);
                         $('#error_modal_ajax .error-msg').html(response.error_ajax);
                         $('#error_modal_ajax').modal('show');
                     }else{
-                        location.href = '<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id], true)?>';
+                        location.href = '<?= $this->Url->build(['action' => 'review', $thesisTopic->id], true)?>';
                     }
                 },
                 error: function(jqXHR, textStatus, errorThrown){
-                    $('.overlay-upload_confidentality_contract').hide();
+                    $('.overlay-upload_review_doc').hide();
                     $('#error_modal_ajax .error-msg').html('<?= __('Hiba történt mentés közben. Próbálja újra!') . '<br/>' . __('Hiba') . ': ' ?>' + errorThrown);
                     $('#error_modal_ajax .error-code').text('-1000');
                     $('#error_modal_ajax').modal('show');

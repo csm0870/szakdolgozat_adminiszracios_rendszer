@@ -63,7 +63,7 @@
                         <strong><?= __('Külső konzulenstól való eltekintés indoklása') . ': ' ?></strong><?= h($thesisTopic->cause_of_no_external_consultant) ?>
                     </p>
                 <?php } ?>
-                <?php if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22])){ ?>
+                <?php if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22, 23, 24, 25])){ ?>
                     <p class="mb-2">
                         <strong><?= __('Belső konzulens értékelése') . ': ' ?></strong><?= $thesisTopic->internal_consultant_grade === null ? __('még nincs értékelve') : h($thesisTopic->internal_consultant_grade) ?>
                     </p>
@@ -88,7 +88,7 @@
                 </p>
             </fieldset>
         </div>
-        <?php if(in_array($thesisTopic->thesis_topic_status_id, [18, 19, 20, 21, 22])){ ?>
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [18, 19, 20, 21, 22, 23, 24, 25])){ ?>
             <div class="col-12">
                 <div id="accordion">
                     <div class="card">
@@ -158,7 +158,7 @@
         $('#topics_menu_item').addClass('active');
         $('#thesis_topics_index_menu_item').addClass('active');
         
-        <?php if(in_array($thesisTopic->thesis_topic_status_id, [18, 19, 20, 21, 22])){ ?>
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [18, 19, 20, 21, 22, 23, 24, 25])){ ?>
             /**
              * Accordion megjelenítésekor nyíl cseréje
              */
@@ -219,21 +219,6 @@
                     $('#confirmationModal').modal('hide');
                     location.href = '<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'cancelBooking', $thesisTopic->id], true) ?>';
                 });
-            });
-        <?php } ?>
-    
-        <?php if(in_array($thesisTopic->thesis_topic_status_id, [22]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
-            $('#reviewer_details_link').on('click', function(e){
-                e.preventDefault();
-                if($('#reviewer_details_container').css('display') == 'none'){
-                    $('#reviewer_details_container').slideDown(500);
-                    $('#reviewer_details_arrow_down').addClass('d-none');
-                    $('#reviewer_details_arrow_up').removeClass('d-none');
-                }else{
-                    $('#reviewer_details_container').slideUp(500);
-                    $('#reviewer_details_arrow_down').removeClass('d-none');
-                    $('#reviewer_details_arrow_up').addClass('d-none');
-                }
             });
         <?php } ?>
     });

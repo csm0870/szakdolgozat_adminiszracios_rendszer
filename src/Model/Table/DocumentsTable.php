@@ -38,6 +38,7 @@ class DocumentsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+        $this->addBehavior('Josegonzalez/Upload.Upload', ['confidentiality_contract' => ['path' =>'files{DS}documents{DS}']]);
     }
 
     /**
@@ -58,8 +59,6 @@ class DocumentsTable extends Table
             ->allowEmpty('name');
 
         $validator
-            ->scalar('file')
-            ->maxLength('file', 255)
             ->allowEmpty('file');
 
         return $validator;

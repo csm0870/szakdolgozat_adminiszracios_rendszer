@@ -11,20 +11,22 @@
                     <fieldset class="border-1-grey p-3 mb-3">
                         <legend class="w-auto"><?= __('A téma adatai') ?></legend>
                         <p class="mb-4">
-                            <strong><?= __('Álapot') . ': ' ?></strong>
+                            <strong><?= __('Állapot') . ': ' ?></strong>
                             <?php
-                                if($thesisTopic->thesis_topic_status_id == 23){
-                                    if($thesisTopic->confidential === true && $thesisTopic->has('review')){
+                                if($thesisTopic->thesis_topic_status_id == 23 && $thesisTopic->has('review')){
+                                    if($thesisTopic->confidential === true && $thesisTopic->review->confidentiality_contract_status != 4){
                                         if($thesisTopic->review->confidentiality_contract_status == null) echo __('A titoktartási szerződés feltöltésére vár.');
                                         elseif($thesisTopic->review->confidentiality_contract_status == 1) echo __('A titoktartási szerződés feltölve, véglegesítésre vár.');
                                         elseif($thesisTopic->review->confidentiality_contract_status == 2) echo __('A titoktartási szerződés véglegesítve, tanszékvezető ellenőrzésére vár.');
                                         elseif($thesisTopic->review->confidentiality_contract_status == 3) echo __('A titoktartási szerződés elutasítva, újra feltölthető.');
-                                        elseif($thesisTopic->review->confidentiality_contract_status == 4) echo __('A dolgozat bírálatra vár.');
+                                    }else{
+                                        if($thesisTopic->review->review_status == null) echo __('A dolgozat bírálatra vár.');
+                                        elseif($thesisTopic->review->review_status == 1) echo __('A bírálat véglegesítésre vár.');
+                                        elseif($thesisTopic->review->review_status == 2) echo __('A bírálat véglegesítve, bírálati lap feltöltésére vár.');
+                                        elseif($thesisTopic->review->review_status == 3) echo __('A bírálati lap feltöltve, véglegesítésre vár.');
+                                        elseif($thesisTopic->review->review_status == 4) echo __('A bírálati lap feltöltés véglegesítve. A bírálat a tanszékvezető ellenőrzésére vár.');
+                                        elseif($thesisTopic->review->review_status == 5) echo __('A bírálat elutasítva, ismét bírálható.');
                                     }
-
-                                    if($thesisTopic->confidential == false) echo __('A dolgozat bírálatra vár.');
-                                }elseif($thesisTopic->thesis_topic_status_id == 24){
-                                    echo __('A dolgozat bírálva.');
                                 }
                             ?>
                         </p>
@@ -87,10 +89,10 @@
                     <fieldset class="border-1-grey p-3 text-center">
                         <legend class="w-auto"><?= __('Műveletek') ?></legend>
                         <?php
-                        
-                            if($thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status != 4){
-                                echo $this->Html->link(__('Titoktartási nyilatkozat letöltése'), ['controller' => 'Reviews', 'action' => 'confidentialityContractDoc', $thesisTopic->id], ['class' => 'btn btn-secondary border-radius-45px mb-2', 'target' => '_blank']). '<br/>';
-                            }
+                            if(($thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status === 4) ||
+                                $thesisTopic->confidential === false){
+                                echo $this->Html->link(__('Dolgozat bírálata'), ['controller' => 'Reviews', 'action' => 'review', $thesisTopic->id], ['class' => 'btn btn-secondary border-radius-45px mb-2']). '<br/>';
+                            } 
                             
                             if($thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status == 1){
                                 echo $this->Form->button(__('Titoktartási szerződés feltöltésének véglegesítése'), ['type' => 'button', 'role' => 'button', 'class' => 'btn btn-info finalizeBtn border-radius-45px mb-2']) . '<br/>';
@@ -100,10 +102,9 @@
                                 echo $this->Html->link(__('Titoktartási nyilatkozat feltöltése'), '#', ['class' => 'btn btn-secondary border-radius-45px uploadConfidentialityContractBtn mb-2']). '<br/>';
                             }
                         
-                            if(($thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status === 4) ||
-                                $thesisTopic->confidential === false){
-                                echo $this->Html->link(__('Dolgozat bírálata'), '#', ['class' => 'btn btn-secondary border-radius-45px setReviewerSuggestionBtn mb-2']). '<br/>';
-                            }       
+                            if($thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status != 4){
+                                echo $this->Html->link(__('Titoktartási nyilatkozat letöltése'), ['controller' => 'Reviews', 'action' => 'confidentialityContractDoc', $thesisTopic->id], ['class' => 'btn btn-secondary border-radius-45px mb-2', 'target' => '_blank']). '<br/>';
+                            }   
                         ?>
                     </fieldset>
                 </div>

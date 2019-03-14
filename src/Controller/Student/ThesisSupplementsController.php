@@ -106,15 +106,15 @@ class ThesisSupplementsController extends AppController
         $ok = true;
         if($thesisTopic->student_id != ($user->has('student') ? $user->student->id : '-1')){
             $ok = false;
-            $this->Flash->error(__('A melléklet nem törölhető.') . ' ' . __('A szakdolgozat/diplomamunka nem Önhöz tartozik.'));
+            $this->Flash->error(__('A melléklet nem törölhető.') . ' ' . __('A dolgozat nem Önhöz tartozik.'));
         }elseif(!in_array($thesisTopic->thesis_topic_status_id, [16, 17, 19])){
             $ok = false;
-            $this->Flash->error(__('A melléklet nem törölhető.') . ' ' . __('A szakdolgozat/diplomamunka állapota alapján már nem változtathatók a mellékletek.'));
+            $this->Flash->error(__('A melléklet nem törölhető.') . ' ' . __('A dolgozat állapota alapján már nem változtathatók a mellékletek.'));
         }
         
         if($ok === false) return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);
         
-        if ($this->ThesisSupplements->delete($thesisSupplement)) {
+        if ($this->ThesisSupplements->delete($thesisSupplement)){
             $this->Flash->success(__('Törlés sikeres.'));
         } else {
             $this->Flash->error(__('Törlés sikertelen. Próbálja újra!'));

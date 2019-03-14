@@ -83,7 +83,7 @@ class AppController extends Controller
         }
         
         //Layout beállítása, ha a listában lévő controllerek hívják meg
-        if(in_array($this->getRequest()->getParam('controller'), ['Information', 'ThesisTopics', 'Students', 'Consultations', 'ConsultationOccasions', 'FinalExamSubjects', 'Reviewers', 'OfferedTopics']) || ($this->getRequest()->getParam('controller') == 'Pages' && $this->getRequest()->getParam('action') == 'dashboard')){
+        if(in_array($this->getRequest()->getParam('controller'), ['Information', 'ThesisTopics', 'Students', 'Consultations', 'ConsultationOccasions', 'FinalExamSubjects', 'Reviewers', 'OfferedTopics', 'Reviews']) || ($this->getRequest()->getParam('controller') == 'Pages' && $this->getRequest()->getParam('action') == 'dashboard')){
             $this->viewBuilder()->setLayout('logged_in_page');
         }
         

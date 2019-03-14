@@ -20,7 +20,7 @@
                                         <td>
                                             <?=
                                                 h($thesisTopic->title) . 
-                                                (in_array($thesisTopic->thesis_topic_status_id, [18, 19, 20, 21, 22]) ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '')
+                                                (in_array($thesisTopic->thesis_topic_status_id, [18, 19, 20, 21, 22, 23, 24, 25]) ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '')
                                             ?>
                                         </td>
                                         <td><?= $thesisTopic->has('internal_consultant') ? h($thesisTopic->internal_consultant->name) : '' ?></td>

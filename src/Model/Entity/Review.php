@@ -12,13 +12,15 @@ use Cake\ORM\Entity;
  * @property int|null $processing_literature_point
  * @property string|null $cause_of_processing_literature_point
  * @property int|null $writing_up_the_topic_point
- * @property string|null $cause_writing_up_the_topic_point
+ * @property string|null $cause_of_writing_up_the_topic_point
  * @property int|null $practical_applicability_point
- * @property string|null $cause_of_practical_applicability
+ * @property string|null $cause_of_practical_applicability_point
  * @property string|null $general_comments
- * @property int|null $grade
+ * @property string|null $cause_of_rejecting_confidentiality_contract
+ * @property string|null $review_doc
  * @property |null $confidentiality_contract
  * @property int|null $confidentiality_contract_status
+ * @property int|null $review_status
  * @property \Cake\I18n\FrozenTime|null $modified
  * @property \Cake\I18n\FrozenTime|null $created
  * @property int|null $thesis_topic_id
@@ -46,13 +48,16 @@ class Review extends Entity
         'processing_literature_point' => true,
         'cause_of_processing_literature_point' => true,
         'writing_up_the_topic_point' => true,
-        'cause_writing_up_the_topic_point' => true,
+        'cause_of_writing_up_the_topic_point' => true,
         'practical_applicability_point' => true,
-        'cause_of_practical_applicability' => true,
+        'cause_of_practical_applicability_point' => true,
         'general_comments' => true,
-        'grade' => true,
+        'cause_of_rejecting_confidentiality_contract' => true,
+        'review_doc' => true,
+        'cause_of_rejecting_review' => true,
         'confidentiality_contract' => true,
         'confidentiality_contract_status' => true,
+        'review_status' => true,
         'modified' => true,
         'created' => true,
         'thesis_topic_id' => true,

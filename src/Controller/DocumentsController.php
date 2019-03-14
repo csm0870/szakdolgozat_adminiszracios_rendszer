@@ -14,94 +14,42 @@ class DocumentsController extends AppController
 {
 
     /**
-     * Index method
-     *
-     * @return \Cake\Http\Response|void
+     * Fájl letöltése
+     * 
+     * @param type $document_id Dokument aznosója
      */
-    public function index()
-    {
-        $documents = $this->paginate($this->Documents);
-
-        $this->set(compact('documents'));
-    }
-
-    /**
-     * View method
-     *
-     * @param string|null $id Document id.
-     * @return \Cake\Http\Response|void
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function view($id = null)
-    {
-        $document = $this->Documents->get($id, [
-            'contain' => []
-        ]);
-
-        $this->set('document', $document);
-    }
-
-    /**
-     * Add method
-     *
-     * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
-     */
-    public function add()
-    {
-        $document = $this->Documents->newEntity();
-        if ($this->request->is('post')) {
-            $document = $this->Documents->patchEntity($document, $this->request->getData());
-            if ($this->Documents->save($document)) {
-                $this->Flash->success(__('The document has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The document could not be saved. Please, try again.'));
+    public function downloadFile($document_id = null){
+        $document = $this->Documents->find('all', ['conditions' => ['id' => $document_id]])->first();
+        
+        $group_id = $this->Auth->user('group_id');
+        
+        $prefix = '';
+        if($group_id == 1){
+            $prefix = 'admin';
+        }elseif($group_id == 2){
+            $prefix = 'internal_consultant';
+        }elseif($group_id == 3){
+            $prefix = 'head_of_department';
+        }elseif($group_id == 4){
+            $prefix = 'topic_manager';
+        }elseif($group_id == 5){
+            $prefix = 'thesis_manager';
+        }elseif($group_id == 6){
+            $prefix = 'student';
+        }elseif($group_id == 7){
+            $prefix = 'reviewer';
+        }elseif($group_id == 8){
+            $prefix = 'final_exam_organizer';
         }
-        $this->set(compact('document'));
-    }
-
-    /**
-     * Edit method
-     *
-     * @param string|null $id Document id.
-     * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function edit($id = null)
-    {
-        $document = $this->Documents->get($id, [
-            'contain' => []
-        ]);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $document = $this->Documents->patchEntity($document, $this->request->getData());
-            if ($this->Documents->save($document)) {
-                $this->Flash->success(__('The document has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The document could not be saved. Please, try again.'));
+        
+        if(empty($document) || empty($document->file)){
+            $this->Flash->error(__('Fájl nem létezik.'));
+            return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => $prefix]);
         }
-        $this->set(compact('document'));
-    }
+        
+        $response = $this->getResponse()->withFile(ROOT . DS . 'files' . DS . 'documents' . DS . $document->file,
+                                                   ['download' => true, 'name' => $document->file]);
 
-    /**
-     * Delete method
-     *
-     * @param string|null $id Document id.
-     * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function delete($id = null)
-    {
-        $this->request->allowMethod(['post', 'delete']);
-        $document = $this->Documents->get($id);
-        if ($this->Documents->delete($document)) {
-            $this->Flash->success(__('The document has been deleted.'));
-        } else {
-            $this->Flash->error(__('The document could not be deleted. Please, try again.'));
-        }
-
-        return $this->redirect(['action' => 'index']);
+        return $response;
     }
 }

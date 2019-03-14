@@ -29,7 +29,7 @@ class ThesisSupplementsController extends AppController
         
         $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['id' => $thesisSupplement->thesis_topic_id]])->first();
         if($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : '-1')){
-            $this->Flash->error(__('A szakdolgozat/diplomamunka nem Önhöz tartozik.'));
+            $this->Flash->error(__('A dolgozat nem Önhöz tartozik.'));
             return;
         }
         
@@ -55,16 +55,16 @@ class ThesisSupplementsController extends AppController
         $ok = true;
         if(empty($thesisTopic)){
             $ok = false;
-            $this->Flash->error(__('A szakdolgozat/diplomamunka mellékletek nem elérhetőek.') . ' ' . __('A szakdolgozat/diplomamunka nem létezik.'));
+            $this->Flash->error(__('A dolgozat mellékletek nem elérhetőek.') . ' ' . __('A dolgozat nem létezik.'));
         }elseif($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : '-1')){
             $ok = false;
-            $this->Flash->error(__('A szakdolgozat/diplomamunka mellékletek nem elérhetőek.') . ' ' . __('A szakdolgozat/diplomamunka nem Önhöz tartozik.'));
+            $this->Flash->error(__('A dolgozat mellékletek nem elérhetőek.') . ' ' . __('A dolgozat nem Önhöz tartozik.'));
         }
         
         if($ok === false) return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);
         
         # create a new zipstream object
-        $zip = new \ZipStream\ZipStream(($user->has('student') ? ($user->student->neptun == '' ? '' : $user->student->neptun . '_') : '' ) . 'mellekletek.zip');
+        $zip = new \ZipStream\ZipStream('mellekletek.zip');
 
         $i = 0;
         foreach($thesisTopic->thesis_supplements as $supplement){
@@ -75,7 +75,7 @@ class ThesisSupplementsController extends AppController
         }
         
         if($i < 1){//Ha nem volt melléklet
-            $this->Flash->error(__('A szakdolgozat/diplomamunka mellékletek nem elérhezőek.') . ' ' . __('A szakdolgozathou/diplomamunkához nem tartoznak mellékletek.'));
+            $this->Flash->error(__('A dolgozat mellékletek nem elérhetőek.') . ' ' . __('A dolgozat nem tartoznak mellékletek.'));
             return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);            
         }
 

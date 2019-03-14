@@ -60,9 +60,9 @@ class ThesisTopicsController extends AppController
             $thesisTopic->thesis_topic_status_id = $accepted == 0 ? 11 : 12;
 
             if($this->ThesisTopics->save($thesisTopic)){
-                $this->Flash->success(__('Mentés sikeres!!'));
+                $this->Flash->success($accepted == 0 ? __('Elutasítás sikeres.') : __('Elfogadás sikeres.'));
             }else{
-                $this->Flash->error(__('Hiba történt. Próbálja újra!'));
+                $this->Flash->error(($accepted == 0 ? __('Elutasítás sikertelen.') : __('Elfogadás sikertelen.')) . ' ' . __('Próbálja újra!'));
             }
         }
             

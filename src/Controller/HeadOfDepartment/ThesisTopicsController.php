@@ -26,7 +26,7 @@ class ThesisTopicsController extends AppController
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         //Csak azokat a témákat látja, amelyet a belső konzulens már elfogadott
         $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['deleted !=' => true, 'thesis_topic_status_id NOT IN' => [1, 2, 3, 4, 5, 6, 7] /* Már eljutott a tanszékvezetőig */],
-                                                          'contain' => ['Students', 'InternalConsultants', 'ThesisTopicStatuses'], 'order' => ['ThesisTopics.modified' => 'DESC']]);
+                                                          'contain' => ['Students', 'InternalConsultants', 'ThesisTopicStatuses', 'Reviews'], 'order' => ['ThesisTopics.modified' => 'DESC']]);
 
         $this->set(compact('thesisTopics'));
     }
@@ -62,9 +62,9 @@ class ThesisTopicsController extends AppController
             $thesisTopic->thesis_topic_status_id = $accepted == 0 ? 9 : ($thesisTopic->cause_of_no_external_consultant === null ? 10 : 12);
 
             if($this->ThesisTopics->save($thesisTopic)){
-                $this->Flash->success(__('Mentés sikeres!!'));
+                $this->Flash->success($accepted == 0 ? __('Elutasítás sikeres.') : __('Elfogadás sikeres.'));
             }else{
-                $this->Flash->error(__('Hiba történt. Próbálja újra!'));
+                $this->Flash->error(($accepted == 0 ? __('Elutasítás sikertelen.') : __('Elfogadás sikertelen.')) . ' ' . __('Próbálja újra!'));
             }
         }
         return $this->redirect(['action' => 'index']);
@@ -141,10 +141,10 @@ class ThesisTopicsController extends AppController
             }
             
             if($this->ThesisTopics->save($thesisTopic)){
-                $this->Flash->success(__('Mentés sikeres!'));
+                $this->Flash->success($decide_to_continue == 0 ? __('Elutasítás sikeres.') : __('Elfogadás sikeres.'));
             }else{
                 $saved = false;
-                $error_ajax = __('Mentés sikertelen. Próbálja újra!');
+                $error_ajax = ($decide_to_continue == 0 ? __('Elutasítás sikertelen.') : __('Elfogadás sikertelen.')) . ' ' . __('Próbálja újra!');
                 
                 $errors = $thesisTopic->getErrors();
                 if(!empty($errors)){

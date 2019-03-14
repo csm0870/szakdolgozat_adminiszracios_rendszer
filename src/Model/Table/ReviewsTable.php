@@ -42,7 +42,8 @@ class ReviewsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
-        $this->addBehavior('Josegonzalez/Upload.Upload', ['confidentiality_contract' => ['path' =>'files{DS}confidentiality_contracts{DS}']]);
+        $this->addBehavior('Josegonzalez/Upload.Upload', ['confidentiality_contract' => ['path' =>'files{DS}confidentiality_contracts{DS}'],
+                                                          'review_doc' => ['path' =>'files{DS}review_docs{DS}']]);
 
         $this->belongsTo('ThesisTopics', [
             'foreignKey' => 'thesis_topic_id'
@@ -68,58 +69,75 @@ class ReviewsTable extends Table
             ->allowEmpty('id', 'create');
 
         $validator
-            ->allowEmpty('structure_and_style_point');
+            ->allowEmpty('structure_and_style_point')
+            ->range('structure_and_style_point', [0, 10], __('A pontszámnak 0 és 10 között kell lennie.'));
 
         $validator
             ->scalar('cause_of_structure_and_style_point')
+            ->maxLength('cause_of_structure_and_style_point', 280, __('Maximum 280 karaktert adhat meg.'))
             ->allowEmpty('cause_of_structure_and_style_point');
 
         $validator
-            ->allowEmpty('processing_literature_point');
+            ->allowEmpty('processing_literature_point')
+            ->range('processing_literature_point', [0, 10], __('A pontszámnak 0 és 10 között kell lennie.'));
 
         $validator
             ->scalar('cause_of_processing_literature_point')
+            ->maxLength('cause_of_processing_literature_point', 280, __('Maximum 280 karaktert adhat meg.'))
             ->allowEmpty('cause_of_processing_literature_point');
 
         $validator
-            ->allowEmpty('writing_up_the_topic_point');
+            ->allowEmpty('writing_up_the_topic_point')
+            ->range('writing_up_the_topic_point', [0, 20], __('A pontszámnak 0 és 20 között kell lennie.'));
 
         $validator
-            ->scalar('cause_writing_up_the_topic_point')
-            ->allowEmpty('cause_writing_up_the_topic_point');
+            ->scalar('cause_of_writing_up_the_topic_point')
+            ->maxLength('cause_of_writing_up_the_topic_point', 280, __('Maximum 280 karaktert adhat meg.'))
+            ->allowEmpty('cause_of_writing_up_the_topic_point');
 
         $validator
-            ->allowEmpty('practical_applicability_point');
+            ->allowEmpty('practical_applicability_point')
+            ->range('practical_applicability_point', [0, 10], __('A pontszámnak 0 és 10 között kell lennie.'));
 
         $validator
-            ->scalar('cause_of_practical_applicability')
-            ->allowEmpty('cause_of_practical_applicability');
+            ->scalar('cause_of_practical_applicability_point')
+            ->maxLength('cause_of_practical_applicability_point', 280, __('Maximum 280 karaktert adhat meg.'))
+            ->allowEmpty('cause_of_practical_applicability_point');
 
         $validator
             ->scalar('general_comments')
+            ->minLength('general_comments', 490, __('Legalább 490 karaktert adjon meg.'))
             ->allowEmpty('general_comments');
 
         $validator
-            ->allowEmpty('grade');
+            ->scalar('cause_of_rejecting_confidentiality_contract')
+            ->allowEmpty('cause_of_rejecting_confidentiality_contract');
 
+        $validator
+            ->allowEmpty('review_doc')
+            ->add('review_doc', 'custom', [ //Csak PDF lehet a fájlformátum
+                    'rule' => 'allowOnlyPdf',
+                    'provider' => 'table',
+                    'message' => __('Csak PDF a megengedett fájlformátum.')
+                ]);
+        
+        $validator
+            ->scalar('cause_of_rejecting_review')
+            ->allowEmpty('cause_of_rejecting_review');
+        
         $validator
             ->allowEmpty('confidentiality_contract')
             ->add('confidentiality_contract', 'custom', [ //Csak PDF lehet a fájlformátum
-                    'rule' => function($value, $context){
-                        if(!empty($value) && !empty($value['name'])){
-                            $ext = pathinfo($value['name'], PATHINFO_EXTENSION);
-                            if($ext != 'pdf'){
-                                return false;
-                            }
-                        }
-                        
-                        return true;
-                    }, 
-                    'message' => __('Csak PDF a megengedett fájl formátum.')
+                    'rule' => 'allowOnlyPdf',
+                    'provider' => 'table',
+                    'message' => __('Csak PDF a megengedett fájlformátum.')
                 ]);
 
         $validator
             ->allowEmpty('confidentiality_contract_status');
+
+        $validator
+            ->allowEmpty('review_status');
 
         return $validator;
     }
@@ -137,5 +155,23 @@ class ReviewsTable extends Table
         $rules->add($rules->existsIn(['reviewer_id'], 'Reviewers'));
 
         return $rules;
+    }
+    
+    /**
+     * Csak PDF a megengedett fájlformátum
+     * 
+     * @param type $value
+     * @param array $context
+     * @return boolean
+     */
+    public function allowOnlyPdf($value, array $context){
+        if(!empty($value) && !empty($value['name'])){
+            $ext = pathinfo($value['name'], PATHINFO_EXTENSION);
+            if($ext != 'pdf'){
+                return false;
+            }
+        }
+
+        return true;
     }
 }

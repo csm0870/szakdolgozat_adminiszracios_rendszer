@@ -11,7 +11,23 @@
                     <fieldset class="border-1-grey p-3 mb-3">
                         <legend class="w-auto"><?= __('A téma adatai') ?></legend>
                         <p class="mb-4">
-                            <strong><?= __('Állapot') . ': ' ?></strong><?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : ''?>
+                            <strong><?= __('Állapot') . ': ' ?></strong>
+                            <?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '' ?>
+                            <?php
+                                if($thesisTopic->thesis_topic_status_id == 23 && $thesisTopic->has('review')){
+                                    if($thesisTopic->confidential === true && $thesisTopic->review->confidentiality_contract_status != 4){
+                                        if($thesisTopic->review->confidentiality_contract_status == null || $thesisTopic->review->confidentiality_contract_status == 1) echo '(' . __('A titoktartási szerződés feltöltésére vár.') . ')';
+                                        elseif($thesisTopic->review->confidentiality_contract_status == 2) echo '(' . __('A titoktartási szerződés feltöltve, tanszékvezető ellenőrzésére vár.') . ')';
+                                        elseif($thesisTopic->review->confidentiality_contract_status == 3) echo '(' . __('A titoktartási szerződés elutasítva, új feltöltésre vár.') . ')';
+                                    }else{
+                                        if($thesisTopic->review->review_status == null || $thesisTopic->review->review_status == 1) echo '(' . __('A dolgozat bírálatra vár.') . ')';
+                                        elseif($thesisTopic->review->review_status == 2) echo '(' . __('A bírálat véglegesítve, bírálati lap feltöltésére vár.') . ')';
+                                        elseif($thesisTopic->review->review_status == 3) echo '(' . __('A bírálati lap feltöltve, véglegesítésre vár.') . ')';
+                                        elseif($thesisTopic->review->review_status == 4) echo '(' . __('A bírálati lap feltöltés véglegesítve. Tanszékvezető ellenőrzésére vár.') . ')';
+                                        elseif($thesisTopic->review->review_status == 5) echo '(' . __('A bírálat elutasítva, a dolgozat ismét bírálható.') . ')';
+                                    }
+                                }
+                            ?>
                         </p>
                         <p class="mb-1">
                             <strong><?= __('Belső konzulens') . ': ' ?></strong><?= $thesisTopic->has('internal_consultant') ? h($thesisTopic->internal_consultant->name) : '' ?>
@@ -66,13 +82,15 @@
                             </p>
                         <?php } ?>
                     </fieldset>
-                    <?php if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22, 23])){ ?>
+                    <?php if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22, 23, 24, 25])){ ?>
                         <fieldset class="border-1-grey p-3 mb-3">
                             <legend class="w-auto"><?= __('Dolgozat értékelése') ?></legend>
                             <p class="mb-2">
                                 <strong><?= __('Belső konzulens értékelése') . ': ' ?></strong><?= $thesisTopic->internal_consultant_grade === null ? __('még nincs értékelve') : h($thesisTopic->internal_consultant_grade) ?>
                             </p>
                             <?php if(in_array($thesisTopic->thesis_topic_status_id, [22, 23]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
+                                <?php if($thesisTopic->thesis_topic_status_id == 23 && $thesisTopic->has('review') && in_array($thesisTopic->review->review_status, [4, 5]))
+                                        echo $this->Html->link(__('Bírálat megtekintése') . ' ->', ['controller' => 'Reviews', 'action' => 'checkReview', $thesisTopic->id], ['class' => 'mb-2', 'style' => 'display: inline-block']); ?>
                                 <p class="mb-1">
                                     <?= $this->Html->link(__('Dolgozat bírálója') . '&nbsp;' . '<i class="fas fa-angle-down fa-lg" id="reviewer_details_arrow_down"></i>' . '<i class="fas fa-angle-up fa-lg d-none" id="reviewer_details_arrow_up"></i>',
                                                           '#', ['id' => 'reviewer_details_link', 'escape' => false]) ?>
@@ -127,7 +145,7 @@
                         </p>
                     <?php } ?>
                 </div>
-                <?php if(in_array($thesisTopic->thesis_topic_status_id, [20, 21, 22, 23])){ ?>
+                <?php if(in_array($thesisTopic->thesis_topic_status_id, [20, 21, 22, 23, 24, 25])){ ?>
                     <div class="col-12">
                         <div id="accordion">
                             <div class="card">
@@ -183,9 +201,14 @@
                                 echo '<br/>';
                             }
                             
-                            if($thesisTopic->thesis_topic_status_id == 21) echo $this->Html->link(__('Bíráló kijelölése'), '#', ['class' => 'btn btn-info setReviewerForThesisTopicBtn border-radius-45px mb-2']) . '<br/>';
+                            if($thesisTopic->thesis_topic_status_id == 23 && $thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status == 2)
+                                echo $this->Html->link(__('Bíráló titoktartási szerződésének ellenőrzése'), '#', ['class' => 'btn btn-info checkConfidentialityContractBtn border-radius-45px mb-2']) . '<br/>';
                             
-                            if($thesisTopic->thesis_topic_status_id == 22) echo $this->Html->link(__('Bírálatra küldés'), '#', ['class' => 'btn btn-info sendToReviewBtn border-radius-45px mb-2']) . '<br/>';
+                            if($thesisTopic->thesis_topic_status_id == 21)
+                                echo $this->Html->link(__('Bíráló kijelölése'), '#', ['class' => 'btn btn-info setReviewerForThesisTopicBtn border-radius-45px mb-2']) . '<br/>';
+                            
+                            if($thesisTopic->thesis_topic_status_id == 22)
+                                echo $this->Html->link(__('Bírálatra küldés'), '#', ['class' => 'btn btn-info sendToReviewBtn border-radius-45px mb-2']) . '<br/>';
                             
                             echo $this->Html->link(__('Témaengedélyező PDF letöltése'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px mb-2', 'target' => '_blank']);
                         ?>
@@ -210,32 +233,46 @@
     </div>
 <?php } ?>
 <?php if($thesisTopic->thesis_topic_status_id == 21){ ?>
-<!-- Diplomakurzus első félévének teljesítésének rögzítése modal -->
-<div class="modal fade" id="setReviewerForThesisTopicModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-body">
-                <div id="set_reviewer_for_thesis_topic_container">
+    <!-- Bíráló kijelölése modal -->
+    <div class="modal fade" id="setReviewerForThesisTopicModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div id="set_reviewer_for_thesis_topic_container">
 
+                    </div>
                 </div>
             </div>
         </div>
-  </div>
-</div>
+    </div>
 <?php } ?>
 <?php if($thesisTopic->thesis_topic_status_id == 22){ ?>
-<!-- Diplomakurzus első félévének teljesítésének rögzítése modal -->
-<div class="modal fade" id="sendToReviewModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-body">
-                <div id="send_to_review_container">
+    <!-- Bírálatra küldés modal -->
+    <div class="modal fade" id="sendToReviewModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div id="send_to_review_container">
 
+                    </div>
                 </div>
             </div>
         </div>
-  </div>
-</div>
+    </div>
+<?php } ?>
+<?php if($thesisTopic->thesis_topic_status_id == 23 && $thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status == 2){ ?>
+    <!-- Bíráló titoktartási szerződésének ellenőrzése modal -->
+    <div class="modal fade" id="checkConfidentialityContractModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div id="check_confidentiality_contract_container">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 <?php } ?>
 <script>
     $(function(){
@@ -247,7 +284,7 @@
                 url: '<?= $this->Url->build(['action' => 'decideToContinueAfterFailedFirstThesisSubject', $thesisTopic->id], true) ?>',
                 cache: false
             })
-            .done(function( response ) {
+            .done(function(response){
                 $('#decide_to_continue_after_failed_first_thesis_subject_container').html(response.content);
             });
 
@@ -257,14 +294,14 @@
             });
         <?php } ?>
         
-        <?php if($thesisTopic->thesis_topic_status_id == 21){?>
+        <?php if($thesisTopic->thesis_topic_status_id == 21){ ?>
             //Tartalom lekeérése a "bíráló személyének kijelölése" modalba
             $.ajax({
                 url: '<?= $this->Url->build(['controller' => 'Reviewers', 'action' => 'setReviewerForThesisTopic', $thesisTopic->id], true) ?>',
                 cache: false
             })
-            .done(function( response ) {
-                $('#send_to_review_container').html(response.content);
+            .done(function(response){
+                $('#set_reviewer_for_thesis_topic_container').html(response.content);
             });
 
             $('.headOfDepartment-thesisTopics-details .setReviewerForThesisTopicBtn').on('click', function(e){
@@ -273,13 +310,13 @@
             });
         <?php } ?>
         
-        <?php if($thesisTopic->thesis_topic_status_id == 22){?>
+        <?php if($thesisTopic->thesis_topic_status_id == 22){ ?>
             //Tartalom lekeérése a "bírálatra küldés" modalba
             $.ajax({
-                url: '<?= $this->Url->build(['controller' => 'Reviewers', 'action' => 'sendToReview', $thesisTopic->id], true) ?>',
+                url: '<?= $this->Url->build(['controller' => 'Reviews', 'action' => 'sendToReview', $thesisTopic->id], true) ?>',
                 cache: false
             })
-            .done(function( response ) {
+            .done(function(response){
                 $('#send_to_review_container').html(response.content);
             });
 
@@ -289,7 +326,23 @@
             });
         <?php } ?>
         
-        <?php if(in_array($thesisTopic->thesis_topic_status_id, [20, 21, 22, 23])){ ?>
+        <?php if($thesisTopic->thesis_topic_status_id == 23 && $thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status == 2){ ?>
+            //Tartalom lekeérése a "bírálatra küldés" modalba
+            $.ajax({
+                url: '<?= $this->Url->build(['controller' => 'Reviews', 'action' => 'checkConfidentialityContract', $thesisTopic->id], true) ?>',
+                cache: false
+            })
+            .done(function( response ) {
+                $('#check_confidentiality_contract_container').html(response.content);
+            });
+
+            $('.headOfDepartment-thesisTopics-details .checkConfidentialityContractBtn').on('click', function(e){
+                e.preventDefault();
+                $('#checkConfidentialityContractModal').modal('show');
+            });
+        <?php } ?>
+        
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [20, 21, 22, 23, 24, 25])){ ?>
             /**
              * Accordion megjelenítésekor nyíl cseréje
              */
@@ -307,7 +360,7 @@
             });
         <?php } ?>
         
-        <?php if(in_array($thesisTopic->thesis_topic_status_id, [22, 23]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [22, 23, 24, 25]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
             $('#reviewer_details_link').on('click', function(e){
                 e.preventDefault();
                 if($('#reviewer_details_container').css('display') == 'none'){

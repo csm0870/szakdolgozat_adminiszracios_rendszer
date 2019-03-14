@@ -23,7 +23,7 @@ class ThesisTopicsController extends AppController
         
         $query = $this->ThesisTopics->find();
         //Bírálat alatt levő és az adott bírálóhoz tartozó témák
-        $thesisTopics = $query->where(['ThesisTopics.thesis_topic_status_id IN' => [23] /* Bíálat alatt*/])
+        $thesisTopics = $query->where(['ThesisTopics.thesis_topic_status_id' => 23 /* Bíálat alatt*/])
                               ->matching('Reviews', function ($q) use($reviewer_id) { return $q->where(['Reviews.reviewer_id' => $reviewer_id]); })
                               ->contain(['Reviews']);
                                         
@@ -47,8 +47,8 @@ class ThesisTopicsController extends AppController
         if(empty($thesisTopic)){ //Nem létezik a téma
             $this->Flash->error(__('A dolgozat részletei nem elérhetők.') . ' ' . __('Nem létező dolgozat.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [23])){ //Nem "Bíálat alatt" státuszban van
-            $this->Flash->error(__('A dolgozat részletei nem elérhetők.') . ' ' . __('A téma nem bírálható állapotban van.'));
+        }elseif(in_array($thesisTopic->thesis_topic_status_id != 23)){ //Nem "Bíálat alatt" státuszban van
+            $this->Flash->error(__('A dolgozat részletei nem elérhetők.') . ' ' . __('A dolgozat nem bírálható állapotban van.'));
             $ok = false;
         }else{
              $query = $this->ThesisTopics->find();
