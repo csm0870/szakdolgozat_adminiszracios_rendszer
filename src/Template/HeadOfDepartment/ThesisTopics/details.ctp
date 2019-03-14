@@ -88,8 +88,8 @@
                             <p class="mb-2">
                                 <strong><?= __('Belső konzulens értékelése') . ': ' ?></strong><?= $thesisTopic->internal_consultant_grade === null ? __('még nincs értékelve') : h($thesisTopic->internal_consultant_grade) ?>
                             </p>
-                            <?php if(in_array($thesisTopic->thesis_topic_status_id, [22, 23]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
-                                <?php if($thesisTopic->thesis_topic_status_id == 23 && $thesisTopic->has('review') && in_array($thesisTopic->review->review_status, [4, 5]))
+                            <?php if(in_array($thesisTopic->thesis_topic_status_id, [22, 23, 24, 25]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
+                                <?php if(in_array($thesisTopic->thesis_topic_status_id, [23, 24, 25])  && in_array($thesisTopic->review->review_status, [4, 5, 6]))
                                         echo $this->Html->link(__('Bírálat megtekintése') . ' ->', ['controller' => 'Reviews', 'action' => 'checkReview', $thesisTopic->id], ['class' => 'mb-2', 'style' => 'display: inline-block']); ?>
                                 <p class="mb-1">
                                     <?= $this->Html->link(__('Dolgozat bírálója') . '&nbsp;' . '<i class="fas fa-angle-down fa-lg" id="reviewer_details_arrow_down"></i>' . '<i class="fas fa-angle-up fa-lg d-none" id="reviewer_details_arrow_up"></i>',
@@ -108,7 +108,7 @@
                                     <p class="mb-1">
                                         <strong><?= __('Pozició') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->position) ?>
                                     </p>
-                                    <?php if(in_array($thesisTopic->thesis_topic_status_id, [23]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer') && $thesisTopic->review->reviewer->has('user')){ ?>
+                                    <?php if($thesisTopic->thesis_topic_status_id == 23 && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer') && $thesisTopic->review->reviewer->has('user')){ ?>
                                         <p class="mb-1 mt-4">
                                             <strong><?= __('Belépési email') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->user->email) ?>
                                         </p>
@@ -203,6 +203,9 @@
                             
                             if($thesisTopic->thesis_topic_status_id == 23 && $thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status == 2)
                                 echo $this->Html->link(__('Bíráló titoktartási szerződésének ellenőrzése'), '#', ['class' => 'btn btn-info checkConfidentialityContractBtn border-radius-45px mb-2']) . '<br/>';
+                            
+                            if(in_array($thesisTopic->thesis_topic_status_id, [23, 24, 25]) && $thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status == 4)
+                                echo $this->Html->link(__('Bíráló titoktartási szerződésének letöltése'), ['controller' => 'Reviews', 'action' => 'getUploadedConfidentialityContract', $thesisTopic->id], ['class' => 'btn btn-info border-radius-45px mb-2', 'target' => '__blank']) . '<br/>';
                             
                             if($thesisTopic->thesis_topic_status_id == 21)
                                 echo $this->Html->link(__('Bíráló kijelölése'), '#', ['class' => 'btn btn-info setReviewerForThesisTopicBtn border-radius-45px mb-2']) . '<br/>';

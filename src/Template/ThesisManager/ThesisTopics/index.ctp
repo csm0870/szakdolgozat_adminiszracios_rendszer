@@ -27,6 +27,10 @@
                                         <td><?= $thesisTopic->has('student') ? (h($thesisTopic->student->name) . (empty($thesisTopic->student->neptun) ? '' : ('<br/>(' . h($thesisTopic->student->neptun) . ')'))) : '' ?></td>
                                         <td>
                                             <?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '' ?>
+                                            <?php
+                                                if($thesisTopic->thesis_topic_status_id == 25 && $thesisTopic->accepted_thesis_data_applyed_to_neptun !== true)
+                                                    echo '<br/>' . '(' . __('Az elfogadott dolgozat adatait fel kell vinni a Neptun rendszerbe.') . ')';
+                                            ?>
                                         </td>
                                     </tr>
                                 <?php } ?>

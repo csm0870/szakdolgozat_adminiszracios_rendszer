@@ -10,6 +10,13 @@
                     <legend class="w-auto"><?= __('A téma adatai') ?></legend>
                     <p class="<?= $thesisTopic->thesis_topic_status_id == 19 ? 'mb-2' : 'mb-4' ?>">
                         <strong><?= __('Állapot') . ': ' ?></strong><?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : ''?>
+                        <?php
+                            if($thesisTopic->thesis_topic_status_id == 25 && $thesisTopic->accepted_thesis_data_applyed_to_neptun !== true){
+                                echo '(' . __('Az elfogadott dolgozat adatait fel kell vinni a Neptun rendszerbe.') . ')';
+                                echo '<br/>';
+                                echo $this->Html->link(__('Adatok felvitele') . ' ->', '#', ['class' => 'mt-2 applyAcceptedThesisDataBtn', 'style' => 'display: inline-block']);
+                            }
+                        ?>
                     </p>
                     <?php if($thesisTopic->thesis_topic_status_id == 19){ ?>
                         <p class="mb-4">
@@ -75,6 +82,8 @@
                         <p class="mb-2">
                             <strong><?= __('Belső konzulens értékelése') . ': ' ?></strong><?= $thesisTopic->internal_consultant_grade === null ? __('még nincs értékelve') : h($thesisTopic->internal_consultant_grade) ?>
                         </p>
+                        <?php if(in_array($thesisTopic->thesis_topic_status_id, [24, 25]) && $thesisTopic->has('review'))
+                                    echo $this->Html->link(__('Bírálat megtekintése') . ' ->', ['controller' => 'Reviews', 'action' => 'checkReview', $thesisTopic->id], ['class' => 'mb-2', 'style' => 'display: inline-block']); ?>
                         <?php if(in_array($thesisTopic->thesis_topic_status_id, [22, 23, 24, 25]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
                             <p class="mb-1">
                                 <?= $this->Html->link(__('Dolgozat bírálója') . '&nbsp;' . '<i class="fas fa-angle-down fa-lg" id="reviewer_details_arrow_down"></i>' . '<i class="fas fa-angle-up fa-lg d-none" id="reviewer_details_arrow_up"></i>',
@@ -178,6 +187,32 @@
       </div>
     </div>
 <?php } ?>
+<?php if($thesisTopic->thesis_topic_status_id == 25 && $thesisTopic->accepted_thesis_data_applyed_to_neptun !== true){ ?>
+    <!-- Elfogadott dolgozat adatainak felvitele modal -->
+    <div class="modal fade" id="applyAcceptedThesisDataModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="form-modal">
+                        <div class="form-header text-center">
+                            <?= __('Dolgozat adatainak felvitele a Neptun rendszerbe') ?>
+                        </div>
+                        <div class="form-body">
+                        </div>
+                        <div class="form-footer text-center">
+                            <?= $this->Html->link(__('Az adatokat felvittem'), '#', ['class' => 'btn btn-success dataApplyedBtn border-radius-45px'])?>
+                        </div>
+                        <div class="overlay overlay-accept_thesis_supplements" style="display:none">
+                            <div class="spinner fa-3x">
+                                <i class="fas fa-spinner fa-pulse"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php } ?>
 <script>
     $(function(){
         $('#thesis_topics_index_menu_item').addClass('active');
@@ -226,6 +261,34 @@
                     $('#reviewer_details_arrow_down').removeClass('d-none');
                     $('#reviewer_details_arrow_up').addClass('d-none');
                 }
+            });
+        <?php } ?>
+            
+        <?php if($thesisTopic->thesis_topic_status_id == 25 && $thesisTopic->accepted_thesis_data_applyed_to_neptun !== true){ ?>
+            $('.applyAcceptedThesisDataBtn').on('click', function(e){
+                e.preventDefault();
+                $('#applyAcceptedThesisDataModal').modal('show');
+            });
+            
+            /**
+             * Confirmation modal megnyitása submit előtt
+             */
+            $('#applyAcceptedThesisDataModal .dataApplyedBtn').on('click', function(e){
+                e.preventDefault();
+
+                $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan felvitted az adatokat?') ?>');
+                $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Igen') ?>').css('background-color', '#71D0BD');
+                //Save gomb eventjeinek resetelése cserével
+                $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
+                $('#confirmationModal .msg').text('<?= __('Adatok felvitele a Neptun rendszerbe.') ?>');
+
+                $('#confirmationModal').modal('show');
+
+                $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
+                    e.preventDefault();
+                    $('#confirmationModal').modal('hide');
+                    location.href = '<?= $this->Url->build(['action' => 'acceptedThesisDataApplyed', $thesisTopic->id], true) ?>';
+                });
             });
         <?php } ?>
     });

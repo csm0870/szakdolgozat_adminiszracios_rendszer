@@ -1,4 +1,4 @@
-<div class="container headOfDepartment-checkReview">
+<div class="container student-checkReview">
     <div class="row">
         <div class="col-12 text-center">
             <?= $this->Html->link('<i class="fas fa-arrow-alt-circle-left fa-lg"></i>' . '&nbsp;' . __('Vissza'), ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id], ['escape' => false, 'class' => 'backBtn float-left border-radius-45px', 'title' => __('Vissza')]) ?>
@@ -7,19 +7,7 @@
         <div class="col-12">
             <?= $this->Flash->render() ?>
         </div>
-        <div class="col-12 mb-4 mt-2">
-            <?php
-                if($thesisTopic->thesis_topic_status_id == 23 && $thesisTopic->has('review')){
-                    echo '<br/><strong>' .  __('Állapot') . ': ' . '</strong>';
-                    if($thesisTopic->review->review_status == 4) echo __('A bírálati lap feltöltés véglegesítve. A bírálat a tanszékvezető ellenőrzésére vár.');
-                    elseif($thesisTopic->review->review_status == 5){
-                        echo __('A bírálat elutasítva, a dolgozat ismét bírálható.');
-                        echo '<br/><strong>Elutasítás oka:</strong>&nbsp;' . h($thesisTopic->review->cause_of_rejecting_review);
-                    }
-                }
-            ?>
-        </div>
-        <div class="col-12">
+        <div class="col-12 mt-2">
             <?php
                 $this->Form->templates(['inputContainer' => '<div class="form-group">{{content}}</div>',
                                         'inputContainerError' => '<div class="form-group">{{content}}{{error}}</div>']);
@@ -63,38 +51,12 @@
                 }
                 echo '</div>';
             ?>
-            </div>
-        <div class="col-12">
-            <fieldset class="border-1-grey p-3 text-center">
-                <legend class="w-auto"><?= __('Műveletek') ?></legend>
-                <?php
-                    if($thesisTopic->review->review_status == 4)
-                        echo $this->Html->link(__('Bírálat elfogadása'), '#', ['class' => 'btn btn-secondary acceptReviewBtn border-radius-45px mb-2']) . '<br/>';
-                
-                    if(in_array($thesisTopic->review->review_status, [4, 5, 6]))
-                        echo $this->Html->link(__('Feltöltött bírálati lap letöltése'), ['action' => 'getReviewDoc', $thesisTopic->id], ['class' => 'btn btn-secondary border-radius-45px mb-2', 'target' => '__blank']);
-
-                ?>
-            </fieldset>
         </div>
     </div>
 </div>
-<?php if($thesisTopic->review->review_status == 4){ ?>
-    <!-- Bírálat elfogadása modal -->
-    <div class="modal fade" id="acceptReviewModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div id="accept_review_container">
-
-                    </div>
-                </div>
-            </div>
-      </div>
-    </div>
-<?php } ?>
 <script>
     $(function(){
+        $('#topics_menu_item').addClass('active');
         $('#thesis_topics_index_menu_item').addClass('active');
         
         /**
@@ -126,22 +88,6 @@
                 else $('#grade').text('1');
             }
         })();
-    
-        <?php if($thesisTopic->review->review_status == 4){ ?>
-            //Tartalom lekeérése a "bírálat elfogadása" modalba
-            $.ajax({
-                url: '<?= $this->Url->build(['controller' => 'Reviews', 'action' => 'acceptReview', $thesisTopic->id], true) ?>',
-                cache: false
-            })
-            .done(function( response ) {
-                $('#accept_review_container').html(response.content);
-            });
-
-            $('.headOfDepartment-checkReview .acceptReviewBtn').on('click', function(e){
-                e.preventDefault();
-                $('#acceptReviewModal').modal('show');
-            });
-        <?php } ?>
     });
 </script>
 

@@ -157,7 +157,7 @@ class ReviewsController extends AppController
             $this->Flash->error(__('A bírálat nem elérhető.') . ' ' . __('Nem létező dolgozat.'));
             $ok = false;
         }elseif(!in_array($thesisTopic->thesis_topic_status_id, [23, 24, 25])){ //Nem "Bírálat alatt", vagy "Bírálva státuszban van" státuszban van
-            $this->Flash->error(__('A bírálat nem elérhető.') . ' ' . __('A dolgozat még nem lett bírálva, vagy nem bírálatt alatt van.'));
+            $this->Flash->error(__('A bírálat nem elérhető.') . ' ' . __('A dolgozat még nem lett bírálva, vagy nem bírálat alatt van.'));
             $ok = false;
         }elseif($thesisTopic->has('review') == false){ //Nincs bírálat a dolgozathoz
             $this->Flash->error(__('A bírálat nem elérhető.') . ' ' . __('A dolgozathoz nem tartozik bírálat.'));
@@ -165,8 +165,8 @@ class ReviewsController extends AppController
         }elseif($thesisTopic->confidential === true && $thesisTopic->review->confidentiality_contract_status != 4){ //Még nincs elfogadva a titoktartási szerződés
             $this->Flash->error(__('A bírálat nem elérhető.') . ' ' . __('Még nincs elfogadott titoktartási szerződés a bírálótól.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->review->review_status, [4, 5])){ //Még nincs véglegesített bírálat
-            $this->Flash->error(__('A bírálat nem elérhető.') . ' ' . __('A bírálat még nem szültetett meg.'));
+        }elseif(!in_array($thesisTopic->review->review_status, [4, 5, 6])){ //Még nincs véglegesített bírálat
+            $this->Flash->error(__('A bírálat nem elérhető.') . ' ' . __('A bírálat még nem született meg.'));
             $ok = false;
         }
         
@@ -289,7 +289,7 @@ class ReviewsController extends AppController
         }elseif($thesisTopic->confidential === true && $thesisTopic->review->confidentiality_contract_status != 4){ //Még nincs elfogadva a titoktartási szerződés
             $this->Flash->error(__('A feltölött bírálati lap nem elérhető.') . ' ' . __('Még nincs elfogadott titoktartási szerződés a bírálótól.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->review->review_status, [4, 5])){ //Még nincs véglegesített bírálat
+        }elseif(!in_array($thesisTopic->review->review_status, [4, 5, 6])){ //Még nincs véglegesített bírálat
             $this->Flash->error(__('A feltölött bírálati lap nem elérhető.') . ' ' . __('A bírálat még nem született meg.'));
             $ok = false;
         }elseif(empty($thesisTopic->review->review_doc)){ //Ha nincs bírálati lap feltöltve

@@ -22,7 +22,7 @@ use Cake\ORM\Entity;
  * @property string|null $external_consultant_email
  * @property string|null $external_consultant_phone_number
  * @property string|null $external_consultant_address
- * @property bool|null $thesis_accepted
+ * @property bool|null $accepted_thesis_data_applyed_to_neptun
  * @property int|null $internal_consultant_grade
  * @property string|null $first_thesis_subject_failed_suggestion
  * @property string|null $cause_of_rejecting_thesis_supplements
@@ -74,7 +74,7 @@ class ThesisTopic extends Entity
         'external_consultant_email' => true,
         'external_consultant_phone_number' => true,
         'external_consultant_address' => true,
-        'thesis_accepted' => true,
+        'accepted_thesis_data_applyed_to_neptun' => true,
         'internal_consultant_grade' => true,
         'first_thesis_subject_failed_suggestion' => true,
         'cause_of_rejecting_thesis_supplements' => true,

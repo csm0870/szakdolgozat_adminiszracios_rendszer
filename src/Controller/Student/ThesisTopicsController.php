@@ -230,7 +230,10 @@ class ThesisTopicsController extends AppController
             return $this->redirect(['controller' => 'Students', 'action' => 'edit', $data['student_id']]);
         }
 
-        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id], 'contain' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels'], 'ThesisTopicStatuses', 'InternalConsultants', 'ThesisSupplements', 'StartingYears', 'ExpectedEndingYears', 'Languages']])->first();
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id],
+                                                         'contain' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels'],
+                                                                       'ThesisTopicStatuses', 'InternalConsultants', 'ThesisSupplements',
+                                                                       'StartingYears', 'ExpectedEndingYears', 'Languages', 'Reviews']])->first();
         
         $ok = true;
         //Megnézzük, hogy megfelelő-e a téma a diplomamunka/szakdolgozat feltöltéséhez

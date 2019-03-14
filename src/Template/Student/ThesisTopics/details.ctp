@@ -63,12 +63,17 @@
                         <strong><?= __('Külső konzulenstól való eltekintés indoklása') . ': ' ?></strong><?= h($thesisTopic->cause_of_no_external_consultant) ?>
                     </p>
                 <?php } ?>
-                <?php if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22, 23, 24, 25])){ ?>
+            </fieldset>
+            <?php if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22, 23, 24, 25])){ ?>
+                <fieldset class="border-1-grey p-3 mb-3">
+                    <legend class="w-auto"><?= __('Dolgozat értékelése') ?></legend>
                     <p class="mb-2">
                         <strong><?= __('Belső konzulens értékelése') . ': ' ?></strong><?= $thesisTopic->internal_consultant_grade === null ? __('még nincs értékelve') : h($thesisTopic->internal_consultant_grade) ?>
                     </p>
-                <?php } ?>
-            </fieldset>
+                    <?php if(in_array($thesisTopic->thesis_topic_status_id, [24, 25]) && $thesisTopic->has('review'))
+                                echo $this->Html->link(__('Bírálat megtekintése') . ' ->', ['controller' => 'Reviews', 'action' => 'checkReview', $thesisTopic->id], ['class' => 'mb-2', 'style' => 'display: inline-block']); ?>
+                </fieldset>
+            <?php } ?>
             <fieldset class="border-1-grey p-3 mb-3">
                 <legend class="w-auto"><?= __('Hallgató adatai') ?></legend>
                 <p class="mb-1">

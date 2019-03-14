@@ -27,11 +27,10 @@ class ThesisTopicsController extends AppController
         $this->set(compact('thesisTopics'));
     }
     
-    
     /**
      * Téma részletek
      * 
-     * @param type $id
+     * @param type $id Téma azonosítója
      * @return type
      */
     public function details($id = null){
@@ -58,6 +57,7 @@ class ThesisTopicsController extends AppController
     /**
      * Mellékletek elfogadása/elutasítása
      * 
+     * @param type $id Téma azonosítója
      * @return type
      */
     public function acceptThesisSupplements($id = null){
@@ -120,5 +120,37 @@ class ThesisTopicsController extends AppController
         
         $this->set(compact('thesisTopic' ,'ok', 'error_msg', 'saved', 'error_ajax'));
         $this->set('_serialize', ['saved', 'error_ajax']);
+    }
+    
+    /**
+     * Elfogadott dolgozat adatainak felvitelének rögzítése a Neptun rendszerbe
+     * 
+     * @param type $id Téma azonosítója
+     * @return type
+     */
+    public function acceptedThesisDataApplyed($id = null){
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id]])->first();
+        
+        $ok = true;
+        //Megnézzük, hogy megfelelő-e a téma a diplomamunka/szakdolgozat feltöltéséhez
+        if(empty($thesisTopic)){ //Nem létezik a téma
+            $this->Flash->error(__('Az adatok felvitele nem rögzíthető.') . ' ' . __('Nem létezik a téma.'));
+            $ok = false;
+        }elseif($thesisTopic->thesis_topic_status_id != 25){ //A dolgozat még nincs elfogadott állapotban
+            $this->Flash->error(__('Az adatok felvitele nem rögzíthető.') . ' ' . __('A dolgozat még nincs elfogadott állapotban.'));
+            $ok = false;
+        }elseif($thesisTopic->accepted_thesis_data_applyed_to_neptun === true){ //Az adatok már fel vannak vive 
+            $this->Flash->error(__('Az adatok felvitele nem rögzíthető.') . ' ' . __('A dolgozat adatainak felvitele már megtörtént.'));
+            $ok = false;
+        }
+        
+        if(!$ok) return $this->redirect(['action' => 'index']);
+        
+        $thesisTopic->accepted_thesis_data_applyed_to_neptun = true;
+        
+        if($this->ThesisTopics->save($thesisTopic)) $this->Flash->success(__('Az adatok felvitele rögzítve.'));
+        else $this->Flash->error(__('Az adatok felvitelét nem sikerült rögzíteni. Próbálja újra!'));
+        
+        return $this->redirect(['action' => 'details', $thesisTopic->id]);
     }
 }

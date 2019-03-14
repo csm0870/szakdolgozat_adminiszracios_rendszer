@@ -156,8 +156,8 @@ class ThesisTopicsTable extends Table
             ->allowEmpty('external_consultant_address');
 
         $validator
-            ->boolean('thesis_accepted')
-            ->allowEmpty('thesis_accepted');
+            ->boolean('accepted_thesis_data_applyed_to_neptun')
+            ->allowEmpty('accepted_thesis_data_applyed_to_neptun');
 
         $validator
             ->allowEmpty('internal_consultant_grade');
@@ -313,8 +313,10 @@ class ThesisTopicsTable extends Table
                     else if($total_points < 31 && $total_points >= 26) $grade = 2;
                 }
                 
-                if($grade > 1 && $thesisTopic->internal_consultant_grade > 1) $thesisTopic->thesis_topic_status_id = 25;
-                else $thesisTopic->thesis_topic_status_id = 15;
+                if($grade > 1 && $thesisTopic->internal_consultant_grade > 1){
+                    $thesisTopic->thesis_topic_status_id = 25;
+                    $thesisTopic->accepted_thesis_data_applyed_to_neptun = false; //A Neptun rendszerbe még nem lettek felvive a megfelelő adatok az elfogadott dolgozatról
+                }else $thesisTopic->thesis_topic_status_id = 15;
                 
                 $this->save($thesisTopic);
             }
