@@ -163,6 +163,8 @@ class UsersController extends AppController
                     return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'student']);
                 elseif($user['group_id'] == 7) // Bíráló
                     return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'reviewer']);
+                elseif($user['group_id'] == 8) // Záróvizsga összeállító
+                    return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'final_exam_organizer']);
                 
                 return $this->redirect($this->Auth->redirectUrl());
             }

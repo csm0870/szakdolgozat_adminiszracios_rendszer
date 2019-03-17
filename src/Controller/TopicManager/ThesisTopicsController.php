@@ -133,7 +133,7 @@ class ThesisTopicsController extends AppController
             $query = $this->ThesisTopics->find();
             $data_for_courses[] = $query->where(['ThesisTopics.starting_year_id' => $year->id,
                                                  'ThesisTopics.starting_semester' => $semester,
-                                                 'thesis_topic_status_id' => 12 /* Elfogadott*/])
+                                                 'ThesisTopics.thesis_topic_status_id' => 12 /* Elfogadott téma */])
                                         ->matching('Students', function ($q) use($course_id) { return $q->where(['Students.course_id' => $course_id]);})
                                         ->count();
             $labels_for_courses[] = $course;
@@ -144,7 +144,7 @@ class ThesisTopicsController extends AppController
             $query = $this->ThesisTopics->find();
             $data_for_course_types[] = $query->where(['ThesisTopics.starting_year_id' => $year->id,
                                                       'ThesisTopics.starting_semester' => $semester,
-                                                      'ThesisTopics.thesis_topic_status_id' => 12 /* Elfogadott*/])
+                                                      'ThesisTopics.thesis_topic_status_id' => 12 /* Elfogadott téma */])
                                              ->matching('Students', function ($q) use($course_type_id) { return $q->where(['Students.course_type_id' => $course_type_id]);})
                                              ->count();
                                              
@@ -156,7 +156,7 @@ class ThesisTopicsController extends AppController
             $query = $this->ThesisTopics->find();
             $data_for_course_levels[] = $query->where(['ThesisTopics.starting_year_id' => $year->id,
                                                        'ThesisTopics.starting_semester' => $semester,
-                                                       'thesis_topic_status_id' => 12 /* Elfogadott*/])
+                                                       'ThesisTopics.thesis_topic_status_id' => 12 /* Elfogadott téma */])
                                                ->matching('Students', function ($q) use($course_level_id) { return $q->where(['Students.course_level_id' => $course_level_id]);})
                                                ->count();
             
