@@ -347,3 +347,50 @@ html, body{
     text-decoration: none;
     color: red;
 }
+
+/* Notifications */
+
+/* Notifications index */
+
+.notification{
+    cursor: pointer;
+}
+
+.notifications-index .unread-message{
+    font-weight: bold;
+    background-color: #cccccc;
+}
+
+.notifications-index .unread{
+    color: red;
+}
+
+/* Notification modal */
+
+.notification-container .notification-header{
+    border-radius: 15px 15px 0 0;
+    padding: 10px 8px;
+    background: #a2e5a8;
+    font-size: 1.1rem;
+    font-weight: bolder;
+}
+
+.notification-container .label{
+    font-weight: bold;
+}
+
+.notification-container .notification-body,
+.notification-container .notification-footer{
+    padding: 10px 8px;
+    background: white;
+}
+
+.notification-container .notification-footer{
+    border-radius: 0 0 15px 15px;
+}
+
+.notification-container .notification-subject,
+.notification-container .notification-date,
+.notification-container .notification-message-text{
+    word-break: normal;
+}

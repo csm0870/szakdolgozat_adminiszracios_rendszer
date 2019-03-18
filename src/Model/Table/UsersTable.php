@@ -11,6 +11,7 @@ use Cake\Validation\Validator;
  *
  * @property \App\Model\Table\GroupsTable|\Cake\ORM\Association\BelongsTo $Groups
  * @property \App\Model\Table\InternalConsultantsTable|\Cake\ORM\Association\HasMany $InternalConsultants
+ * @property \App\Model\Table\NotificationsTable|\Cake\ORM\Association\HasMany $Notifications
  * @property \App\Model\Table\RawPasswordsTable|\Cake\ORM\Association\HasMany $RawPasswords
  * @property \App\Model\Table\ReviewersTable|\Cake\ORM\Association\HasMany $Reviewers
  * @property \App\Model\Table\StudentsTable|\Cake\ORM\Association\HasMany $Students
@@ -49,6 +50,9 @@ class UsersTable extends Table
             'foreignKey' => 'group_id'
         ]);
         $this->hasOne('InternalConsultants', [
+            'foreignKey' => 'user_id'
+        ]);
+        $this->hasMany('Notifications', [
             'foreignKey' => 'user_id'
         ]);
         $this->hasOne('RawPasswords', [

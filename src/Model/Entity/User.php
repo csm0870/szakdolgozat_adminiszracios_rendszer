@@ -15,10 +15,11 @@ use Cake\Auth\DefaultPasswordHasher;
  * @property int|null $group_id
  *
  * @property \App\Model\Entity\Group $group
- * @property \App\Model\Entity\InternalConsultant $internal_consultant
- * @property \App\Model\Entity\RawPassword $raw_password
- * @property \App\Model\Entity\Reviewer $reviewer
- * @property \App\Model\Entity\Student $student
+ * @property \App\Model\Entity\InternalConsultant[] $internal_consultants
+ * @property \App\Model\Entity\Notification[] $notifications
+ * @property \App\Model\Entity\RawPassword[] $raw_passwords
+ * @property \App\Model\Entity\Reviewer[] $reviewers
+ * @property \App\Model\Entity\Student[] $students
  */
 class User extends Entity
 {
@@ -40,6 +41,7 @@ class User extends Entity
         'group_id' => true,
         'group' => true,
         'internal_consultant' => true,
+        'notifications' => true,
         'raw_password' => true,
         'reviewer' => true,
         'student' => true

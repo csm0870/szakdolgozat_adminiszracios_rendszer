@@ -220,15 +220,15 @@
 <?php if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22, 23, 24]) && $thesisTopic->internal_consultant_grade === null){ ?>
 <!-- Diplomakurzus első félévének teljesítésének rögzítése modal -->
 <div class="modal fade" id="setThesisGradeModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-body">
-                <div id="set_thesis_grade_container">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+              <div class="modal-body">
+                  <div id="set_thesis_grade_container">
 
-                </div>
-            </div>
-        </div>
-  </div>
+                  </div>
+              </div>
+          </div>
+    </div>
 </div>
 <?php } ?>
 <script>

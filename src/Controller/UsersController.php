@@ -150,21 +150,21 @@ class UsersController extends AppController
                 $this->Auth->setUser($user);
                 
                 if($user['group_id'] == 1) // Admin
-                    return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'admin']);
+                    return $this->redirect(['controller' => 'Notifications', 'action' => 'index', 'prefix' => 'admin']);
                 elseif($user['group_id'] == 2) // Belső konzulens
-                    return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'internal_consultant']);
+                    return $this->redirect(['controller' => 'Notifications', 'action' => 'index', 'prefix' => 'internal_consultant']);
                 elseif($user['group_id'] == 3) // Tanszékvezető
-                    return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'head_of_department']);
+                    return $this->redirect(['controller' => 'Notifications', 'action' => 'index', 'prefix' => 'head_of_department']);
                 elseif($user['group_id'] == 4) // Témakezelő
-                    return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'topic_manager']);
+                    return $this->redirect(['controller' => 'Notifications', 'action' => 'index', 'prefix' => 'topic_manager']);
                 elseif($user['group_id'] == 5) // Szakdolgozatkezelő
-                    return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'thesis_manager']);
+                    return $this->redirect(['controller' => 'Notifications', 'action' => 'index', 'prefix' => 'thesis_manager']);
                 elseif($user['group_id'] == 6) // Hallgató
-                    return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'student']);
+                    return $this->redirect(['controller' => 'Notifications', 'action' => 'index', 'prefix' => 'student']);
                 elseif($user['group_id'] == 7) // Bíráló
-                    return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'reviewer']);
+                    return $this->redirect(['controller' => 'Notifications', 'action' => 'index', 'prefix' => 'reviewer']);
                 elseif($user['group_id'] == 8) // Záróvizsga összeállító
-                    return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'final_exam_organizer']);
+                    return $this->redirect(['controller' => 'Notifications', 'action' => 'index', 'prefix' => 'final_exam_organizer']);
                 
                 return $this->redirect($this->Auth->redirectUrl());
             }

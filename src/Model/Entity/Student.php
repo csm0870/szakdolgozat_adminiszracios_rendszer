@@ -50,7 +50,7 @@ class Student extends Entity
         'email' => true,
         'phone_number' => true,
         'specialisation' => true,
-        'final_exam_subjects_status' => true,
+        'final_exam_subjects_status' => true, // null, 0 - még nincsenek tárgyak, 1 - már ki vannak választva a tárgyak, de még módosíthatja a hallgató, 2 - a hallgató véglegesítette a tárgyakat, 3 - belső konzulens elfogadta a tárgyakat
         'created' => true,
         'modified' => true,
         'course_id' => true,

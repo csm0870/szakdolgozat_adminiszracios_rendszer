@@ -212,12 +212,10 @@
 
                     $('#confirmationModal').modal('show');
 
-                    var thesis_topic_id = $(this).data('id');
-
                     $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
                         e.preventDefault();
                         $('#confirmationModal').modal('hide');
-                        location.href = '<?= $this->Url->build(['controller' => 'FinalExamSubjects', 'action' => 'finalize'], true) ?>' + '/' + thesis_topic_id;
+                        location.href = '<?= $this->Url->build(['controller' => 'FinalExamSubjects', 'action' => 'finalize'], true) ?>';
                     });
                 });
             <?php } ?>

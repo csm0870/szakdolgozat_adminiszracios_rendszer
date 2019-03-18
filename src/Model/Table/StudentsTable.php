@@ -220,4 +220,57 @@ class StudentsTable extends Table
         
         return $can_modify_data;
     }
+    
+    /**
+     * Mentés után callback
+     * 
+     * Értesítések létrehozása
+     * 
+     * @param type $event
+     * @param type $entity
+     * @param type $options
+     */
+    public function afterSave($event, $entity, $options){
+        if($entity->isNew() == false){
+            //Ha a halllgató véglegesíti
+            if($entity->getOriginal('final_exam_subjects_status') == 1 && $entity->final_exam_subjects_status == 2){
+                
+                $internalConsultant = $this->ThesisTopics->InternalConsultants->find('all', ['conditions' => ['InternalConsultants.id' => $entity->final_exam_subjects_internal_consultant_id],
+                                                                                             'contain' => ['Users']])->first();
+                
+                if(!empty($internalConsultant) && $internalConsultant->has('user')){
+                    $Notifications = \Cake\ORM\TableRegistry::get('Notifications');
+                    
+                    $notification = $Notifications->newEntity();
+                    $notification->user_id = $internalConsultant->user_id;
+                    $notification->unread = true;
+                    $notification->subject = 'Záróvizsga-tárgyak ellenőrzése';
+                    $notification->message = 'A ' . h($entity->name) . ' (' . h($entity->neptun) . ') nevű hallgató megadta a záróvizsga-tárgy javaslatait. A tárgyak ellenőrzésre várnak.' .
+                                             '<br/>Részletek megtekintése: ' . \Cake\Routing\Router::url(['controller' => 'FinalExamSubjects', 'action' => 'details', $entity->id, 'prefix' => 'internal_consultant'], true);
+                
+                    $Notifications->save($notification);
+                }
+            }
+            
+            //Ha a belső konzulens elfogadta a ZV-tárgyakat
+            if($entity->getOriginal('final_exam_subjects_status') == 2 && $entity->final_exam_subjects_status == 3){
+                
+                $user = $this->Users->find('all', ['conditions' => ['Users.id' => $entity->user_id]])->first();
+                $internalConsultant = $this->ThesisTopics->InternalConsultants->find('all', ['conditions' => ['InternalConsultants.id' => $entity->final_exam_subjects_internal_consultant_id]])->first();
+                
+                if(!empty($user) && !empty($internalConsultant)){
+                    $Notifications = \Cake\ORM\TableRegistry::get('Notifications');
+                    
+                    $notification = $Notifications->newEntity();
+                    $notification->user_id = $user->id;
+                    $notification->unread = true;
+                    $notification->subject = 'A záróvizsga-tárgyakat elfogadta a belső konzulense';
+                    $notification->message = 'A ' . h($internalConsultant->name) . ' nevű belső konzulense elfogadta a záróvizsga-tárgyakat.' .
+                                             '<br/><a href="' . \Cake\Routing\Router::url(['controller' => 'FinalExamSubjects', 'action' => 'index', 'prefix' => 'student'], true) . '">' . 'Részletek megtekintése' . '</a>';
+                
+                    $Notifications->save($notification);
+                }
+            }
+        }
+    }
 }

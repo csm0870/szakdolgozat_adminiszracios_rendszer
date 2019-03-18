@@ -45,47 +45,47 @@ use Cake\Routing\Route\DashedRoute;
  *
  */
 Router::defaultRouteClass(DashedRoute::class);
-Router::extensions(['pdf']);
+Router::extensions(['pdf', 'json']);
 
 //Az egyes user típusoknak különböző route prefix
 
 Router::prefix('admin',  function ($routes) {
-    $routes->connect('/', ['controller' => 'Pages', 'action' => 'dashboard']); 
+    $routes->connect('/', ['controller' => 'Notifications', 'action' => 'index']); 
     $routes->fallbacks(DashedRoute::class);
 });
 
 Router::prefix('internal_consultant',  function ($routes) {
-    $routes->connect('/', ['controller' => 'Pages', 'action' => 'dashboard']); 
+    $routes->connect('/', ['controller' => 'Notifications', 'action' => 'index']); 
     $routes->fallbacks(DashedRoute::class);
 });
 
 Router::prefix('head_of_department',  function ($routes) {
-    $routes->connect('/', ['controller' => 'Pages', 'action' => 'dashboard']); 
+    $routes->connect('/', ['controller' => 'Notifications', 'action' => 'index']); 
     $routes->fallbacks(DashedRoute::class);
 });
 
 Router::prefix('topic_manager',  function ($routes) {
-    $routes->connect('/', ['controller' => 'Pages', 'action' => 'dashboard']); 
+    $routes->connect('/', ['controller' => 'Notifications', 'action' => 'index']); 
     $routes->fallbacks(DashedRoute::class);
 });
 
 Router::prefix('thesis_manager',  function ($routes) {
-    $routes->connect('/', ['controller' => 'Pages', 'action' => 'dashboard']); 
+    $routes->connect('/', ['controller' => 'Notifications', 'action' => 'index']); 
     $routes->fallbacks(DashedRoute::class);
 });
 
 Router::prefix('student',  function ($routes) {
-    $routes->connect('/', ['controller' => 'Pages', 'action' => 'dashboard']); 
+    $routes->connect('/', ['controller' => 'Notifications', 'action' => 'index']); 
     $routes->fallbacks(DashedRoute::class);
 });
 
 Router::prefix('reviewer',  function ($routes) {
-    $routes->connect('/', ['controller' => 'Pages', 'action' => 'dashboard']); 
+    $routes->connect('/', ['controller' => 'Notifications', 'action' => 'index']); 
     $routes->fallbacks(DashedRoute::class);
 });
 
 Router::prefix('final_exam_organizer',  function ($routes) {
-    $routes->connect('/', ['controller' => 'Pages', 'action' => 'dashboard']); 
+    $routes->connect('/', ['controller' => 'Notifications', 'action' => 'index']); 
     $routes->fallbacks(DashedRoute::class);
 });
 
