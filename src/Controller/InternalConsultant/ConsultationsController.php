@@ -215,7 +215,7 @@ class ConsultationsController extends AppController
             $error_msg = __('A konzultációs csoportot nem véglegesítheti.') . ' ' .  __('A témának, amelyhez tartozik, nem Ön a belső konzulense.');
             $ok = false;
         }elseif($thesisTopic->thesis_topic_status_id != 15){ //Nem "Az első diplimakurzus teljesítve" státuszban van
-            $error_msg = __('A konzultációs csoportot nem véglegesítheti.') . ' ' .  __('A téma'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.';
+            $error_msg = __('A konzultációs csoportot nem véglegesítheti.') . ' ' .  __('A téma nem az "Első diplomakurzus teljesítve" állapotban van.');
             $ok = false;
         }
         
@@ -237,7 +237,8 @@ class ConsultationsController extends AppController
         $saved = true;
         $error_ajax = "";
         if($this->getRequest()->is(['post', 'patch', 'put'])){
-            $consultation = $this->Consultations->patchEntity($consultation, $this->getRequest()->getData());
+            $accepted = $this->getRequest()->getData('accepted');
+            $consultation = $this->Consultations->patchEntity($consultation, ['accepted' => $accepted]);
             
             if($this->Consultations->save($consultation)){
                 $this->Flash->success(__('Mentés sikeres!'));
@@ -249,6 +250,23 @@ class ConsultationsController extends AppController
                         $error_ajax = __('Mentés sikertelen. Próbálja újra!');
                         $consultation->accepted = null;
                         $this->Consultations->save($consultation);
+                    }
+                }
+                //Ha nem felelt meg a követelményeknek, akkor erről egy értesítés
+                if($consultation->current === true && $consultation->accepted === false){
+                    $student = $this->Consultations->ThesisTopics->Students->find('all', ['conditions' => ['Students.id' => $thesisTopic->student_id],
+                                                                                          'contain' => ['Users']])->first();
+                    if(!empty($student) && $student->has('user')){
+                        $this->loadModel('Notifications');
+
+                        $notification = $this->Notifications->newEntity();
+                        $notification->user_id = $student->user_id;
+                        $notification->unread = true;
+                        $notification->subject = 'A belső konzulense rögzítette, hogy a ' . ($entity->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' a formai követelményeknek nem felelt meg.';
+                        $notification->message = 'A ' . h($thesisTopic->title) . ' című témához tartozó  ' . ($thesisTopic->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' a formai követelményeknek nem felelt meg, így ismét a második diplomakurzust kell teljesítenie.' .
+                                                 '<br/><a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id, 'prefix' => 'student'], true) . '">' . 'Részletek megtekintése' . '</a>';
+
+                        $this->Notifications->save($notification);
                     }
                 }
             }else{

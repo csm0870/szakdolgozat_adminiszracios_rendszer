@@ -21,7 +21,7 @@ class ThesisTopicsController extends AppController
      * Szakdolgozatkezelő témalista(szakdolgozatlista)
      */
     public function index(){
-        $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['deleted !=' => true, 'thesis_topic_status_id IN' => [18, 19, 20, 21, 22, 23, 24, 25]],
+        $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['deleted !=' => true, 'thesis_topic_status_id IN' => [16, 17, 18, 19, 20, 21, 22, 23, 24, 25]],
                                                           'contain' => ['Students', 'InternalConsultants', 'ThesisTopicStatuses'], 'order' => ['ThesisTopics.modified' => 'DESC']]);
 
         $this->set(compact('thesisTopics'));
@@ -44,7 +44,7 @@ class ThesisTopicsController extends AppController
         if(empty($thesisTopic)){ //Nem létezik a téma
             $this->Flash->error(__('Részeletek nem elérhetőek.') . ' ' . __('Nem létezik a téma.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [18, 19, 20, 21, 22, 23, 24, 25])){ //A szakdolgozati feltöltés nincs véglegesítve
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22, 23, 24, 25])){ //A szakdolgozati feltöltés nincs véglegesítve
             $this->Flash->error(__('Részeletek nem elérhetőek.') . ' ' . __('A dolgozat még nincs abban az állapotban, hogy elérheti.'));
             $ok = false;
         }

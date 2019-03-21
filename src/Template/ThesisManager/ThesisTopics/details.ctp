@@ -125,7 +125,7 @@
                     </p>
                 </fieldset>
         </div>
-        <?php if(in_array($thesisTopic->thesis_topic_status_id, [18, 19, 20, 21, 22, 23, 24, 25])){ ?>
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [17, 18, 19, 20, 21, 22, 23, 24, 25])){ ?>
             <div class="col-12">
                 <div id="accordion">
                     <div class="card">
@@ -233,22 +233,24 @@
             });
         <?php } ?>
         
-        /**
-         * Accordion megjelenítésekor nyíl cseréje
-         */
-        $('#supplementCollapse').on('show.bs.collapse', function () {
-            $('#supplement_arrow_up').removeClass('d-none');
-            $('#supplement_arrow_down').addClass('d-none');
-        });
-        
-        /**
-         * Accordion eltüntetésekor nyíl cseréje
-         */
-        $('#supplementCollapse').on('hide.bs.collapse', function () {
-            $('#supplement_arrow_down').removeClass('d-none');
-            $('#supplement_arrow_up').addClass('d-none');
-        });
-        
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [17, 18, 19, 20, 21, 22, 23, 24, 25])){ ?>
+            /**
+             * Accordion megjelenítésekor nyíl cseréje
+             */
+            $('#supplementCollapse').on('show.bs.collapse', function () {
+                $('#supplement_arrow_up').removeClass('d-none');
+                $('#supplement_arrow_down').addClass('d-none');
+            });
+
+            /**
+             * Accordion eltüntetésekor nyíl cseréje
+             */
+            $('#supplementCollapse').on('hide.bs.collapse', function () {
+                $('#supplement_arrow_down').removeClass('d-none');
+                $('#supplement_arrow_up').addClass('d-none');
+            });
+        <?php } ?>
+            
         <?php if(in_array($thesisTopic->thesis_topic_status_id, [22, 23, 24, 25]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
             $('#reviewer_details_link').on('click', function(e){
                 e.preventDefault();

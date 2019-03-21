@@ -47,7 +47,7 @@ class ThesisTopicsController extends AppController
         if(empty($thesisTopic)){ //Nem létezik a téma
             $this->Flash->error(__('A dolgozat részletei nem elérhetők.') . ' ' . __('Nem létező dolgozat.'));
             $ok = false;
-        }elseif(in_array($thesisTopic->thesis_topic_status_id != 23)){ //Nem "Bíálat alatt" státuszban van
+        }elseif($thesisTopic->thesis_topic_status_id != 23){ //Nem "Bíálat alatt" státuszban van
             $this->Flash->error(__('A dolgozat részletei nem elérhetők.') . ' ' . __('A dolgozat nem bírálható állapotban van.'));
             $ok = false;
         }else{

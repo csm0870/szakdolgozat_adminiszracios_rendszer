@@ -19,7 +19,7 @@
                 <strong><?= __('Pozició') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->position) ?>
             </p>
             <p>
-                <?= __('Bírálatra küldés után (amelyek a téma részleteinél elérhetők lesznek) egy email és hozzá tartozó jelszó generálódik, - ha még az adott bírálónak nincs - amelyeket el kell eljuttatni a bírálónak a belépéshez.' .
+                <?= __('Bírálatra küldés után (amelyek a téma részleteinél elérhetők lesznek) egy email és hozzá tartozó jelszó generálódik, - ha még az adott bírálónak nincs - amelyeket el kell eljuttatni a bírálónak a belépéshez. ' .
                     'Ezzel a bíráló beléphet, majd elérheti a megfelelő dokumentumokat a bírálathoz, és megteheti a bírálatot.' .
                     '<br/>' .
                     'Titkos dolgozat esetén először a titkosítási kérelmet kell letöltenie, majd aláírva feltölteni, amelyet el kell fogadni, és ezután férhet hozzá a dolgozathoz.')

@@ -244,9 +244,9 @@ class StudentsTable extends Table
                     $notification = $Notifications->newEntity();
                     $notification->user_id = $internalConsultant->user_id;
                     $notification->unread = true;
-                    $notification->subject = 'Záróvizsga-tárgyak ellenőrzése';
+                    $notification->subject = 'Záróvizsga-tárgyak ellenőrzése.';
                     $notification->message = 'A ' . h($entity->name) . ' (' . h($entity->neptun) . ') nevű hallgató megadta a záróvizsga-tárgy javaslatait. A tárgyak ellenőrzésre várnak.' .
-                                             '<br/>Részletek megtekintése: ' . \Cake\Routing\Router::url(['controller' => 'FinalExamSubjects', 'action' => 'details', $entity->id, 'prefix' => 'internal_consultant'], true);
+                                             '<br/><a href="' . \Cake\Routing\Router::url(['controller' => 'FinalExamSubjects', 'action' => 'details', $entity->id, 'prefix' => 'internal_consultant'], true) . '">' . 'Részletek megtekintése' . '</a>';
                 
                     $Notifications->save($notification);
                 }
@@ -264,7 +264,7 @@ class StudentsTable extends Table
                     $notification = $Notifications->newEntity();
                     $notification->user_id = $user->id;
                     $notification->unread = true;
-                    $notification->subject = 'A záróvizsga-tárgyakat elfogadta a belső konzulense';
+                    $notification->subject = 'A záróvizsga-tárgyakat elfogadta a belső konzulense.';
                     $notification->message = 'A ' . h($internalConsultant->name) . ' nevű belső konzulense elfogadta a záróvizsga-tárgyakat.' .
                                              '<br/><a href="' . \Cake\Routing\Router::url(['controller' => 'FinalExamSubjects', 'action' => 'index', 'prefix' => 'student'], true) . '">' . 'Részletek megtekintése' . '</a>';
                 

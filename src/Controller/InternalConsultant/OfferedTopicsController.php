@@ -146,10 +146,10 @@ class OfferedTopicsController extends AppController
         $ok = true;
         if(empty($offeredTopic)){ //Ha nem létezik a téma
             $ok = false;
-            $this->Flash->error(__('A téma nem fogadható el.') . ' ' . __('A téma nem létezik.'));
+            $this->Flash->error(__('A téma részletei nem elérhetőek.') . ' ' . __('A téma nem létezik.'));
         }elseif($user->internal_consultant->id != $offeredTopic->internal_consultant_id){ //Ha nem az adott belső konzulenshez tartozik
             $ok = false;
-            $this->Flash->error(__('A téma nem fogadható el.') . ' ' . __('A téma nem Önhöz tartozik.'));
+            $this->Flash->error(__('A téma részletei nem elérhetőek.') . ' ' . __('A téma nem Önhöz tartozik.'));
         }
         
         if($ok === false) return $this->redirect(['action' => 'index']);

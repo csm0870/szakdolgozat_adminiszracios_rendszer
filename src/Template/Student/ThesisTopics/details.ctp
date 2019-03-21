@@ -148,7 +148,7 @@
                         }
                     }
                     
-                    if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 19])) echo $this->Html->link(__('Diplomamunka/szakdolgozat feltöltése'), ['controller' => 'ThesisTopics', 'action' => 'uploadThesis', $thesisTopic->id], ['class' => 'btn btn-info border-radius-45px mb-2']);
+                    if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 19])) echo $this->Html->link(__('Diplomamunka/szakdolgozat feltöltése'), ['controller' => 'ThesisTopics', 'action' => 'uploadThesis', $thesisTopic->id], ['class' => 'btn btn-info border-radius-45px mb-2']) . '<br/>';
                     
                     echo $this->Html->link(__('Témaengedélyező PDF letöltése'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px mb-2', 'target' => '_blank']) . '<br/>';
 
