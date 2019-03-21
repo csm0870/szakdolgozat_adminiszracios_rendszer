@@ -1,5 +1,5 @@
 <?php
-namespace App\Controller\Student;
+namespace App\Controller\ThesisManager;
 
 use App\Controller\AppController;
 

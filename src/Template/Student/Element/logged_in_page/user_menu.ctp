@@ -3,8 +3,10 @@
         <nav class="navbar navbar-dark bg-dark navbar-expand-md" style="background-color: #e3f2fd;">
         <div class="collapse navbar-collapse" id="navbarText">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item" id="notifications_menu_item">
-                    <a class="nav-link" href="<?= $this->Url->build(['controller' => 'Notifications', 'action' => 'index'], true) ?>"><?= __('Értesítések') ?></a>
+                <li class="nav-item" id="notifications_index_menu_item">
+                    <a class="nav-link" href="<?= $this->Url->build(['controller' => 'Notifications', 'action' => 'index'], true) ?>">
+                        <?= ($has_unread_notification === true ? '<sup class="unread-sup" style="padding-right: 2px">' . __('Új') . '</sup>' : '') . __('Értesítések') ?>
+                    </a>
                 </li>
                 <li class="nav-item" id="student_data_menu_item">
                     <a class="nav-link" href="<?= $this->Url->build(['controller' => 'Students', 'action' => 'edit']) ?>"><?= __('Hallgatói adatok') ?></a>

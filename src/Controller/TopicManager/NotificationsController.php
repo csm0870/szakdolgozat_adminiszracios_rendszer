@@ -1,5 +1,5 @@
 <?php
-namespace App\Controller\Student;
+namespace App\Controller\TopicManager;
 
 use App\Controller\AppController;
 

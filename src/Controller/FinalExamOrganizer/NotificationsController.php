@@ -1,5 +1,5 @@
 <?php
-namespace App\Controller\Student;
+namespace App\Controller\FinalExamOrganizer;
 
 use App\Controller\AppController;
 

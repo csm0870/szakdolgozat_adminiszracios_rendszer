@@ -350,6 +350,10 @@ html, body{
 
 /* Notifications */
 
+.unread-sup{
+    color: red;
+}
+
 /* Notifications index */
 
 .notification{
@@ -361,11 +365,25 @@ html, body{
     background-color: #cccccc;
 }
 
-.notifications-index .unread{
-    color: red;
+.notifications-index .notifications-table thead th,
+.notifications-index .notifications-table tfoot th{
+    background-color: #d9dde2;
 }
 
 /* Notification modal */
+
+.notification-header button{
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    -webkit-appearance: none;
+    float: right;
+    font-weight: 700;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .5;
+    cursor: pointer;
+}
 
 .notification-container .notification-header{
     border-radius: 15px 15px 0 0;
@@ -393,4 +411,18 @@ html, body{
 .notification-container .notification-date,
 .notification-container .notification-message-text{
     word-break: normal;
+}
+
+.fullscreen-modal .modal-dialog{
+    min-width: 100%;
+    min-height: 100%;
+    margin: 0;
+}
+
+.fullscreen-modal .notification-container{
+    min-height: 100%;
+}
+
+.fullscreen-modal .notification-body{
+    min-height: 83vh;
 }

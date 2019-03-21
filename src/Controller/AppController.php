@@ -92,8 +92,13 @@ class AppController extends Controller
             $user_id = $this->Auth->user('id');
             $this->loadModel('Users');
             $logged_in_user = $this->Users->get($user_id);
+            
+            $this->loadModel('Notifications');
+            $count_of_unread_notifications = $this->Notifications->find('all', ['conditions' => ['Notifications.user_id' => $user_id, 'Notifications.unread' => true]])->count();
 
-            $this->set('logged_in_user', $logged_in_user);
+            $has_unread_notification = $count_of_unread_notifications == 0 ? false : true;
+            
+            $this->set(compact('logged_in_user', 'has_unread_notification'));
         }
         
         if(!\Cake\Core\Configure::check('title')){

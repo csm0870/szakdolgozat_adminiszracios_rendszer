@@ -1,5 +1,5 @@
 <?php
-namespace App\Controller\Student;
+namespace App\Controller\InternalConsultant;
 
 use App\Controller\AppController;
 
