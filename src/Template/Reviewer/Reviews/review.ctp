@@ -80,7 +80,7 @@
                     echo $this->Form->control('general_comments', ['class' => 'form-control', 'label' => ['text' => __('Általános megjegyzések')], 'readonly' => in_array($thesisTopic->review->review_status, [2, 3, 4, 6]),
                                                                    'placeholder' => __('minimum 10 sor a word dokumentum szerint'), 'required' => true, 'minlength' => 490]);
 
-                    echo '<h5 class="mt-5 mb-4">' . __('Kérdések') . '(' . __('minimum 3 darab') . '):' .  '</h5>';
+                    echo '<h5 class="mt-5 mb-4">' . __('Kérdések') . ' (' . __('minimum 3 darab') . '):' .  '</h5>';
 
                     echo '<div id="question_container">';
                     $i = 1;
@@ -261,7 +261,7 @@
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Véglegesítés') ?>').css('background-color', '#71D0BD');
                 //Save gomb eventjeinek resetelése cserével
                 $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-                $('#confirmationModal .msg').text('<?= __('Bírálat véglegesítése. Végelgesítés után az adatok már nem módosíthatóak. Véglegesítés után egy word dokumentum generálódik, amelyet ki kell nyomtatni, aláírni, majd PDF-ben feltölteni.') ?>');
+                $('#confirmationModal .msg').text('<?= __('Bírálat véglegesítése. Ha módosított az adatokon, és úgy nyomja meg a véglegesítést, akkor azok nem mentődnek el, csak a mentés gombra kattintva módosulnak az adatok. Végelgesítés után az adatok már nem módosíthatóak. Véglegesítés után egy word dokumentum generálódik, amelyet ki kell nyomtatni, aláírni, majd PDF-ben feltölteni.') ?>');
 
                 $('#confirmationModal').modal('show');
 

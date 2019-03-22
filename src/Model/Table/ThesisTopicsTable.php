@@ -286,42 +286,9 @@ class ThesisTopicsTable extends Table
      * @param type $options
      */
     public function afterSave($event, $entity, $options){
-        //Ha belső konzulens értékelte a dolgozatot, és a bíráló is már bírálta, akkor megvizsgáljuk a két értékelést,
-        //és azoknak megfelelően elfogadott lesz a dolgozat vagy újra második diplomakurzust kell felvennie a hallgatónak
-        if($entity->getOriginal('thesis_topic_status_id') == 23 && $entity->thesis_topic_status_id == 24 && $entity->internal_consultant_grade !== null ||
-           $entity->getOriginal('internal_consultant_grade') === null && $entity->internal_consultant_grade !== null && $entity->thesis_topic_status_id == 24){
-            $thesisTopic = $this->find('all', ['conditions' => ['ThesisTopics.id' => $entity->id],
-                                               'contain' => ['Reviews', 'Consultations']])->first();
-            
-            
-            if($thesisTopic->has('review')){
-                $total_points = 0;
-                $grade = 1;
-                
-                //Összpontszám kiszámítása
-                $total_points = (empty($thesisTopic->review->structure_and_style_point) ? 0 : $thesisTopic->review->structure_and_style_point) +
-                            (empty($thesisTopic->review->processing_literature_point) ? 0 : $thesisTopic->review->processing_literature_point) +
-                            (empty($thesisTopic->review->writing_up_the_topic_point) ? 0 : $thesisTopic->review->writing_up_the_topic_point) +
-                            (empty($thesisTopic->review->practical_applicability_point) ? 0 : $thesisTopic->review->practical_applicability_point);
-        
-                //Jegy kiszámítása
-                if(!empty($thesisTopic->review->structure_and_style_point) && !empty($thesisTopic->review->processing_literature_point) &&
-                   !empty($thesisTopic->review->writing_up_the_topic_point) && !empty($thesisTopic->review->practical_applicability_point)){
-
-                    if($total_points >= 45) $grade = 5;
-                    else if($total_points < 45 && $total_points >= 38) $grade = 4;
-                    else if($total_points < 38 && $total_points >= 31) $grade = 3;
-                    else if($total_points < 31 && $total_points >= 26) $grade = 2;
-                }
-                
-                if($grade > 1 && $thesisTopic->internal_consultant_grade > 1){
-                    $thesisTopic->thesis_topic_status_id = 25;
-                    $thesisTopic->accepted_thesis_data_applyed_to_neptun = false; //A Neptun rendszerbe még nem lettek felvive a megfelelő adatok az elfogadott dolgozatról
-                }else $thesisTopic->thesis_topic_status_id = 15;
-                
-                $this->save($thesisTopic);
-            }
-        }
+        //======================================================================
+        // ÉRTESÍTÉSEK KEZDETE
+        //======================================================================
         
         //Kiírt téma lefoglalása
         if($entity->isNew() && $entity->thesis_topic_status_id == 2){
@@ -486,10 +453,11 @@ class ThesisTopicsTable extends Table
                                          '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'student'], true) . '">' . 'Részletek megtekintése' . '</a>';
                 
                 $Notifications->save($notification);
-                
+            }
+            
+            if(!empty($student) && !empty($internalConsultant)){
                 //Tanszékvezetők, itt ha a belső konzulens egy tanszékhez tartozna, akkor annak a tanszékvezetője kapná csak az értesítést
                 $head_of_departments = $this->Students->Users->find('all', ['conditions' => ['group_id' => 3]]);
-
                 foreach($head_of_departments as $head_of_department){
                     $notification = $Notifications->newEntity();
                     $notification->user_id = $head_of_department->id;
@@ -542,10 +510,11 @@ class ThesisTopicsTable extends Table
                                          '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'student'], true) . '">' . 'Részletek megtekintése' . '</a>';
                 
                 $Notifications->save($notification);
-                
+            }
+            
+            if(!empty($student) && !empty($internalConsultant)){
                 //Témakezelők
                 $topic_managers = $this->Students->Users->find('all', ['conditions' => ['group_id' => 4]]);
-
                 foreach($topic_managers as $topic_manager){
                     $notification = $Notifications->newEntity();
                     $notification->user_id = $topic_manager->id;
@@ -565,11 +534,7 @@ class ThesisTopicsTable extends Table
         if($entity->getOriginal('thesis_topic_status_id') == 8 && $entity->thesis_topic_status_id == 12){
             $student = $this->Students->find('all', ['conditions' => ['Students.id' => $entity->student_id],
                                                      'contain' => ['Users']])->first();
-            
-            $internalConsultant = $this->InternalConsultants->find('all', ['conditions' => ['InternalConsultants.id' => $entity->internal_consultant_id],
-                                                                           'contain' => ['Users']])->first();
-            
-            if(!empty($student) && $student->has('user') && !empty($internalConsultant)){
+            if(!empty($student) && $student->has('user')){
                 $Notifications = \Cake\ORM\TableRegistry::get('Notifications');
                 
                 $notification = $Notifications->newEntity();
@@ -580,20 +545,23 @@ class ThesisTopicsTable extends Table
                                          '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'student'], true) . '">' . 'Részletek megtekintése' . '</a>';
                 
                 $Notifications->save($notification);
-                
-                if($internalConsultant->has('user')){
-                    $notification = $Notifications->newEntity();
-                    $notification->user_id = $internalConsultant->user->id;
-                    $notification->unread = true;
-                    $notification->subject = 'Önhöz tartozó hallgató által leadott témát elfogadott a tanszékvezető. A téma el van fogadva.';
-                    $notification->message = 'Hallgató: ' . h($student->name) . ' (' . h($student->neptun) . ')<br/>' .
-                                             'Téma címe: ' . h($entity->title) . '<br/>' .
-                                             'A téma el van fogadva.' . '<br/>' .
-                                             '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'internal_consultant'], true) . '">' . 'Részletek megtekintése' . '</a>';
-
-                    $Notifications->save($notification);
-                }
             }
+            
+            $internalConsultant = $this->InternalConsultants->find('all', ['conditions' => ['InternalConsultants.id' => $entity->internal_consultant_id],
+                                                                           'contain' => ['Users']])->first();
+            if(!empty($internalConsultant) && $internalConsultant->has('user')){
+                $notification = $Notifications->newEntity();
+                $notification->user_id = $internalConsultant->user->id;
+                $notification->unread = true;
+                $notification->subject = 'Önhöz tartozó hallgató által leadott témát elfogadott a tanszékvezető. A téma el van fogadva.';
+                $notification->message = 'Hallgató: ' . h($student->name) . ' (' . h($student->neptun) . ')<br/>' .
+                                         'Téma címe: ' . h($entity->title) . '<br/>' .
+                                         'A téma el van fogadva.' . '<br/>' .
+                                         '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'internal_consultant'], true) . '">' . 'Részletek megtekintése' . '</a>';
+
+                $Notifications->save($notification);
+            }
+            
         }
         
         //A belső konzulens "első diplomakurzus sikertelen"-t rögzít
@@ -613,7 +581,9 @@ class ThesisTopicsTable extends Table
                                          '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'student'], true) . '">' . 'Részletek megtekintése' . '</a>';
                 
                 $Notifications->save($notification);
+            }
                 
+            if(!empty($student) && !empty($internalConsultant)){
                 //Tanszékvezetők, itt ha a belső konzulens egy tanszékhez tartozna, akkor annak a tanszékvezetője kapná csak az értesítést
                 $head_of_departments = $this->Students->Users->find('all', ['conditions' => ['group_id' => 3]]);
 
@@ -635,14 +605,9 @@ class ThesisTopicsTable extends Table
         
         //A tanszékvezető elutasítja a téma folytatását sikertelen első diplomakurzus esetén
         if($entity->getOriginal('thesis_topic_status_id') == 13 && $entity->thesis_topic_status_id == 14){
-            
             $student = $this->Students->find('all', ['conditions' => ['Students.id' => $entity->student_id],
                                                      'contain' => ['Users']])->first();
-            
-            $internalConsultant = $this->InternalConsultants->find('all', ['conditions' => ['InternalConsultants.id' => $entity->internal_consultant_id],
-                                                                           'contain' => ['Users']])->first();
-            
-            if(!empty($student) && $student->has('user') && !empty($internalConsultant)){
+            if(!empty($student) && $student->has('user')){
                 $Notifications = \Cake\ORM\TableRegistry::get('Notifications');
                 
                 $notification = $Notifications->newEntity();
@@ -653,19 +618,21 @@ class ThesisTopicsTable extends Table
                                          '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'student'], true) . '">' . 'Részletek megtekintése' . '</a>';
                 
                 $Notifications->save($notification);
-                
-                if($internalConsultant->has('user')){
-                    $notification = $Notifications->newEntity();
-                    $notification->user_id = $internalConsultant->user->id;
-                    $notification->unread = true;
-                    $notification->subject = 'Az Önhöz tartozó hallgatónál sikertelen első diplomakurzusról döntést hozott a tanszékvezető.';
-                    $notification->message = 'Hallgató: ' . h($student->name) . ' (' . h($student->neptun) . ')<br/>' .
-                                             'Téma címe: ' . h($entity->title) . '<br/>' .
-                                             'A tanszékvezető elutasította a folytatást.' . '<br/>' .
-                                             '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'internal_consultant'], true) . '">' . 'Részletek megtekintése' . '</a>';
+            }
+            
+            $internalConsultant = $this->InternalConsultants->find('all', ['conditions' => ['InternalConsultants.id' => $entity->internal_consultant_id],
+                                                                           'contain' => ['Users']])->first();
+            if(!empty($internalConsultant) && $internalConsultant->has('user')){
+                $notification = $Notifications->newEntity();
+                $notification->user_id = $internalConsultant->user->id;
+                $notification->unread = true;
+                $notification->subject = 'Egy Önhöz tartozó hallgatónál sikertelen első diplomakurzusról döntést hozott a tanszékvezető.';
+                $notification->message = 'Hallgató: ' . h($student->name) . ' (' . h($student->neptun) . ')<br/>' .
+                                         'Téma címe: ' . h($entity->title) . '<br/>' .
+                                         'A tanszékvezető elutasította a folytatást.' . '<br/>' .
+                                         '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'internal_consultant'], true) . '">' . 'Részletek megtekintése' . '</a>';
 
-                    $Notifications->save($notification);
-                }
+                $Notifications->save($notification);
             }
         }
         
@@ -673,11 +640,7 @@ class ThesisTopicsTable extends Table
         if($entity->getOriginal('thesis_topic_status_id') == 13 && $entity->thesis_topic_status_id == 12){
             $student = $this->Students->find('all', ['conditions' => ['Students.id' => $entity->student_id],
                                                      'contain' => ['Users']])->first();
-            
-            $internalConsultant = $this->InternalConsultants->find('all', ['conditions' => ['InternalConsultants.id' => $entity->internal_consultant_id],
-                                                                           'contain' => ['Users']])->first();
-            
-            if(!empty($student) && $student->has('user') && !empty($internalConsultant)){
+            if(!empty($student) && $student->has('user')){
                 $Notifications = \Cake\ORM\TableRegistry::get('Notifications');
                 
                 $notification = $Notifications->newEntity();
@@ -688,19 +651,21 @@ class ThesisTopicsTable extends Table
                                          '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'student'], true) . '">' . 'Részletek megtekintése' . '</a>';
                 
                 $Notifications->save($notification);
-                
-                if($internalConsultant->has('user')){
-                    $notification = $Notifications->newEntity();
-                    $notification->user_id = $internalConsultant->user->id;
-                    $notification->unread = true;
-                    $notification->subject = 'Az Önhöz tartozó hallgatónál sikertelen első diplomakurzusról döntést hozott a tanszékvezető.';
-                    $notification->message = 'Hallgató: ' . h($student->name) . ' (' . h($student->neptun) . ')<br/>' .
-                                             'Téma címe: ' . h($entity->title) . '<br/>' .
-                                             'A tanszékvezető elfogadta a téma folytatását, a hallgató ismét felveheti az első diplomakurzust a meglevő témával.' . '<br/>' .
-                                             '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'internal_consultant'], true) . '">' . 'Részletek megtekintése' . '</a>';
+            }
+            
+            $internalConsultant = $this->InternalConsultants->find('all', ['conditions' => ['InternalConsultants.id' => $entity->internal_consultant_id],
+                                                                           'contain' => ['Users']])->first();
+            if(!empty($internalConsultant) && $internalConsultant->has('user')){
+                $notification = $Notifications->newEntity();
+                $notification->user_id = $internalConsultant->user->id;
+                $notification->unread = true;
+                $notification->subject = 'Egy Önhöz tartozó hallgatónál sikertelen első diplomakurzusról döntést hozott a tanszékvezető.';
+                $notification->message = 'Hallgató: ' . h($student->name) . ' (' . h($student->neptun) . ')<br/>' .
+                                         'Téma címe: ' . h($entity->title) . '<br/>' .
+                                         'A tanszékvezető elfogadta a téma folytatását, a hallgató ismét felveheti az első diplomakurzust a meglevő témával.' . '<br/>' .
+                                         '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'internal_consultant'], true) . '">' . 'Részletek megtekintése' . '</a>';
 
-                    $Notifications->save($notification);
-                }
+                $Notifications->save($notification);
             }
         }
         
@@ -741,8 +706,9 @@ class ThesisTopicsTable extends Table
                                          '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'student'], true) . '">' . 'Részletek megtekintése' . '</a>';
             
                 $Notifications->save($notification);
+            }
             
-            
+            if(!empty($student) && !empty($internalConsultant)){
                 //Szakdolgozatkezelők
                 $thesis_managers = $this->Students->Users->find('all', ['conditions' => ['group_id' => 5]]);
                 foreach($thesis_managers as $thesis_manager){
@@ -764,8 +730,8 @@ class ThesisTopicsTable extends Table
         //A hallgató véglegesíti a mellékletek feltöltését
         if($entity->getOriginal('thesis_topic_status_id') == 17 && $entity->thesis_topic_status_id == 18){
             $student = $this->Students->find('all', ['conditions' => ['Students.id' => $entity->student_id]])->first();
-            
-            if(!empty($student)){
+            $internalConsultant = $this->InternalConsultants->find('all', ['conditions' => ['InternalConsultants.id' => $entity->internal_consultant_id]])->first();
+            if(!empty($student) && !empty($internalConsultant)){
                 $Notifications = \Cake\ORM\TableRegistry::get('Notifications');
 
                 //Szakdolgozatkezelők
@@ -823,13 +789,13 @@ class ThesisTopicsTable extends Table
             
             $internalConsultant = $this->InternalConsultants->find('all', ['conditions' => ['InternalConsultants.id' => $entity->internal_consultant_id],
                                                                            'contain' => ['Users']])->first();
-            if(!empty($internalConsultant)){
+            if(!empty($internalConsultant) && $internalConsultant->has('user')){
                 $Notifications = \Cake\ORM\TableRegistry::get('Notifications');
                 
                 $notification = $Notifications->newEntity();
                 $notification->user_id = $internalConsultant->user_id;
                 $notification->unread = true;
-                $notification->subject = 'Az Önhöz tartozó ' . ($entity->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' mellékleteit elfogadták. Jelölje ki a bírálót!';
+                $notification->subject = 'Egy Önhöz tartozó ' . ($entity->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' mellékleteit elfogadták. Jelölje ki a bírálót!';
                 $notification->message = 'A téma címe: ' . h($entity->title) . '<br/>' .
                                          'Hallgató: ' . h($student->name) . ' (' . h($student->neptun) . ')' . '<br/>' .
                                          'A bíráló kijelölhető a dolgozathoz.' . '<br/>' .
@@ -897,7 +863,7 @@ class ThesisTopicsTable extends Table
                 $notification = $Notifications->newEntity();
                 $notification->user_id = $internalConsultant->user_id;
                 $notification->unread = true;
-                $notification->subject = 'Az Önhöz tartozó ' . ($entity->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' bírálóját kijelölte a tanszékvezető.';
+                $notification->subject = 'Egy Önhöz tartozó ' . ($entity->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' bírálóját kijelölte a tanszékvezető.';
                 $notification->message = 'A téma címe: ' . h($entity->title) . '<br/>' .
                                          'Hallgató: ' . h($student->name) . ' (' . h($student->neptun) . ')' . '<br/>' .
                                          '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'internal_consultant'], true) . '">' . 'Részletek megtekintése' . '</a>';
@@ -906,7 +872,7 @@ class ThesisTopicsTable extends Table
             }
         }
         
-        //A szakdolgozatkezelő elfogadja a dolgozat mellékleteket
+        //A dolgozatot a tanszékvezető bírálatra küldi
         if($entity->getOriginal('thesis_topic_status_id') == 22 && $entity->thesis_topic_status_id == 23){
             $Notifications = \Cake\ORM\TableRegistry::get('Notifications');
             
@@ -925,11 +891,11 @@ class ThesisTopicsTable extends Table
             
             $internalConsultant = $this->InternalConsultants->find('all', ['conditions' => ['InternalConsultants.id' => $entity->internal_consultant_id],
                                                                            'contain' => ['Users']])->first();
-            if(!empty($internalConsultant)){
+            if(!empty($internalConsultant) && $internalConsultant->has('user')){
                 $notification = $Notifications->newEntity();
                 $notification->user_id = $internalConsultant->user_id;
                 $notification->unread = true;
-                $notification->subject = 'Az Önhöz tartozó ' . ($entity->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' bírálatra lett küldve.';
+                $notification->subject = 'Egy Önhöz tartozó ' . ($entity->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' bírálatra lett küldve.';
                 $notification->message = 'A téma címe: ' . h($entity->title) . '<br/>' .
                                          'Hallgató: ' . h($student->name) . ' (' . h($student->neptun) . ')' . '<br/>' .
                                          'A bírálat után a bírálatot megtekintheti.' . '<br/>' .
@@ -942,15 +908,156 @@ class ThesisTopicsTable extends Table
             $review = $Reviews->find('all', ['conditions' => ['Reviews.thesis_topic_id' => $entity->id],
                                              'contain' => ['Reviewers' => ['Users']]])->first();
             
+            $language = $this->Languages->find('all', ['conditions' => ['Languages.id' => $entity->language_id]])->first();
+            
             if(!empty($review) && $review->has('reviewer') && $review->reviewer->has('user')){
                 $notification = $Notifications->newEntity();
                 $notification->user_id = $review->reviewer->user->id;
                 $notification->unread = true;
                 $notification->subject = 'Egy ' . ($entity->is_thesis === true ? 'szakdolgozathoz' : 'diplomamunkáhpz') . ' Önt jelölték ki bírálónak.';
-                $notification->message = 'A téma címe: ' . h($entity->title) . '<br/>' .
+                $notification->message = 'Dolgozat címe: ' . h($entity->title) . '<br/>' .
+                                         'Titkos: ' . ($entity->confidential === true ? 'igen' : 'nem') . '<br/>' .
+                                         (!empty($language) ? 'Nyelv: ' . h($language->name) . '<br/>' : '') .
                                          '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'reviewer'], true) . '">' . 'Részletek megtekintése' . '</a>';
             
                 $Notifications->save($notification);
+            }
+        }
+        
+        //A bírálat megszületik
+        if($entity->getOriginal('thesis_topic_status_id') == 23 && $entity->thesis_topic_status_id == 24){
+            $Notifications = \Cake\ORM\TableRegistry::get('Notifications');
+            
+            $student = $this->Students->find('all', ['conditions' => ['Students.id' => $entity->student_id],
+                                                     'contain' => ['Users']])->first();
+            if(!empty($student) && $student->has('user')){
+                $notification = $Notifications->newEntity();
+                $notification->user_id = $student->user_id;
+                $notification->unread = true;
+                $notification->subject = 'A bírálatra küldött ' . ($entity->is_thesis === true ? 'szakdolgozata' : 'diplomamunkája') . ' bírálva lett. A bírálatot megtekintheti.';
+                $notification->message = 'A ' . h($entity->title) . ' című ' . ($entity->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' bírálva lett.' . '<br/>' .
+                                         '<a href="' . \Cake\Routing\Router::url(['controller' => 'Reviews', 'action' => 'checkReview', $entity->id, 'prefix' => 'student'], true) . '">' . 'Részletek megtekintése' . '</a>';
+            
+                $Notifications->save($notification);
+            }
+            
+            $internalConsultant = $this->InternalConsultants->find('all', ['conditions' => ['InternalConsultants.id' => $entity->internal_consultant_id],
+                                                                           'contain' => ['Users']])->first();
+            if(!empty($internalConsultant) && $internalConsultant->has('user')){
+                $notification = $Notifications->newEntity();
+                $notification->user_id = $internalConsultant->user_id;
+                $notification->unread = true;
+                $notification->subject = 'Egy Önhöz tartozó ' . ($entity->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' bírálva lett. A bírálatot megtekintheti.';
+                $notification->message = 'A téma címe: ' . h($entity->title) . '<br/>' .
+                                         'Hallgató: ' . h($student->name) . ' (' . h($student->neptun) . ')' . '<br/>' .
+                                         '<a href="' . \Cake\Routing\Router::url(['controller' => 'Reviews', 'action' => 'checkReview', $entity->id, 'prefix' => 'internal_consultant'], true) . '">' . 'Részletek megtekintése' . '</a>';
+            
+                $Notifications->save($notification);
+            }
+        }
+        
+        //A dolgozat el lett fogadva (belső konzulens és a bíráló értékelése is megfelelő volt)
+        if($entity->getOriginal('thesis_topic_status_id') == 24 && $entity->thesis_topic_status_id == 25){
+            $Notifications = \Cake\ORM\TableRegistry::get('Notifications');
+            
+            $student = $this->Students->find('all', ['conditions' => ['Students.id' => $entity->student_id],
+                                                     'contain' => ['Users']])->first();
+            if(!empty($student) && $student->has('user')){
+                $notification = $Notifications->newEntity();
+                $notification->user_id = $student->user_id;
+                $notification->unread = true;
+                $notification->subject = 'A leadottt ' . ($entity->is_thesis === true ? 'szakdolgozata' : 'diplomamunkája') . ' el lett fogadva.';
+                $notification->message = 'A ' . h($entity->title) . ' című ' . ($entity->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' el lett fogadva. További teendője nincs a dolgozattal kapcsolatban.' . '<br/>' .
+                                         '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'student'], true) . '">' . 'Részletek megtekintése' . '</a>';
+            
+                $Notifications->save($notification);
+            }
+            
+            $internalConsultant = $this->InternalConsultants->find('all', ['conditions' => ['InternalConsultants.id' => $entity->internal_consultant_id],
+                                                                           'contain' => ['Users']])->first();
+            if(!empty($internalConsultant) && $internalConsultant->has('user')){
+                $notification = $Notifications->newEntity();
+                $notification->user_id = $internalConsultant->user_id;
+                $notification->unread = true;
+                $notification->subject = 'Egy Önhöz tartozó ' . ($entity->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' el lett fogadva.';
+                $notification->message = 'A téma címe: ' . h($entity->title) . '<br/>' .
+                                         'Hallgató: ' . h($student->name) . ' (' . h($student->neptun) . ')' . '<br/>' .
+                                         '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'internal_consultant'], true) . '">' . 'Részletek megtekintése' . '</a>';
+            
+                $Notifications->save($notification);
+            }
+            
+            if(!empty($student) && !empty($internalConsultant)){
+                //Tanszékvezetők, itt ha a belső konzulens egy tanszékhez tartozna, akkor annak a tanszékvezetője kapná csak az értesítést
+                $head_of_departments = $this->Students->Users->find('all', ['conditions' => ['group_id' => 3]]);
+                foreach($head_of_departments as $head_of_department){
+                    $notification = $Notifications->newEntity();
+                    $notification->user_id = $head_of_department->id;
+                    $notification->unread = true;
+                    $notification->subject = 'Egy leadott ' . ($entity->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' el lett fogadva.';
+                    $notification->message = 'A téma címe: ' . h($entity->title) . '<br/>' .
+                                             'Hallgató: ' . h($student->name) . ' (' . h($student->neptun) . ')' . '<br/>' .
+                                             'Belső konzulens: ' . h($internalConsultant->name) . '<br/>' .
+                                             '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'head_of_department'], true) . '">' . 'Részletek megtekintése' . '</a>';
+
+                    $Notifications->save($notification);
+                    
+                    //Szakdolgozatkezelők
+                    $thesis_managers = $this->Students->Users->find('all', ['conditions' => ['group_id' => 5]]);
+                    foreach($thesis_managers as $thesis_manager){
+                        $notification = $Notifications->newEntity();
+                        $notification->user_id = $thesis_manager->id;
+                        $notification->unread = true;
+                        $notification->subject = 'Egy leadott ' . ($entity->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' el lett fogadva. Vigye fel az adatokat a Neptun rendszerbe!';
+                        $notification->message = 'A téma címe: ' . h($entity->title) . '<br/>' .
+                                                 'Hallgató: ' . h($student->name) . ' (' . h($student->neptun) . ')' . '<br/>' .
+                                                 'Belső konzulens: ' . h($internalConsultant->name) . '<br/>' .
+                                                 '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'thesis_manager'], true) . '">' . 'Részletek megtekintése' . '</a>';
+
+                        $Notifications->save($notification);
+                    }
+                }
+            }
+        }
+        
+        //======================================================================
+        // ÉRTESÍTÉSEK VÉGE
+        //======================================================================
+        
+        //Ha belső konzulens értékelte a dolgozatot, és a bíráló is már bírálta, akkor megvizsgáljuk a két értékelést,
+        //és azoknak megfelelően elfogadott lesz a dolgozat vagy újra második diplomakurzust kell felvennie a hallgatónak
+        if($entity->getOriginal('thesis_topic_status_id') == 23 && $entity->thesis_topic_status_id == 24 && $entity->internal_consultant_grade !== null ||
+           $entity->getOriginal('internal_consultant_grade') === null && $entity->internal_consultant_grade !== null && $entity->thesis_topic_status_id == 24){
+            $thesisTopic = $this->find('all', ['conditions' => ['ThesisTopics.id' => $entity->id],
+                                               'contain' => ['Reviews', 'Consultations']])->first();
+            
+            
+            if($thesisTopic->has('review')){
+                $total_points = 0;
+                $grade = 1;
+                
+                //Összpontszám kiszámítása
+                $total_points = (empty($thesisTopic->review->structure_and_style_point) ? 0 : $thesisTopic->review->structure_and_style_point) +
+                            (empty($thesisTopic->review->processing_literature_point) ? 0 : $thesisTopic->review->processing_literature_point) +
+                            (empty($thesisTopic->review->writing_up_the_topic_point) ? 0 : $thesisTopic->review->writing_up_the_topic_point) +
+                            (empty($thesisTopic->review->practical_applicability_point) ? 0 : $thesisTopic->review->practical_applicability_point);
+        
+                //Jegy kiszámítása
+                if(!empty($thesisTopic->review->structure_and_style_point) && !empty($thesisTopic->review->processing_literature_point) &&
+                   !empty($thesisTopic->review->writing_up_the_topic_point) && !empty($thesisTopic->review->practical_applicability_point)){
+
+                    if($total_points >= 45) $grade = 5;
+                    else if($total_points < 45 && $total_points >= 38) $grade = 4;
+                    else if($total_points < 38 && $total_points >= 31) $grade = 3;
+                    else if($total_points < 31 && $total_points >= 26) $grade = 2;
+                }
+                
+                if($grade > 1 && $thesisTopic->internal_consultant_grade > 1){
+                    $thesisTopic->thesis_topic_status_id = 25;
+                    $thesisTopic->accepted_thesis_data_applyed_to_neptun = false; //A Neptun rendszerbe még nem lettek felvive a megfelelő adatok az elfogadott dolgozatról
+                }else $thesisTopic->thesis_topic_status_id = 15;
+                
+                $this->save($thesisTopic);
             }
         }
     }

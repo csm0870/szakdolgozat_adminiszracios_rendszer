@@ -436,7 +436,7 @@ class ReviewsController extends AppController
         if(empty($thesisTopic)){ //Nem létezik a téma
             $error_msg = __('A titoktartási nyilatkozat nem tölthető fel.') . ' ' . __('Nem létező dolgozat.');
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [23])){ //Nem "A téma nem elfogadott", nem "Diplomakurzus sikertelen, tanaszékvezető döntésére vár", nem "Első diplomakurzus teljesítve", vagy nem "Elutsítva (első diplomakurzus sikertelen)" státuszban van
+        }elseif($thesisTopic->thesis_topic_status_id != 23){ //Nem "A téma nem elfogadott", nem "Diplomakurzus sikertelen, tanaszékvezető döntésére vár", nem "Első diplomakurzus teljesítve", vagy nem "Elutsítva (első diplomakurzus sikertelen)" státuszban van
             $error_msg = __('A titoktartási nyilatkozat nem tölthető fel.') . ' ' . ' ' . __('A dolgozat nem bírálható állapotban van.');
             $ok = false;
         }elseif($thesisTopic->confidential !== true){ //Nem titkos a dolgozat

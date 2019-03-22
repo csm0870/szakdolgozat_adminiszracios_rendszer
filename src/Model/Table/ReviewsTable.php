@@ -158,6 +158,179 @@ class ReviewsTable extends Table
     }
     
     /**
+     * Mentés után callback
+     * 
+     * 
+     * @param type $event
+     * @param type $entity
+     * @param type $options
+     */
+    public function afterSave($event, $entity, $options){
+        
+        //======================================================================
+        // ÉRTESÍTÉSEK KEZDETE
+        //======================================================================
+        
+        //Feltöltött titoktartási szerződést véglegesítette a bíráló
+        if($entity->getOriginal('confidentiality_contract_status') == 1 && $entity->confidentiality_contract_status == 2){
+            $Notifications = \Cake\ORM\TableRegistry::get('Notifications');
+            
+            $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $entity->thesis_topic_id],
+                                                             'contain' => ['Students', 'InternalConsultants']])->first();
+            
+            if(!empty($thesisTopic) && $thesisTopic->has('student') && $thesisTopic->has('internal_consultant')){
+                //Tanszékvezetők, itt ha a belső konzulens egy tanszékhez tartozna, akkor annak a tanszékvezetője kapná csak az értesítést
+                $head_of_departments = $this->ThesisTopics->Students->Users->find('all', ['conditions' => ['group_id' => 3]]);
+
+                foreach($head_of_departments as $head_of_department){
+                    $notification = $Notifications->newEntity();
+                    $notification->user_id = $head_of_department->id;
+                    $notification->unread = true;
+                    $notification->subject = 'A bíráló feltöltötte a titoktartási szerződést. Ellenőrízze a megfelelőségét!';
+                    $notification->message = 'A bírálathoz tartozó dolgozat adatai:' . '<br/>' .
+                                             'Hallgató: ' . h($thesisTopic->student->name) . ' (' . h($thesisTopic->student->neptun) . ')<br/>' .
+                                             'Téma címe: ' . h($thesisTopic->title) . '<br/>' .
+                                             'Belső konzulens: ' . h($thesisTopic->internal_consultant->name) . '<br/>' .
+                                             '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id, 'prefix' => 'head_of_department'], true) . '">' . 'Részletek megtekintése' . '</a>';
+
+                    $Notifications->save($notification);
+                }
+            }
+        }
+        
+        //A tanszékvezető elutasítja a bíráló feltöltött titoktartási szerződését
+        if($entity->getOriginal('confidentiality_contract_status') == 2 && $entity->confidentiality_contract_status == 3){
+            $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $entity->thesis_topic_id]])->first();
+            $reviewer = $this->Reviewers->find('all', ['conditions' => ['Reviewers.id' => $entity->reviewer_id],
+                                                       'contain' => ['Users']])->first();
+            
+            if(!empty($thesisTopic))
+                $language = $this->ThesisTopics->Languages->find('all', ['conditions' => ['Languages.id' => $thesisTopic->language_id]])->first();
+            
+            if(!empty($thesisTopic) && !empty($reviewer) && $reviewer->has('user')){
+                $Notifications = \Cake\ORM\TableRegistry::get('Notifications');
+                
+                $notification = $Notifications->newEntity();
+                $notification->user_id = $reviewer->user->id;
+                $notification->unread = true;
+                $notification->subject = 'A tanszékvezető elutasította a feltöltött titoktartási szerződését.';
+                $notification->message = 'Dolgozat címe: ' . h($thesisTopic->title) . '<br/>' .
+                                         'Titkos: ' . ($entity->confidential === true ? 'igen' : 'nem') . '<br/>' .
+                                         (!empty($language) ? 'Nyelv: ' . h($language->name) . '<br/>' : '') .
+                                         'Újra feltöltheti a titoktartási szerződést.' . '<br/>' .
+                                         '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id, 'prefix' => 'reviewer'], true) . '">' . 'Részletek megtekintése' . '</a>';
+
+                $Notifications->save($notification);
+            }
+        }
+        
+        //A tanszékvezető elfogadja a bíráló feltöltött titoktartási szerződését
+        if($entity->getOriginal('confidentiality_contract_status') == 2 && $entity->confidentiality_contract_status == 4){
+            $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $entity->thesis_topic_id]])->first();
+            $reviewer = $this->Reviewers->find('all', ['conditions' => ['Reviewers.id' => $entity->reviewer_id],
+                                                       'contain' => ['Users']])->first();
+            
+            if(!empty($thesisTopic))
+                $language = $this->ThesisTopics->Languages->find('all', ['conditions' => ['Languages.id' => $thesisTopic->language_id]])->first();
+            
+            if(!empty($thesisTopic) && !empty($reviewer) && $reviewer->has('user')){
+                $Notifications = \Cake\ORM\TableRegistry::get('Notifications');
+                
+                $notification = $Notifications->newEntity();
+                $notification->user_id = $reviewer->user->id;
+                $notification->unread = true;
+                $notification->subject = 'A tanszékvezető elfogadta a feltöltött titoktartási szerződését. Bírálja a dolgozatot!';
+                $notification->message = 'Dolgozat címe: ' . h($thesisTopic->title) . '<br/>' .
+                                         'Titkos: ' . ($entity->confidential === true ? 'igen' : 'nem') . '<br/>' .
+                                         (!empty($language) ? 'Nyelv: ' . h($language->name) . '<br/>' : '') .
+                                         '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id, 'prefix' => 'reviewer'], true) . '">' . 'Részletek megtekintése' . '</a>';
+
+                $Notifications->save($notification);
+            }
+        }
+        
+        //A bíráló véglegesíti a feltöltött bírálati lapot (már az elektronikus bírálat is megvan)
+        if($entity->getOriginal('review_status') == 3 && $entity->review_status == 4){
+            $Notifications = \Cake\ORM\TableRegistry::get('Notifications');
+            
+            $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $entity->thesis_topic_id],
+                                                             'contain' => ['Students', 'InternalConsultants']])->first();
+            
+            if(!empty($thesisTopic) && $thesisTopic->has('student') && $thesisTopic->has('internal_consultant')){
+                //Tanszékvezetők, itt ha a belső konzulens egy tanszékhez tartozna, akkor annak a tanszékvezetője kapná csak az értesítést
+                $head_of_departments = $this->ThesisTopics->Students->Users->find('all', ['conditions' => ['group_id' => 3]]);
+
+                foreach($head_of_departments as $head_of_department){
+                    $notification = $Notifications->newEntity();
+                    $notification->user_id = $head_of_department->id;
+                    $notification->unread = true;
+                    $notification->subject = 'Egy bírálatra küldött dolgozat bírálva lett. Ellenőrízze a megfelelőségét!';
+                    $notification->message = 'A bírálathoz tartozó dolgozat adatai:' . '<br/>' .
+                                             'Hallgató: ' . h($thesisTopic->student->name) . ' (' . h($thesisTopic->student->neptun) . ')<br/>' .
+                                             'Téma címe: ' . h($thesisTopic->title) . '<br/>' .
+                                             'Belső konzulens: ' . h($thesisTopic->internal_consultant->name) . '<br/>' .
+                                             '<a href="' . \Cake\Routing\Router::url(['controller' => 'Reviews', 'action' => 'check_review', $thesisTopic->id, 'prefix' => 'head_of_department'], true) . '">' . 'Részletek megtekintése' . '</a>';
+
+                    $Notifications->save($notification);
+                }
+            }
+        }
+        
+        //A tanszékvezető elutasítja a bírálatot
+        if($entity->getOriginal('review_status') == 4 && $entity->review_status == 5){
+            $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $entity->thesis_topic_id]])->first();
+            $reviewer = $this->Reviewers->find('all', ['conditions' => ['Reviewers.id' => $entity->reviewer_id],
+                                                       'contain' => ['Users']])->first();
+            
+            if(!empty($thesisTopic))
+                $language = $this->ThesisTopics->Languages->find('all', ['conditions' => ['Languages.id' => $thesisTopic->language_id]])->first();
+            
+            if(!empty($thesisTopic) && !empty($reviewer) && $reviewer->has('user')){
+                $Notifications = \Cake\ORM\TableRegistry::get('Notifications');
+                
+                $notification = $Notifications->newEntity();
+                $notification->user_id = $reviewer->user->id;
+                $notification->unread = true;
+                $notification->subject = 'A tanszékvezető elutasított a bírálatot. Bírálja újra a dolgozatot!';
+                $notification->message = 'Dolgozat címe: ' . h($thesisTopic->title) . '<br/>' .
+                                         'Titkos: ' . ($entity->confidential === true ? 'igen' : 'nem') . '<br/>' .
+                                         (!empty($language) ? 'Nyelv: ' . h($language->name) . '<br/>' : '') .
+                                         '<a href="' . \Cake\Routing\Router::url(['controller' => 'Reviews', 'action' => 'review', $thesisTopic->id, 'prefix' => 'reviewer'], true) . '">' . 'Részletek megtekintése' . '</a>';
+
+                $Notifications->save($notification);
+            }
+        }
+        
+        //A tanszékvezető elfogadja a bírálatot
+        if($entity->getOriginal('review_status') == 4 && $entity->review_status == 6){
+            $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $entity->thesis_topic_id]])->first();
+            $reviewer = $this->Reviewers->find('all', ['conditions' => ['Reviewers.id' => $entity->reviewer_id],
+                                                       'contain' => ['Users']])->first();
+            
+            if(!empty($thesisTopic))
+                $language = $this->ThesisTopics->Languages->find('all', ['conditions' => ['Languages.id' => $thesisTopic->language_id]])->first();
+            
+            if(!empty($thesisTopic) && !empty($reviewer) && $reviewer->has('user')){
+                $Notifications = \Cake\ORM\TableRegistry::get('Notifications');
+                
+                $notification = $Notifications->newEntity();
+                $notification->user_id = $reviewer->user->id;
+                $notification->unread = true;
+                $notification->subject = 'A tanszékvezető elfogadta a bírálatot. További teendője nincs.';
+                $notification->message = 'Dolgozat címe: ' . h($thesisTopic->title) . '<br/>' .
+                                         'Titkos: ' . ($entity->confidential === true ? 'igen' : 'nem') . '<br/>' .
+                                         (!empty($language) ? 'Nyelv: ' . h($language->name) : '');
+
+                $Notifications->save($notification);
+            }
+            
+            //======================================================================
+            // ÉRTESÍTÉSEK VÉGE
+            //======================================================================
+        }
+    }
+    
+    /**
      * Csak PDF a megengedett fájlformátum
      * 
      * @param type $value
