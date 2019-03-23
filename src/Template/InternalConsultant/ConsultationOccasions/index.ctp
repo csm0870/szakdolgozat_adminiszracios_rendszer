@@ -9,27 +9,38 @@
             <div class="row consultationOccasions-body">
                 <div class="col-12">
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover topics-table">
-                            <tr>
-                                <th><?= __('Alkalom időpontja') ?></th>
-                                <th><?= __('Műveletek') ?></th>
-                                <th><?= __('Létrehozva') ?></th>
-                            </tr>
-                            <?php foreach($consultationOccasions as $consultationOccasion){ ?>
+                        <table class="table table-bordered table-hover topics-table" id="data_table">
+                            <thead>
                                 <tr>
-                                    <td><?= empty($consultationOccasion->date) ? '' : $this->Time->format($consultationOccasion->date, 'yyyy-MM-dd') ?></td>
-                                    <td class="text-center">
-                                        <?php
-                                            if($consultation->accepted === null){
-                                                echo $this->Html->link('<i class="fas fa-edit fa-lg"></i>', '#', ['class' => 'iconBtn editBtn', 'data-id' => $consultationOccasion->id, 'escape' => false, 'title' => __('Szerkesztés')]);
-                                                echo $this->Html->link('<i class="fas fa-trash fa-lg"></i>', '#', ['escape' => false, 'title' => __('Törlés'), 'class' => 'iconBtn deleteBtn', 'data-id' => $consultationOccasion->id]);
-                                                echo $this->Form->postLink('', ['action' => 'delete', $consultationOccasion->id], ['style' => 'display: none', 'id' => 'deleteConsultationOccasion_' . $consultationOccasion->id]);
-                                            }
-                                        ?>
-                                    </td>
-                                    <td><?= empty($consultationOccasion->created) ? '' : $this->Time->format($consultationOccasion->created, 'yyyy-MM-dd HH:mm:ss') ?></td>
+                                    <th><?= __('Alkalom időpontja') ?></th>
+                                    <th><?= __('Műveletek') ?></th>
+                                    <th><?= __('Létrehozva') ?></th>
                                 </tr>
-                            <?php } ?>
+                            </thead>
+                            <thead>
+                                <tr>
+                                    <th><?= $this->Form->control('date_search_text', ['id' => 'date_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
+                                    <th></th>
+                                    <th><?= $this->Form->control('created_search_text', ['id' => 'created_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach($consultationOccasions as $consultationOccasion){ ?>
+                                    <tr>
+                                        <td><?= empty($consultationOccasion->date) ? '' : ('<searchable-text>' . $this->Time->format($consultationOccasion->date, 'yyyy-MM-dd') . '</searchable-text>') ?></td>
+                                        <td class="text-center">
+                                            <?php
+                                                if($consultation->accepted === null){
+                                                    echo $this->Html->link('<i class="fas fa-edit fa-lg"></i>', '#', ['class' => 'iconBtn editBtn', 'data-id' => $consultationOccasion->id, 'escape' => false, 'title' => __('Szerkesztés')]);
+                                                    echo $this->Html->link('<i class="fas fa-trash fa-lg"></i>', '#', ['escape' => false, 'title' => __('Törlés'), 'class' => 'iconBtn deleteBtn', 'data-id' => $consultationOccasion->id]);
+                                                    echo $this->Form->postLink('', ['action' => 'delete', $consultationOccasion->id], ['style' => 'display: none', 'id' => 'deleteConsultationOccasion_' . $consultationOccasion->id]);
+                                                }
+                                            ?>
+                                        </td>
+                                        <td><?= empty($consultationOccasion->created) ? '' : ('<searchable-text>' . $this->Time->format($consultationOccasion->created, 'yyyy-MM-dd HH:mm:ss') . '</searchable-text>')?></td>
+                                    </tr>
+                                <?php } ?>
+                            <tbody>
                         </table>
                     </div>
                 </div>
@@ -126,5 +137,59 @@
             });
         });
         <?php } ?>
+        
+        // DataTable
+        var table = $('#data_table').DataTable({
+                        pageLength : 10,
+                        "dom" : 'tp',
+                        "oLanguage": {
+                          "oPaginate": {
+                            "sNext": "<?= __('Következő') ?>",
+                            "sPrevious" : "<?= _('Előző') ?>",
+                          },
+                          "sEmptyTable": "<?= __('Nincs megjeleníthető tartalom') ?>",
+                          "sInfoEmpty": "<?= __('Nincs megjeleníthető tartalom') ?>",
+                          "sLengthMenu": "_MENU_ <?= __('rekord megjelenítése') ?>",
+                          "sZeroRecords" : "<?= __('Nem található a keresésnek megfelelő elem') ?>"
+                        },
+                        drawCallback: function(settings){
+                            //Pagination elrejtése, ha nincs rá szükség
+                            var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+                            pagination.toggle(this.api().page.info().pages > 1);
+                        }
+                      });
+        
+        //Ha a kereső mezőkbe írunk, akkor újra "rajzoljuk" a tálbázatot
+        $('#date_search_text, #created_search_text').on('keyup', function(){
+            table.draw();
+        });
+        
+        //Táblázat sorainak szűrése a keresendő szövegek alapján
+        $.fn.dataTable.ext.search.push(
+            function(settings, searchData, index, rowData, counter){
+                var date_search_text = $('#date_search_text').val().toLowerCase();
+                var created_search_text = $('#created_search_text').val().toLowerCase();
+                
+                if(date_search_text == '' && created_search_text == '') return true;
+                
+                var ok = true;
+                
+                var first_index_of_date_search_text = rowData[0].indexOf('<searchable-text>');
+                var last_index_of_date_search_text = rowData[0].indexOf('</searchable-text>');
+                if(first_index_of_date_search_text != -1 && last_index_of_date_search_text != -1){
+                    var date_searchable_text = rowData[0].substring(first_index_of_date_search_text + '<searchable-text>'.length, last_index_of_date_search_text);
+                    if(date_searchable_text.toLowerCase().indexOf(date_search_text) == -1) ok = false;
+                }
+                
+                var first_index_of_created_search_text = rowData[2].indexOf('<searchable-text>');
+                var last_index_of_created_search_text = rowData[2].indexOf('</searchable-text>');
+                if(first_index_of_created_search_text != -1 && last_index_of_created_search_text != -1){
+                    var created_searchable_text = rowData[2].substring(first_index_of_created_search_text + '<searchable-text>'.length, last_index_of_created_search_text);
+                    if(created_searchable_text.toLowerCase().indexOf(created_search_text) == -1) ok = false;
+                }
+                
+                return ok;
+            }
+        );
     });
 </script>

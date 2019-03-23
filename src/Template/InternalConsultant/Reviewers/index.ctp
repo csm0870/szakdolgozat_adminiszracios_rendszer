@@ -8,29 +8,40 @@
             <div class="row">
                     <div class="col-12">
                         <div class="table-responsive">
-                            <table class="table table-bordered table-hover topics-table">
-                                <tr>
-                                    <th><?= __('Név') ?></th>
-                                    <th><?= __('Email') ?></th>
-                                    <th><?= __('Műveletek') ?></th>
-                                </tr>
-                                <?php foreach($reviewers as $reviewer){ ?>
+                            <table class="table table-bordered table-hover topics-table" id="data_table">
+                                <thead>
                                     <tr>
-                                        <td><?= h($reviewer->name) ?></td>
-                                        <td><?= h($reviewer->email) ?></td>
-                                        <td class="text-center">
-                                            <?php
-                                                echo $this->Html->link('<i class="fas fa-edit fa-lg"></i>', '#', ['class' => 'iconBtn editBtn', 'data-id' => $reviewer->id, 'escape' => false, 'title' => __('Szerkesztés')]);
-                                                echo $this->Html->link('<i class="fas fa-trash fa-lg"></i>', '#', ['escape' => false, 'title' => __('Törlés'), 'class' => 'iconBtn deleteBtn', 'data-id' => $reviewer->id]);
-                                                echo $this->Form->postLink('', ['action' => 'delete', $reviewer->id], ['style' => 'display: none', 'id' => 'deleteReviewerForm_' . $reviewer->id]);
-                                            ?>
-                                        </td>
+                                        <th><?= __('Név') ?></th>
+                                        <th><?= __('Email') ?></th>
+                                        <th><?= __('Műveletek') ?></th>
                                     </tr>
-                                <?php } ?>
+                                </thead>
+                                <thead>
+                                    <tr>
+                                        <th><?= $this->Form->control('name_search_text', ['id' => 'name_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
+                                        <th><?= $this->Form->control('email_search_text', ['id' => 'email_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach($reviewers as $reviewer){ ?>
+                                        <tr>
+                                            <td><?= '<searchable-text>' . h($reviewer->name) . '</searchable-text>' ?></td>
+                                            <td><?= '<searchable-text>' . h($reviewer->email) . '</searchable-text>'?></td>
+                                            <td class="text-center">
+                                                <?php
+                                                    echo $this->Html->link('<i class="fas fa-edit fa-lg"></i>', '#', ['class' => 'iconBtn editBtn', 'data-id' => $reviewer->id, 'escape' => false, 'title' => __('Szerkesztés')]);
+                                                    echo $this->Html->link('<i class="fas fa-trash fa-lg"></i>', '#', ['escape' => false, 'title' => __('Törlés'), 'class' => 'iconBtn deleteBtn', 'data-id' => $reviewer->id]);
+                                                    echo $this->Form->postLink('', ['action' => 'delete', $reviewer->id], ['style' => 'display: none', 'id' => 'deleteReviewerForm_' . $reviewer->id]);
+                                                ?>
+                                            </td>
+                                        </tr>
+                                    <?php } ?>
+                                <tbody>
                             </table>
                         </div>
                     </div>
-                <div class="col-12">
+                <div class="col-12 mt-2">
                     <?= $this->Html->link(__('Új bíráló hozzáadása'), '#', ['class' => 'btn btn-outline-secondary btn-block border-radius-45px', 'id' => 'add_new_reviewer']); ?>
                 </div>
             </div>
@@ -116,5 +127,59 @@
                 $('#deleteReviewerForm_' + id).trigger('click');
             });
         });
+        
+        // DataTable
+        var table = $('#data_table').DataTable({
+                        pageLength : 10,
+                        "dom" : 'tp',
+                        "oLanguage": {
+                          "oPaginate": {
+                            "sNext": "<?= __('Következő') ?>",
+                            "sPrevious" : "<?= _('Előző') ?>",
+                          },
+                          "sEmptyTable": "<?= __('Nincs megjeleníthető tartalom') ?>",
+                          "sInfoEmpty": "<?= __('Nincs megjeleníthető tartalom') ?>",
+                          "sLengthMenu": "_MENU_ <?= __('rekord megjelenítése') ?>",
+                          "sZeroRecords" : "<?= __('Nem található a keresésnek megfelelő elem') ?>"
+                        },
+                        drawCallback: function(settings){
+                            //Pagination elrejtése, ha nincs rá szükség
+                            var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+                            pagination.toggle(this.api().page.info().pages > 1);
+                        }
+                      });
+        
+        //Ha a kereső mezőkbe írunk, akkor újra "rajzoljuk" a tálbázatot
+        $('#name_search_text, #email_search_text').on('keyup', function(){
+            table.draw();
+        });
+        
+        //Táblázat sorainak szűrése a keresendő szövegek alapján
+        $.fn.dataTable.ext.search.push(
+            function(settings, searchData, index, rowData, counter) {
+                var name_search_text = $('#name_search_text').val().toLowerCase();
+                var email_search_text = $('#email_search_text').val().toLowerCase();
+                
+                if(name_search_text  == '' && email_search_text == '') return true;
+                
+                var ok = true;
+                
+                var first_index_of_name_search_text = rowData[0].indexOf('<searchable-text>');
+                var last_index_of_name_search_text = rowData[0].indexOf('</searchable-text>');
+                if(first_index_of_name_search_text != -1 && last_index_of_name_search_text != -1){
+                    var name_searchable_text = rowData[0].substring(first_index_of_name_search_text + '<searchable-text>'.length, last_index_of_name_search_text);
+                    if(name_searchable_text.toLowerCase().indexOf(name_search_text) == -1) ok = false;
+                }
+                
+                var first_index_of_email_search_text = rowData[1].indexOf('<searchable-text>');
+                var last_index_of_email_search_text = rowData[1].indexOf('</searchable-text>');
+                if(first_index_of_email_search_text != -1 && last_index_of_email_search_text != -1){
+                    var email_searchable_text = rowData[1].substring(first_index_of_email_search_text + '<searchable-text>'.length, last_index_of_email_search_text);
+                    if(email_searchable_text.toLowerCase().indexOf(email_search_text) == -1) ok = false;
+                }
+                
+                return ok;
+            }
+        );
     });
 </script>

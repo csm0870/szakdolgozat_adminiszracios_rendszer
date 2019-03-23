@@ -8,7 +8,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="table-responsive">
-                        <table class="table table-hover notifications-table">
+                        <table class="table table-hover notifications-table" id="data_table">
                             <thead>
                                 <tr>
                                     <th style="width: 37px"><?= $this->Form->control('check_all', ['type' => 'checkbox', 'label' => false, 'id' => 'check_all']) ?></th>
@@ -16,15 +16,22 @@
                                     <th style="width: 100px"><?= __('Érkezés') ?></th>
                                 </tr>
                             </thead>
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th><?= $this->Form->control('subject_search_text', ['id' => 'subject_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
+                                    <th><?= $this->Form->control('date_search_text', ['id' => 'date_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
+                                </tr>
+                            </thead>
                             <tbody>
                                 <?php foreach($notifications as $i => $notification){ ?>
                                     <tr class="<?= $notification->unread === true ? 'unread-message' : '' ?> notification" data-id="<?= $notification->id ?>">
                                         <td style="vertical-align: middle;"><?= $this->Form->control("notification[$i]", ['type' => 'checkbox', 'label' => false, 'class' => 'notification-checkbox', 'data-id' => $notification->id]) ?></td>
                                         <td style="vertical-align: middle">
-                                            <?= ($notification->unread === true ? '<sup class="unread-sup">' . __('Új') . '&nbsp;</sup>' : '') . h($notification->subject) ?>
+                                            <?= ($notification->unread === true ? '<sup class="unread-sup">' . __('Új') . '&nbsp;</sup>' : '') . '<searchable-text>' . h($notification->subject) . '</searchable-text>'?>
                                         </td>
                                         <td style="vertical-align: middle">
-                                            <?= empty($notification->created) ? '' : $this->Time->format($notification->created, 'yyyy.MM.dd HH:mm:ss') ?>
+                                            <?= empty($notification->created) ? '' : '<searchable-text>' . $this->Time->format($notification->created, 'yyyy.MM.dd. HH:mm:ss') . '</searchable-text>' ?>
                                         </td>
                                     </tr>
                                 <?php } ?>
@@ -179,5 +186,61 @@
                 });
             });
         <?php } ?>
+        
+        // DataTable
+        var table = $('#data_table').DataTable({
+                        pageLength : 10,
+                        "dom" : 'tp',
+                        "oLanguage": {
+                          "oPaginate": {
+                            "sNext": "<?= __('Következő') ?>",
+                            "sPrevious" : "<?= _('Előző') ?>",
+                          },
+                          "sEmptyTable": "<?= __('Nincs megjeleníthető tartalom') ?>",
+                          "sInfoEmpty": "<?= __('Nincs megjeleníthető tartalom') ?>",
+                          "sLengthMenu": "_MENU_ <?= __('rekord megjelenítése') ?>",
+                          "sZeroRecords" : "<?= __('Nem található a keresésnek megfelelő elem') ?>"
+                        },
+                         "order": [[ 2, "desc" ]],
+                        drawCallback: function(settings){
+                            //Pagination elrejtése, ha nincs rá szükség
+                            var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+                            pagination.toggle(this.api().page.info().pages > 1);
+                        },
+                         "columnDefs": [ { "orderable": false, "targets": 0 } ]
+                      });
+        
+        //Ha a kereső mezőkbe írunk, akkor újra "rajzoljuk" a tálbázatot
+        $('#subject_search_text, #date_search_text').on('keyup', function(){
+            table.draw();
+        });
+        
+        //Táblázat sorainak szűrése a keresendő szövegek alapján
+        $.fn.dataTable.ext.search.push(
+            function(settings, searchData, index, rowData, counter) {
+                var subject_search_text = $('#subject_search_text').val().toLowerCase();
+                var date_search_text = $('#date_search_text').val().toLowerCase();
+                
+                if(subject_search_text == '' && date_search_text == '') return true;
+                
+                var ok = true;
+                
+                var first_index_of_subject_search_text = rowData[1].indexOf('<searchable-text>');
+                var last_index_of_subject_search_text = rowData[1].indexOf('</searchable-text>');
+                if(first_index_of_subject_search_text != -1 && last_index_of_subject_search_text != -1){
+                    var title_searchable_text = rowData[1].substring(first_index_of_subject_search_text + '<searchable-text>'.length, last_index_of_subject_search_text);
+                    if(title_searchable_text.toLowerCase().indexOf(subject_search_text) == -1) ok = false;
+                }
+                
+                var first_index_of_date_search_text = rowData[2].indexOf('<searchable-text>');
+                var last_index_of_date_search_text = rowData[2].indexOf('</searchable-text>');
+                if(first_index_of_date_search_text != -1 && last_index_of_date_search_text != -1){
+                    var date_searchable_text = rowData[2].substring(first_index_of_date_search_text + '<searchable-text>'.length, last_index_of_date_search_text);
+                    if(date_searchable_text.toLowerCase().indexOf(date_search_text) == -1) ok = false;
+                }
+                
+                return ok;
+            }
+        );
     });
 </script>

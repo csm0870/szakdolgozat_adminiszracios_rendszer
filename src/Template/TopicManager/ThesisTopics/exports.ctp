@@ -1,7 +1,7 @@
 <div class="container thesisTopic-exports topicManager">
     <div class="row">
         <div class="col-12 text-center page-title">
-            <h4><?= __('Téma adatok exportálása') ?></h4>
+            <h4><?= __('Téma adatok exportálása') . ' (' . __('elfogadott témák') . ')' ?></h4>
         </div>
         <div class="col-12">
             <div class="row">

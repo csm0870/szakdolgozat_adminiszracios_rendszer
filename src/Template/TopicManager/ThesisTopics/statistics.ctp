@@ -3,7 +3,7 @@
 <div class="container thesisTopic-statistics topicManager">
     <div class="row">
         <div class="col-12 text-center page-title">
-            <h4><?= __('Téma kimutatások') ?></h4>
+            <h4><?= __('Téma kimutatások') . ' (' . __('elfogadott témák') . ')' ?></h4>
         </div>
         <div class="col-12">
             <div class="row">

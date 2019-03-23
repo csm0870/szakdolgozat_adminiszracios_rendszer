@@ -10,6 +10,7 @@
         <?= $this->Html->css('/bootstrap_v4.1/css/bootstrap.min.css') ?>
         <?= $this->Html->css('/datepicker/bootstrap-datepicker3.min.css') ?>
         <?= $this->Html->css('/fontawesome-free-5.6.1-web/css/all.min') ?>
+        <?= $this->Html->css('/jquery-datatables/datatables.min') ?>
         <?= $this->Html->css('error_modal.css') ?>
         <?= $this->Html->css('confirmation_modal.css') ?>
         <?= $this->Html->css('logged_in_page.css') ?>
@@ -19,6 +20,7 @@
         <?= $this->Html->script('/datepicker/bootstrap-datepicker.min.js') ?>
         <?= $this->Html->script('/datepicker/locales/bootstrap-datepicker.hu.min.js') ?>
         <?= $this->Html->script('/fontawesome-free-5.6.1-web/js/all.min') ?>
+        <?= $this->Html->script('/jquery-datatables/datatables.min') ?>
         <?= $this->Html->script('/bootstrap_v4.1/js/bootstrap.min.js') ?>
         <?= $this->Html->script('/tinymce/tinymce.min') ?>
 
