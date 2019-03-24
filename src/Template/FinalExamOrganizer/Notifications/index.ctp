@@ -26,12 +26,13 @@
                             <tbody>
                                 <?php foreach($notifications as $i => $notification){ ?>
                                     <tr class="<?= $notification->unread === true ? 'unread-message' : '' ?> notification" data-id="<?= $notification->id ?>">
-                                        <td style="vertical-align: middle;"><?= $this->Form->control("notification[$i]", ['type' => 'checkbox', 'label' => false, 'class' => 'notification-checkbox', 'data-id' => $notification->id]) ?></td>
+                                        <td style="vertical-align: middle;"><?= $this->Form->control("notification[$i]", ['type' => 'checkbox', 'label' => false, 'id' => 'notification_checkbox_' . $notification->id,  'hiddenField' => false, 'class' => 'notification-checkbox', 'data-id' => $notification->id,
+                                                                                                                          'templates' => ['inputContainer' => '{{content}}']]) ?></td>
                                         <td style="vertical-align: middle">
-                                            <?= ($notification->unread === true ? '<sup class="unread-sup">' . __('Új') . '&nbsp;</sup>' : '') . h($notification->subject) ?>
+                                            <?= ($notification->unread === true ? '<sup class="unread-sup">' . __('Új') . '&nbsp;</sup>' : '') . '<searchable-text>' . h($notification->subject) . '</searchable-text>'?>
                                         </td>
                                         <td style="vertical-align: middle">
-                                            <?= empty($notification->created) ? '' : $this->Time->format($notification->created, 'yyyy.MM.dd. HH:mm:ss') ?>
+                                            <?= empty($notification->created) ? '' : '<searchable-text>' . $this->Time->format($notification->created, 'yyyy.MM.dd. HH:mm:ss') . '</searchable-text>' ?>
                                         </td>
                                     </tr>
                                 <?php } ?>
@@ -109,22 +110,6 @@
                 $this.find('.unread-sup').remove();
                 $this.data('unread', 0);
                 $('#notificationDetailsModal').modal('show');
-            });
-        });
-        
-        /**
-         * Összes kijelölése, illetve összes "nem kijelölése"
-         */
-        $('#check_all').on('change', function(e){
-            var checked = $(this).is(':checked');
-        
-            $('.notification-checkbox').each(function(){
-                $(this).prop('checked', checked);
-                var id = $(this).data('id');
-                //Először eltávolítjuk a form-ból
-                $('#notification_input_' + id).remove();
-                //Beletesszük a formba, ha összes kijelölés van
-                if(checked) $('#deleteNotificationsForm').append('<input type="hidden" name="notifications_ids[]" value="' + id + '" id="notification_input_' + id + '">');
             });
         });
         
@@ -242,5 +227,42 @@
                 return ok;
             }
         );
+    
+         /**
+         * Összes kijelölése, illetve összes "nem kijelölése", csak azoknak a kijelölése, amelyek a megjelenített oldalon vannak
+         */
+        $('#check_all').on('change', function(e){
+            var checked = $(this).is(':checked');
+            var displayed_rows = table.rows( {page:'current'} ).data();
+            
+            for(var i = 0; i< displayed_rows.length; i++){
+                var id = $(displayed_rows[i][0]).data('id');
+                $('#notification_checkbox_' + id).prop('checked', checked);
+                //Először eltávolítjuk a form-ból
+                $('#notification_input_' + id).remove();
+                //Beletesszük a formba, ha összes kijelölés van
+                if(checked) $('#deleteNotificationsForm').append('<input type="hidden" name="notifications_ids[]" value="' + id + '" id="notification_input_' + id + '">');
+            }
+        });
+        
+        /**
+         * Táblázat chekcboxait reseteljük és űrítjuk a törlendő értesítéseket a form-ból
+         *
+         * @return {undefined}         */
+        function resetNotificationCheckboxes(){
+            $('#check_all').prop('checked', false);
+            $('.notification-checkbox').each(function(){
+                var $this = $(this);
+                $this.prop('checked', false);
+                var id = $this.data('id');
+                //Először eltávolítjuk a form-ból
+                $('#notification_input_' + id).remove()
+            });
+        }
+        
+        //Táblázat oldalváltásakor, adat keresésekor, sorbarendezésekor a chekcboxokat reseteljük és űrítjuk a törlendő értesítéseket a form-ból
+        $('#data_table').on({'page.dt' : resetNotificationCheckboxes,
+                             'order.dt' : resetNotificationCheckboxes,
+                             'search.dt' : resetNotificationCheckboxes});
     });
 </script>
