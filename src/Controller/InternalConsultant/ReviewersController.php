@@ -215,18 +215,26 @@ class ReviewersController extends AppController
     public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
-        $reviewer = $this->Reviewers->find('all', ['conditions' => ['id' => $id]])->first();
+        $reviewer = $this->Reviewers->find('all', ['conditions' => ['Reviewers.id' => $id],
+                                                   'contain' => ['Reviews']])->first();
         
         if(empty($reviewer)){
             $this->Flash->success(__('Helytelen aznosító.') . __('A bíráló nem létezik.'));
             return $this->redirect(['action' => 'index']);
         }
         
-        if ($this->Reviewers->delete($reviewer)) {
-            $this->Flash->success(__('Törlés sikeres.'));
-        } else {
-            $this->Flash->error(__('Törlés sikertelen.'));
+        $can_be_deleted = true;
+        foreach($reviewer->reviews as $review){
+            if($review->review_status != 6) $can_be_deleted = false;
         }
+        
+        if($can_be_deleted === true){ //Ha nincs folyamatban lévő bírálata
+            if($this->Reviewers->delete($reviewer)){
+                $this->Flash->success(__('Törlés sikeres.'));
+            }else{
+                $this->Flash->error(__('Törlés sikertelen.'));
+            }
+        }else $this->Flash->error(__('A bírálónak még van folyamatban lévő bíráláta. Nem törölheti.'));
 
         return $this->redirect(['action' => 'index']);
     }
