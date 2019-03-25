@@ -486,7 +486,7 @@ class ThesisTopicsController extends AppController
         if ($this->ThesisTopics->save($thesisTopic)) $this->Flash->success(__('Véglegesítve'));
         else $this->Flash->error(__('Hiba történt. Próbálja újra!'));
 
-        return $this->redirect(['action' => 'index']);
+        return $this->redirect(['action' => 'details', $thesisTopic->id]);
     }
     
     /**

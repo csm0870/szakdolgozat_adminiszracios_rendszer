@@ -10,7 +10,7 @@
                 <div class="col-12">
                     <fieldset class="border-1-grey p-3 mb-3">
                         <legend class="w-auto"><?= __('A téma adatai') ?></legend>
-                        <p class="mb-4">
+                        <p class="<?= $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status == 3 || ($thesisTopic->review->confidentiality_contract_status == 1 && $thesisTopic->review->cause_of_rejecting_confidentiality_contract !== null) ? 'mb-1' : 'mb-4' ?>">
                             <strong><?= __('Állapot') . ': ' ?></strong>
                             <?php
                                 if($thesisTopic->thesis_topic_status_id == 23 && $thesisTopic->has('review')){
@@ -30,6 +30,11 @@
                                 }
                             ?>
                         </p>
+                        <?php if($thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status == 3 || ($thesisTopic->review->confidentiality_contract_status == 1 && $thesisTopic->review->cause_of_rejecting_confidentiality_contract !== null)){ ?>
+                            <p class="mb-4">
+                                <strong><?= __('Elutasítás oka') . ': ' ?></strong><?= h($thesisTopic->review->cause_of_rejecting_confidentiality_contract) ?>
+                            </p>
+                        <?php } ?>
                         <p class="mb-1">
                             <strong><?= __('Téma címe') . ': ' ?></strong><?= h($thesisTopic->title) ?>
                         </p>

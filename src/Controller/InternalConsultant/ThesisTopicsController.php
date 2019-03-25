@@ -195,7 +195,6 @@ class ThesisTopicsController extends AppController
                     $thesisTopic->first_thesis_subject_failed_suggestion = $this->getRequest()->getData('first_thesis_subject_failed_suggestion'); //Elutasítás oka
                 }else{ //Első diplomakurzus sikeres
                     $thesisTopic->thesis_topic_status_id = 15; //Első diplomakurzus teljesítve
-                    $thesisTopic->first_thesis_subject_failed_suggestion = null; // Javaslat nullázása
                 }
             }
             

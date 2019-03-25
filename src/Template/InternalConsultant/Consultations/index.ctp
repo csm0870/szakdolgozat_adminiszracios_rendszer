@@ -31,7 +31,7 @@
                             <tbody>
                                 <?php foreach($consultations as $i => $consultation){ ?>
                                     <tr>
-                                        <td><?= '<searchable-text>' . ($i+1) . '. ' . __('csoport') . '<br/>(' .  ($consultation->current === true ? __('Jelenlegi szakdolgozathoz tartozik') : __('Régebbi szakdolgozathoz tartozik')) . ')' . '</searchable-text>' ?></td>
+                                        <td><?= '<searchable-text>' . ($i+1) . '. ' . __('csoport') . '<br/>(' .  ($consultation->current === true ? __('A jelenlegi szakdolgozat verzióhoz tartozik') : __('Régebbi szakdolgozat verzióhoz tartozik')) . ')' . '</searchable-text>' ?></td>
                                         <td>
                                             <?php
                                                 if($consultation->accepted === null && $consultation->current === true) //Jelenlegi szakdolgozathoz tartozik és még nem véglegesített

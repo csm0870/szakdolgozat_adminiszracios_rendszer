@@ -11,7 +11,12 @@
             <?php
                 if($thesisTopic->thesis_topic_status_id == 23 && $thesisTopic->has('review')){
                     echo '<br/><strong>' .  __('Állapot') . ': ' . '</strong>';
-                    if($thesisTopic->review->review_status == 4) echo __('A bírálati lap feltöltés véglegesítve. A bírálat a tanszékvezető ellenőrzésére vár.');
+                    if($thesisTopic->review->review_status == 4){
+                        echo __('A bírálati lap feltöltés véglegesítve. A bírálat a tanszékvezető ellenőrzésére vár.');
+                        if($thesisTopic->review->cause_of_rejecting_review !== null){
+                            echo '<br/><strong>Az előző bírálat elutasításának oka:</strong>&nbsp;' . h($thesisTopic->review->cause_of_rejecting_review);
+                        }
+                    }
                     elseif($thesisTopic->review->review_status == 5){
                         echo __('A bírálat elutasítva, a dolgozat ismét bírálható.');
                         echo '<br/><strong>Elutasítás oka:</strong>&nbsp;' . h($thesisTopic->review->cause_of_rejecting_review);

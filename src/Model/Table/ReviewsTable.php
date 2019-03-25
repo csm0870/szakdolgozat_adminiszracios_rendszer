@@ -158,8 +158,26 @@ class ReviewsTable extends Table
     }
     
     /**
-     * Mentés után callback
+     * Mentés előtti callback
      * 
+     * @param type $event
+     * @param type $entity
+     * @param type $options
+     */
+    public function beforeSave($event, $entity, $options){
+        //Ha a bíráló véglegesíti a feltöltött titoktartási szerződést
+        if($entity->getOriginal('confidentiality_contract_status') == 1 && $entity->confidentiality_contract_status == 2){
+            $entity->cause_of_rejecting_confidentiality_contract = null;
+        }
+        
+        //Ha a bíráló véglegesíti a feltöltött bírálati lapot, vagyis a bírálatot véglegesíti
+        if($entity->getOriginal('review_status') == 3 && $entity->review_status == 4){
+            $entity->cause_of_rejecting_review = null;
+        }
+    }
+    
+    /**
+     * Mentés után callback
      * 
      * @param type $event
      * @param type $entity

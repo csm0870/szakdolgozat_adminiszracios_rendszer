@@ -215,7 +215,7 @@ class ConsultationsController extends AppController
             $error_msg = __('A konzultációs csoportot nem véglegesítheti.') . ' ' .  __('A témának, amelyhez tartozik, nem Ön a belső konzulense.');
             $ok = false;
         }elseif($thesisTopic->thesis_topic_status_id != 15){ //Nem "Az első diplimakurzus teljesítve" státuszban van
-            $error_msg = __('A konzultációs csoportot nem véglegesítheti.') . ' ' .  __('A téma nem az "Első diplomakurzus teljesítve" állapotban van.');
+            $error_msg = __('A konzultációs csoportot nem véglegesítheti.') . ' ' .  __('A konzultációk csak akkor véglegesíthetőek, ha az első diplomakurzust teljesítve van.');
             $ok = false;
         }
         

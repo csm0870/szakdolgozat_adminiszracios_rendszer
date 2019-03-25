@@ -38,6 +38,10 @@
                             echo __('A bírálat elutasítva, a dolgozat ismét bírálható.');
                             echo '<br/><strong>Elutasítás oka:</strong>&nbsp;' . h($thesisTopic->review->cause_of_rejecting_review);
                         }
+                        
+                        if(in_array($thesisTopic->review->review_status, [1, 2, 3]) && $thesisTopic->review->cause_of_rejecting_review !== null){
+                            echo '<br/><strong>Az előző bírálat elutasításának oka:</strong>&nbsp;' . h($thesisTopic->review->cause_of_rejecting_review);
+                        }
                     }
                 }
             ?>

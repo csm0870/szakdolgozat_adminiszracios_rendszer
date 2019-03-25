@@ -11,16 +11,17 @@
                                         'inputContainerError' => '<div class="form-group">{{content}}{{error}}</div>']);
                 echo $this->Form->create($thesisTopic, ['id' => 'uploadThesisForm', 'type' => 'file', 'class' => 'row'])
             ?>
-            <?php if($thesisTopic->thesis_topic_status_id == 19){ ?>
+            
                 <div class="col-12">
-                    <p class="<?= $thesisTopic->thesis_topic_status_id == 19 ? 'mb-1' : 'mb-4' ?>">
+                    <p class="<?= $thesisTopic->thesis_topic_status_id == 19 || ($thesisTopic->thesis_topic_status_id == 17 && $thesisTopic->cause_of_rejecting_thesis_supplements !== null) ? 'mb-1' : 'mb-4' ?>">
                         <strong><?= __('Állapot') . ': ' ?></strong><?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : ''?>
                     </p>
-                    <p class="mb-3">
-                        <strong><?= __('Elutasítás oka') . ': ' ?></strong><?= h($thesisTopic->cause_of_rejecting_thesis_supplements) ?>
-                    </p>
+                    <?php if($thesisTopic->thesis_topic_status_id == 19 || ($thesisTopic->thesis_topic_status_id == 17 && $thesisTopic->cause_of_rejecting_thesis_supplements !== null)){ ?>
+                        <p class="mb-3">
+                            <strong><?= __('Elutasítás oka') . ': ' ?></strong><?= h($thesisTopic->cause_of_rejecting_thesis_supplements) ?>
+                        </p>
+                    <?php } ?>
                 </div>
-            <?php } ?>
             <div class="col-12">
                 <fieldset class="border-1-grey p-3 mb-2">
                     <legend class="w-auto"><?= __('Mellékletek feltöltése') ?></legend>

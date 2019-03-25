@@ -136,7 +136,6 @@ class ThesisTopicsController extends AppController
                     $thesisTopic->thesis_topic_status_id = 14; //Téma elutasítva (első diplomakurzus sikertelen)
                 }else{ //Javíthatja a diplomakurzust a jelenlegi témával
                     $thesisTopic->thesis_topic_status_id = 12; //Elfogadva
-                    $thesisTopic->first_thesis_subject_failed_suggestion = null; // Első diplomakurzus még nem dőlt el, hogy teljesítette-e
                 }
             }
             

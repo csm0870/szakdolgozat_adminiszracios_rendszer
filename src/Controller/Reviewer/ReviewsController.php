@@ -69,7 +69,7 @@ class ReviewsController extends AppController
             
             $thesisTopic->review = $this->Reviews->patchEntity($thesisTopic->review, $this->getRequest()->getData());
             
-            if(empty($this->getRequest()->getData('structure_and_style_point'))){
+            if($this->getRequest()->getData('structure_and_style_point') == null){
                 $thesisTopic->review->setError('structure_and_style_point', __('Pont megadása kötelező.'));
             }
             
@@ -77,7 +77,7 @@ class ReviewsController extends AppController
                 $thesisTopic->review->setError('cause_of_structure_and_style_point', __('Indoklás megadása kötelező.'));
             }
             
-            if(empty($this->getRequest()->getData('processing_literature_point'))){
+            if($this->getRequest()->getData('processing_literature_point') == null){
                 $thesisTopic->review->setError('processing_literature_point', __('Pont megadása kötelező.'));
             }
             
@@ -85,7 +85,7 @@ class ReviewsController extends AppController
                 $thesisTopic->review->setError('cause_of_processing_literature_point', __('Indoklás megadása kötelező.'));
             }
             
-            if(empty($this->getRequest()->getData('writing_up_the_topic_point'))){
+            if($this->getRequest()->getData('writing_up_the_topic_point') == null){
                 $thesisTopic->review->setError('writing_up_the_topic_point', __('Pont megadása kötelező.'));
             }
             
@@ -93,7 +93,7 @@ class ReviewsController extends AppController
                 $thesisTopic->review->setError('cause_of_writing_up_the_topic_point', __('Indoklás megadása kötelező.'));
             }
             
-            if(empty($this->getRequest()->getData('practical_applicability_point'))){
+            if($this->getRequest()->getData('practical_applicability_point') == null){
                 $thesisTopic->review->setError('practical_applicability_point', __('Pont megadása kötelező.'));
             }
             
@@ -183,7 +183,7 @@ class ReviewsController extends AppController
         if(empty($thesisTopic)){ //Nem létezik a téma
             $this->Flash->error(__('A bírálat nem véglegesíthető.') . ' ' . __('Nem létező dolgozat.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [23])){ //Nem "Bírálat alatt" státuszban van
+        }elseif($thesisTopic->thesis_topic_status_id != 23){ //Nem "Bírálat alatt" státuszban van
             $this->Flash->error(__('A bírálat nem véglegesíthető.') . ' ' . __('A dolgozat nincs abban az állapotban, hogy a bírálat véglegesíthető lenne.'));
             $ok = false;
         }else{
@@ -359,7 +359,6 @@ class ReviewsController extends AppController
         if(!$ok) return $this->redirect(['action' => 'review', $thesisTopic->id]);
         
         $thesisTopic->review->review_status = 4; //Bírálati lap feltöltése véglegesítve
-        $thesisTopic->review->cause_of_rejecting_review = null; //Bírálat elutasításának oka resetelése
         if($this->Reviews->save($thesisTopic->review)) $this->Flash->success(__('Mentés sikeres.'));
         else $this->Flash->error(__('Mentés sikertelen. Próbálja újra!'));
         
