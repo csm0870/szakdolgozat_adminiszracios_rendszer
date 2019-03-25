@@ -14,6 +14,7 @@
                                         <th><?= __('Téma címe') ?></th>
                                         <th><?= __('Belső konzulens') ?></th>
                                         <th><?= __('Hallgató') ?></th>
+                                        <th><?= __('Adatok felvitele a Neptunba') ?></th>
                                         <th><?= __('Állapot') ?></th>
                                     </tr>
                                 </thead>
@@ -22,6 +23,7 @@
                                         <th><?= $this->Form->control('title_search_text', ['id' => 'title_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
                                         <th><?= $this->Form->control('internal_consultant_search_text', ['id' => 'internal_consultant_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
                                         <th><?= $this->Form->control('student_search_text', ['id' => 'student_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
+                                        <th><?= $this->Form->control('data_applyed_search_text', ['id' => 'data_applyed_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
                                         <th><?= $this->Form->control('status_search_text', ['id' => 'status_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
                                     </tr>
                                 </thead>
@@ -36,14 +38,9 @@
                                             </td>
                                             <td><?= $thesisTopic->has('internal_consultant') ? '<searchable-text>' . h($thesisTopic->internal_consultant->name) . '</searchable-text>' : '' ?></td>
                                             <td><?= $thesisTopic->has('student') ? ('<searchable-text>' . h($thesisTopic->student->name) . (empty($thesisTopic->student->neptun) ? '' : ('<br/>(' . h($thesisTopic->student->neptun) . ')')) . '</searchable-text>') : '' ?></td>
+                                            <td><?= '<searchable-text>' . ($thesisTopic->accepted_thesis_data_applyed_to_neptun === true ? __('Az adatok felvitele megtörtént.') : __('Az adatok felvitele még nem történt meg.')) . '</searchable-text>' ?></td>
                                             <td>
-                                                <?= '<searchable-text>' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') ?>
-                                                <?php
-                                                    if($thesisTopic->thesis_topic_status_id == 25 && $thesisTopic->accepted_thesis_data_applyed_to_neptun !== true){
-                                                         echo '<br/>' . '(' . __('Az elfogadott dolgozat adatait fel kell vinni a Neptun rendszerbe.') . ')';
-                                                    }
-                                                    echo '</searchable-text>';
-                                                ?>
+                                                <?= $thesisTopic->has('thesis_topic_status') ? '<searchable-text>' . h($thesisTopic->thesis_topic_status->name) . '</searchable-text>' : '' ?>
                                             </td>
                                         </tr>
                                     <?php } ?>
@@ -91,9 +88,10 @@
                 var title_search_text = $('#title_search_text').val().toLowerCase();
                 var internal_consultant_search_text = $('#internal_consultant_search_text').val().toLowerCase();
                 var student_search_text = $('#student_search_text').val().toLowerCase();
+                var data_applyed_search_text = $('#student_search_text').val().toLowerCase();
                 var status_search_text = $('#status_search_text').val().toLowerCase();
                 
-                if(title_search_text == '' && internal_consultant_search_text == '' && student_search_text == '' && status_search_text == '') return true;
+                if(title_search_text == '' && internal_consultant_search_text == '' && student_search_text == '' && data_applyed_search_text == '' && status_search_text == '') return true;
                 
                 var ok = true;
                 
@@ -118,10 +116,17 @@
                     if(student_searchable_text.toLowerCase().indexOf(student_search_text) == -1) ok = false;
                 }
                 
-                var first_index_of_status_search_text = rowData[3].indexOf('<searchable-text>');
-                var last_index_of_status_search_text = rowData[3].indexOf('</searchable-text>');
+                var first_index_of_data_applyed_search_text = rowData[3].indexOf('<searchable-text>');
+                var last_index_of_data_applyed_search_text = rowData[3].indexOf('</searchable-text>');
+                if(first_index_of_data_applyed_search_text != -1 && last_index_of_data_applyed_search_text != -1){
+                    var data_applyed_searchable_text = rowData[3].substring(first_index_of_data_applyed_search_text + '<searchable-text>'.length, last_index_of_data_applyed_search_text);
+                    if(data_applyed_searchable_text.toLowerCase().indexOf(data_applyed_search_text) == -1) ok = false;
+                }
+                
+                var first_index_of_status_search_text = rowData[4].indexOf('<searchable-text>');
+                var last_index_of_status_search_text = rowData[4].indexOf('</searchable-text>');
                 if(first_index_of_status_search_text != -1 && last_index_of_status_search_text != -1){
-                    var status_searchable_text = rowData[3].substring(first_index_of_status_search_text + '<searchable-text>'.length, last_index_of_status_search_text);
+                    var status_searchable_text = rowData[4].substring(first_index_of_status_search_text + '<searchable-text>'.length, last_index_of_status_search_text);
                     if(status_searchable_text.toLowerCase().indexOf(status_search_text) == -1) ok = false;
                 }
                 
