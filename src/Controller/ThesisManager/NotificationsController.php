@@ -45,9 +45,12 @@ class NotificationsController extends AppController
             }
         }
         
+        $unread_notifications_count = $this->Notifications->find('all', ['conditions' => ['Notifications.user_id' => $this->Auth->user('id'), 'Notifications.unread' => true]])->count();
         
-        $this->set(compact('success', 'subject', 'message', 'date'));
-        $this->set('_serialize', ['success', 'subject', 'message', 'date']);
+        $has_unread = $unread_notifications_count > 0 ? true : false;
+        
+        $this->set(compact('success', 'subject', 'message', 'date', 'has_unread'));
+        $this->set('_serialize', ['success', 'subject', 'message', 'date', 'has_unread']);
     }
     
     /**

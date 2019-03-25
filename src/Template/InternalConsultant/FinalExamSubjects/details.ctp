@@ -111,7 +111,7 @@
                 var id = $(this).data('id');
                 if(this.checkValidity() === false){
                     $('#finalExamSubjectCollapse_' + id).collapse('show');
-                    return;
+                    return false;
                 }
             });
         }

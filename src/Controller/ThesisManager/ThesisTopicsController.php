@@ -14,7 +14,7 @@ class ThesisTopicsController extends AppController
 {
     public function beforeFilter(\Cake\Event\Event $event) {
         parent::beforeFilter($event);
-        if($this->getRequest()->getParam('action') == 'acceptThesisSupplements') $this->viewBuilder()->setLayout(false);
+        if(in_array($this->getRequest()->getParam('action'),['acceptThesisSupplements', 'applyAcceptedThesisData'])) $this->viewBuilder()->setLayout(false);
     }
     
     /**
@@ -128,29 +128,59 @@ class ThesisTopicsController extends AppController
      * @param type $id Téma azonosítója
      * @return type
      */
-    public function acceptedThesisDataApplyed($id = null){
-        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id]])->first();
+    public function applyAcceptedThesisData($id = null){
+        $this->getRequest()->allowMethod('ajax');
+        $this->viewBuilder()->setClassName('Ajax.Ajax');
         
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id],
+                                                         'contain' => ['InternalConsultants', 'Reviews' => ['Reviewers']]])->first();
+        
+        $error_msg = '';
         $ok = true;
-        //Megnézzük, hogy megfelelő-e a téma a diplomamunka/szakdolgozat feltöltéséhez
-        if(empty($thesisTopic)){ //Nem létezik a téma
-            $this->Flash->error(__('Az adatok felvitele nem rögzíthető.') . ' ' . __('Nem létezik a téma.'));
+        if(empty($thesisTopic)){
             $ok = false;
-        }elseif($thesisTopic->thesis_topic_status_id != 25){ //A dolgozat még nincs elfogadott állapotban
-            $this->Flash->error(__('Az adatok felvitele nem rögzíthető.') . ' ' . __('A dolgozat még nincs elfogadott állapotban.'));
+            $error_msg = __('Az adatok felvitele nem rögzíthető.') . ' ' . __('Nem létezik a téma.');
+        }elseif($thesisTopic->thesis_topic_status_id != 25){ //A dolgozat még nincs elfogadva
             $ok = false;
-        }elseif($thesisTopic->accepted_thesis_data_applyed_to_neptun === true){ //Az adatok már fel vannak vive 
-            $this->Flash->error(__('Az adatok felvitele nem rögzíthető.') . ' ' . __('A dolgozat adatainak felvitele már megtörtént.'));
+             __('Az adatok felvitele nem rögzíthető.') . ' ' . __('A dolgozat még nincs elfogadott állapotban.');
+        }elseif($thesisTopic->accepted_thesis_data_applyed_to_neptun === true){ //Az adatok már fel vannak vive
             $ok = false;
+            $error_msg = __('Az adatok felvitele nem rögzíthető.') . ' ' . __('A dolgozat adatainak felvitele már megtörtént.');
         }
         
-        if(!$ok) return $this->redirect(['action' => 'index']);
+        //Ha a feltételeknek megfelelő téma nem található
+        if($ok === false){
+            $this->set(compact('ok', 'error_msg'));
+            return;
+        }
         
-        $thesisTopic->accepted_thesis_data_applyed_to_neptun = true;
+        $saved = true;
+        $error_ajax = "";
+        if($this->getRequest()->is(['post', 'patch', 'put'])){
+            $thesisTopic->accepted_thesis_data_applyed_to_neptun = true;
+            
+            if($this->ThesisTopics->save($thesisTopic)){
+                $this->Flash->success(__('Az adatok felvitele rögzítve.'));
+            }else{
+                $saved = false;
+                $error_ajax = __('Az adatok felvitelét nem sikerült rögzíteni. Próbálja újra!');
+                
+                $errors = $thesisTopic->getErrors();
+                if(!empty($errors)){
+                    foreach($errors as $error){
+                        if(is_array($error)){
+                            foreach($error as $err){
+                                $error_ajax.= '<br/>' . $err;
+                            }
+                        }else{
+                            $error_ajax.= '<br/>' . $error;
+                        }
+                    }
+                }
+            }
+        }
         
-        if($this->ThesisTopics->save($thesisTopic)) $this->Flash->success(__('Az adatok felvitele rögzítve.'));
-        else $this->Flash->error(__('Az adatok felvitelét nem sikerült rögzíteni. Próbálja újra!'));
-        
-        return $this->redirect(['action' => 'details', $thesisTopic->id]);
+        $this->set(compact('thesisTopic' ,'ok', 'error_msg', 'saved', 'error_ajax'));
+        $this->set('_serialize', ['saved', 'error_ajax']);
     }
 }

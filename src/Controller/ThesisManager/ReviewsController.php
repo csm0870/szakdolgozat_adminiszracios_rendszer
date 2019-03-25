@@ -57,7 +57,7 @@ class ReviewsController extends AppController
         }elseif($thesisTopic->has('review') == false){ //Nincs bírálat a dolgozathoz
             $this->Flash->error(__('A feltölött bírálati lap nem elérhető.') . ' ' . __('A dolgozathoz nem tartozik bírálat.'));
             $ok = false;
-        }elseif(!empty($thesisTopic->review->review_doc)){ //Ha nincs bírálati lap feltöltve
+        }elseif(empty($thesisTopic->review->review_doc)){ //Ha nincs bírálati lap feltöltve
             $this->Flash->error(__('A feltölött bírálati lap nem elérhető.') . ' ' . __('Nincs feltöltve bírálati lap.'));
             $ok = false;
         }

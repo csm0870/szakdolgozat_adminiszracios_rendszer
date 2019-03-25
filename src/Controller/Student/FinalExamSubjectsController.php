@@ -36,7 +36,7 @@ class FinalExamSubjectsController extends AppController
         if($student->course_id != 1){ //Ha nem mérnökinformatikus
             $ok = false;
             $error_msg = __('Csak mérnökinformatikus hallgató választhat záróvizsga-tárgyakat.');
-        }elseif($ok === true && $thesisTopics->count() == 0){
+        }elseif(count($student->final_exam_subjects) == 0 && $thesisTopics->count() == 0){ //Ha nincsenek választott tátrgyai és nincs olyan témája, ami alapján olyan helyzetben lenne, hogy ZV-tárgakat választhatna
             $ok = false;
             $error_msg = __('Nincs olyan állapotban lévő szakdolgozata, ami alapján záróvizsga-tárgyakat választhatna.');
         }
@@ -46,18 +46,28 @@ class FinalExamSubjectsController extends AppController
             return;
         }
         
-        $internal_consultant_ids = [];
-        foreach($thesisTopics as $topic){
-            $internal_consultant_ids[] = $topic->internal_consultant_id;
-        }
-        //Azon belső konzulensek, amelyek a hallgató témáihoz tartoznak
-        $internalConsultants = $this->FinalExamSubjects->Students->FinalExamSubjectsInternalConsultants->find('list', ['conditions' => ['id IN' => $internal_consultant_ids]]);        
-        
-        if(empty($internalConsultants)){
-            $ok = false;
-            $error_msg = __('Nincs belső konzulens, akit megjelölhetne a záróvizsga-megjelölő lapon.');
-            $this->set(compact('ok', 'error_msg'));
-            return;
+        if($thesisTopics->count() == 0){ // Ha nincs olyan állapotban lévő témája, ami alapján leadhatna ZV-tárgyakat, de ha itt vagyunk, akkor már van leadva
+            $internalConsultants = $this->FinalExamSubjects->Students->FinalExamSubjectsInternalConsultants->find('list', ['conditions' => ['id' => $student->final_exam_subjects_status]]);
+            if($internalConsultants->count() == 0){
+                $ok = false;
+                $error_msg = __('Nincs belső konzulens rendelve a závizsga tárgyaihoz.');
+                $this->set(compact('ok', 'error_msg'));
+                return;
+            }
+        }else{
+            $internal_consultant_ids = [];
+            foreach($thesisTopics as $topic){
+                $internal_consultant_ids[] = $topic->internal_consultant_id;
+            }
+            //Azon belső konzulensek, amelyek a hallgató témáihoz tartoznak
+            $internalConsultants = $this->FinalExamSubjects->Students->FinalExamSubjectsInternalConsultants->find('list', ['conditions' => ['id IN' => $internal_consultant_ids]]);        
+
+            if(empty($internalConsultants)){
+                $ok = false;
+                $error_msg = __('Nincs belső konzulens, akit megjelölhetne a záróvizsga-megjelölő lapon.');
+                $this->set(compact('ok', 'error_msg'));
+                return;
+            }
         }
         
         //Akkor tölthet fel új tárgyakat, ha még eddig nem voltak, illetve, ha van olyan témája amely olyan állapotban van, hogy egyáltalán ZV tárgyválasztás lehet

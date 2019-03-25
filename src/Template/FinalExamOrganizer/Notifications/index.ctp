@@ -110,6 +110,10 @@
                 $this.find('.unread-sup').remove();
                 $this.data('unread', 0);
                 $('#notificationDetailsModal').modal('show');
+                
+                if(response.has_unread == false){ //Ha már nincs több olvasatlan értesítés
+                    $('#notifications_index_menu_item').find('.unread-sup').remove();
+                }
             });
         });
         

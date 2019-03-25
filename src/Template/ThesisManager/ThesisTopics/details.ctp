@@ -193,20 +193,8 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">
-                    <div class="form-modal">
-                        <div class="form-header text-center">
-                            <?= __('Dolgozat adatainak felvitele a Neptun rendszerbe') ?>
-                        </div>
-                        <div class="form-body">
-                        </div>
-                        <div class="form-footer text-center">
-                            <?= $this->Html->link(__('Az adatokat felvittem'), '#', ['class' => 'btn btn-success dataApplyedBtn border-radius-45px'])?>
-                        </div>
-                        <div class="overlay overlay-accept_thesis_supplements" style="display:none">
-                            <div class="spinner fa-3x">
-                                <i class="fas fa-spinner fa-pulse"></i>
-                            </div>
-                        </div>
+                    <div id="apply_accepted_thesis_data_container">
+                        
                     </div>
                 </div>
             </div>
@@ -267,30 +255,18 @@
         <?php } ?>
             
         <?php if($thesisTopic->thesis_topic_status_id == 25 && $thesisTopic->accepted_thesis_data_applyed_to_neptun !== true){ ?>
+            //Tartalom lekeérése a "adatok felvitele a Neptun rendszerbe" modalba
+            $.ajax({
+                url: '<?= $this->Url->build(['action' => 'applyAcceptedThesisData', $thesisTopic->id], true) ?>',
+                cache: false
+            })
+            .done(function(response){
+                $('#apply_accepted_thesis_data_container').html(response.content);
+            });
+
             $('.applyAcceptedThesisDataBtn').on('click', function(e){
                 e.preventDefault();
                 $('#applyAcceptedThesisDataModal').modal('show');
-            });
-            
-            /**
-             * Confirmation modal megnyitása submit előtt
-             */
-            $('#applyAcceptedThesisDataModal .dataApplyedBtn').on('click', function(e){
-                e.preventDefault();
-
-                $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan felvitted az adatokat?') ?>');
-                $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Igen') ?>').css('background-color', '#71D0BD');
-                //Save gomb eventjeinek resetelése cserével
-                $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-                $('#confirmationModal .msg').text('<?= __('Adatok felvitele a Neptun rendszerbe.') ?>');
-
-                $('#confirmationModal').modal('show');
-
-                $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
-                    e.preventDefault();
-                    $('#confirmationModal').modal('hide');
-                    location.href = '<?= $this->Url->build(['action' => 'acceptedThesisDataApplyed', $thesisTopic->id], true) ?>';
-                });
             });
         <?php } ?>
     });

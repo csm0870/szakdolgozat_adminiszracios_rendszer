@@ -146,7 +146,6 @@
     $(function(){
         $('#final_exam_subjects_index_menu_item').addClass('active');
         <?php if($ok === true){ ?>
-                
             /**
             * Form mezőinek ellenőrzése
             * 
@@ -157,7 +156,7 @@
                     var id = $(this).data('id');
                     if(this.checkValidity() === false){
                         $('#finalExamSubjectCollapse_' + id).collapse('show');
-                        return;
+                        return false;
                     }
                 });
             }
@@ -186,8 +185,6 @@
                     $('#confirmationModal .msg').html('<?= __('Záróvizsga-tárgyak mentése.') ?>');
 
                     $('#confirmationModal').modal('show');
-
-                    var thesis_topic_id = $(this).data('id');
 
                     $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
                         e.preventDefault();

@@ -245,7 +245,7 @@ class StudentsTable extends Table
                     $notification->user_id = $internalConsultant->user_id;
                     $notification->unread = true;
                     $notification->subject = 'Záróvizsga-tárgyak ellenőrzése.';
-                    $notification->message = 'A ' . h($entity->name) . ' (' . h($entity->neptun) . ') nevű hallgató megadta a záróvizsga-tárgy javaslatait. A tárgyak ellenőrzésre várnak.' .
+                    $notification->message = 'A ' . h($entity->name) . ' (' . h($entity->neptun) . ') nevű hallgató megadta a záróvizsga-tárgy javaslatait. Ellenőrízze a tárgyakat!' .
                                              '<br/><a href="' . \Cake\Routing\Router::url(['controller' => 'FinalExamSubjects', 'action' => 'details', $entity->id, 'prefix' => 'internal_consultant'], true) . '">' . 'Részletek megtekintése' . '</a>';
                 
                     $Notifications->save($notification);
