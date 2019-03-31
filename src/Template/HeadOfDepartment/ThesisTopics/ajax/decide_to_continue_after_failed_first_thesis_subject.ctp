@@ -1,10 +1,10 @@
 <div class="form-modal headOfDepartment-decideToContinueAfterFailedFirstThesisSubject">
-    <?= $no_thesis_topic ? '' : $this->Form->create($thesisTopic, ['id' => 'decideToContinueAfterFailedFirstThesisSubjectForm']) ?>
+    <?= $ok ? $this->Form->create($thesisTopic, ['id' => 'decideToContinueAfterFailedFirstThesisSubjectForm']) : '' ?>
     <div class="form-header text-center">
         <?= __('Első diplomakurzus sikertelen, döntés a folytatásról') ?>
     </div>
     <div class="form-body">
-        <?php if($no_thesis_topic){ ?>
+        <?php if($ok === false){ ?>
             <p class="text-center">
                 <?= $error_msg; ?>
             </p>
@@ -33,16 +33,16 @@
         <?php } ?>
     </div>
     <div class="form-footer text-center">
-        <?= $no_thesis_topic ? '' : $this->Form->button(__('Mentés'), ['type' => 'button', 'role' => 'button', 'class' => 'btn btn-success submitBtn border-radius-45px']) ?>
+        <?= $ok === true ? $this->Form->button(__('Mentés'), ['type' => 'button', 'role' => 'button', 'class' => 'btn btn-success submitBtn border-radius-45px']) : '' ?>
     </div>
-    <?= $no_thesis_topic ? '' : $this->Form->end() ?>
+    <?= $ok === true ? $this->Form->end() : '' ?>
     <div class="overlay overlay-decide_to_continue_after_failed_first_thesis_subject" style="display:none">
         <div class="spinner fa-3x">
             <i class="fas fa-spinner fa-pulse"></i>
         </div>
     </div>
 </div>
-<?php if(!$no_thesis_topic){ ?>
+<?php if($ok === true){ ?>
     <?= $this->Html->script('jquery.form.min.js') ?>
     <script>
         $(function(){
@@ -67,7 +67,7 @@
                 });
             });
 
-            //consultationOccasionAddForm ajaxform
+            //decideToContinueAfterFailedFirstThesisSubjectForm ajaxform
             $('#decideToContinueAfterFailedFirstThesisSubjectForm').ajaxForm({
                 replaceTarget: false,
                 target: null,

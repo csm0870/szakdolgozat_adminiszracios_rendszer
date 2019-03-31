@@ -10,10 +10,10 @@
                 <div class="col-12">
                     <fieldset class="border-1-grey p-3 mb-3">
                         <legend class="w-auto"><?= __('A téma adatai') ?></legend>
-                        <p class="<?= $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status == 3 || ($thesisTopic->review->confidentiality_contract_status == 1 && $thesisTopic->review->cause_of_rejecting_confidentiality_contract !== null) ? 'mb-1' : 'mb-4' ?>">
+                        <p class="mb-4">
                             <strong><?= __('Állapot') . ': ' ?></strong>
                             <?php
-                                if($thesisTopic->thesis_topic_status_id == 23 && $thesisTopic->has('review')){
+                                if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview') && $thesisTopic->has('review')){
                                     if($thesisTopic->confidential === true && $thesisTopic->review->confidentiality_contract_status != 4){
                                         if($thesisTopic->review->confidentiality_contract_status == null) echo __('A titoktartási szerződés feltöltésére vár.');
                                         elseif($thesisTopic->review->confidentiality_contract_status == 1) echo __('A titoktartási szerződés feltölve, véglegesítésre vár.');
@@ -29,12 +29,17 @@
                                     }
                                 }
                             ?>
+                            <?php if($thesisTopic->has('review')){ ?>
+                                <?php if((in_array($thesisTopic->review->confidentiality_contract_status, [1, 2]) && $thesisTopic->review->cause_of_rejecting_confidentiality_contract !== null)){ ?>
+                                    <br/>
+                                    <strong><?= __('Előző feltöltés elutasításának oka') . ': ' ?></strong><?= h($thesisTopic->review->cause_of_rejecting_confidentiality_contract) ?>
+                                <?php } ?>
+                                <?php if($thesisTopic->review->confidentiality_contract_status == 3){ ?>
+                                    <br/>
+                                    <strong><?= __('Elutasítás oka') . ': ' ?></strong><?= h($thesisTopic->review->cause_of_rejecting_confidentiality_contract) ?>
+                                <?php } ?>
+                            <?php } ?>
                         </p>
-                        <?php if($thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status == 3 || ($thesisTopic->review->confidentiality_contract_status == 1 && $thesisTopic->review->cause_of_rejecting_confidentiality_contract !== null)){ ?>
-                            <p class="mb-4">
-                                <strong><?= __('Elutasítás oka') . ': ' ?></strong><?= h($thesisTopic->review->cause_of_rejecting_confidentiality_contract) ?>
-                            </p>
-                        <?php } ?>
                         <p class="mb-1">
                             <strong><?= __('Téma címe') . ': ' ?></strong><?= h($thesisTopic->title) ?>
                         </p>

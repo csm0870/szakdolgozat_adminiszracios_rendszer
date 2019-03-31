@@ -26,7 +26,7 @@ class ReviewsController extends AppController
         $this->getRequest()->allowMethod('ajax');
         $this->viewBuilder()->setClassName('Ajax.Ajax');
         
-        $thesisTopic = $this->Reviews->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id],
+        $thesisTopic = $this->Reviews->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id, 'ThesisTopics.deleted !=' => true],
                                                                              'contain' => ['Reviews' => ['Reviewers' => ['Users']]]])->first();
         
         $error_msg = '';
@@ -34,7 +34,7 @@ class ReviewsController extends AppController
         if(empty($thesisTopic)){ //Nem létezik a téma
             $error_msg = __('Bírálatra küldés nem lehetséges.') . ' ' . __('Nem létező dolgozat.');
             $ok = false;
-        }elseif($thesisTopic->thesis_topic_status_id != 22){ //Nem "Bírálatra vár" státuszban van
+        }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview')){ //Nem "Bírálatra vár" státuszban van
             $error_msg = __('Bírálatra küldés nem lehetséges.') . ' ' . __('A dolgozat nem bírálatra küldésre vár.');
             $ok = false;
         }elseif(!$thesisTopic->has('review') || !$thesisTopic->review->has('reviewer')){ //Nincs kijelölve bíráló
@@ -80,8 +80,7 @@ class ReviewsController extends AppController
                 $reviewer_user->group_id = 7;
             }
             
-            
-            if($thesisTopic->review->reviewer->has('user') || $this->Reviewers->Users->save($reviewer_user)){
+            if($thesisTopic->review->reviewer->has('user') || $this->Reviews->Reviewers->Users->save($reviewer_user)){
                 $saved_ok = true;
                 if(!$thesisTopic->review->reviewer->has('user')){
                     $thesisTopic->review->reviewer->user_id = $reviewer_user->id;
@@ -90,13 +89,13 @@ class ReviewsController extends AppController
                     
                     $raw_password->password = $pw;
                     $raw_password->user_id = $reviewer_user->id;
-                    if(!$this->Reviews->Reviewers->save($thesisTopic->review->reviewer) || !$this->Reviewers->Users->RawPasswords->save($raw_password)){
+                    if(!$this->Reviews->Reviewers->save($thesisTopic->review->reviewer) || !$this->Reviews->Reviewers->Users->RawPasswords->save($raw_password)){
                         $saved_ok = false;
                     }
                 }
                 
                 if($saved_ok === true){
-                    $thesisTopic->thesis_topic_status_id = 23; //Bírálat alatt
+                    $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'); //Bírálat alatt
                     if($this->Reviews->ThesisTopics->save($thesisTopic)){
                         $this->Flash->success(__('Bírálatra küldve.'));
                     }else{
@@ -156,7 +155,9 @@ class ReviewsController extends AppController
         if(empty($thesisTopic)){ //Nem létezik a téma
             $this->Flash->error(__('A bírálat nem elérhető.') . ' ' . __('Nem létező dolgozat.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [23, 24, 25])){ //Nem "Bírálat alatt", vagy "Bírálva státuszban van" státuszban van
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])){ //Nem "Bírálat alatt", vagy "Bírálva státuszban van" státuszban van
             $this->Flash->error(__('A bírálat nem elérhető.') . ' ' . __('A dolgozat még nem lett bírálva, vagy nem bírálat alatt van.'));
             $ok = false;
         }elseif($thesisTopic->has('review') == false){ //Nincs bírálat a dolgozathoz
@@ -192,7 +193,7 @@ class ReviewsController extends AppController
         if(empty($thesisTopic)){ //Nem létezik a téma
             $error_msg = __('A bírálatról nem dönthet.') . ' ' . __('Nem létező dolgozat.');
             $ok = false;
-        }elseif($thesisTopic->thesis_topic_status_id != 23){ //Nem "Bírálat alatt" státuszban van
+        }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview')){ //Nem "Bírálat alatt" státuszban van
             $error_msg = __('A bírálatról nem dönthet.') . ' ' . __('A dolgozat nem birálatt alatti állapotban van.');
             $ok = false;
         }elseif($thesisTopic->has('review') == false){ //Nincs bírálat a dolgozathoz
@@ -228,7 +229,7 @@ class ReviewsController extends AppController
                     $thesisTopic->review->cause_of_rejecting_review = $this->getRequest()->getData('cause_of_rejecting_review');
                 }else{
                     $thesisTopic->review->review_status = 6; //Elfogadva
-                    $thesisTopic->thesis_topic_status_id = 24; //Bírálva
+                    $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'); //Bírálva
                 }
             }
                 
@@ -280,7 +281,9 @@ class ReviewsController extends AppController
         if(empty($thesisTopic)){ //Nem létezik a téma
             $this->Flash->error(__('A feltölött bírálati lap nem elérhető.') . ' ' . __('Nem létező dolgozat.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [23, 24, 25])){ //Nem "Bírálat alatt", vagy "Bírálva státuszban van" státuszban van
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])){ //Nem "Bírálat alatt", vagy "Bírálva státuszban van" státuszban van
             $this->Flash->error(__('A feltölött bírálati lap nem elérhető.') . ' ' . __('A dolgozat még nem lett bírálva, vagy nem bírálatt alatt van.'));
             $ok = false;
         }elseif($thesisTopic->has('review') == false){ //Nincs bírálat a dolgozathoz
@@ -322,7 +325,7 @@ class ReviewsController extends AppController
         if(empty($thesisTopic)){ //Nem létezik a téma
             $error_msg = __('A feltöltött titoktartási szerződésről nem dönthet.') . ' ' . __('Nem létező dolgozat.');
             $ok = false;
-        }elseif($thesisTopic->thesis_topic_status_id != 23){ //Nem "Bírálat alatt" státuszban van
+        }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview')){ //Nem "Bírálat alatt" státuszban van
             $error_msg = __('A feltöltött titoktartási szerződésről nem dönthet.') . ' ' . __('A dolgozat nem birálatt alatti állapotban van.');
             $ok = false;
         }elseif($thesisTopic->confidential !== true){ //Nem titkos a dolgozat

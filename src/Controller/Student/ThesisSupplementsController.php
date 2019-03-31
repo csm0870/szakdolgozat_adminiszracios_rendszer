@@ -27,11 +27,18 @@ class ThesisSupplementsController extends AppController
         $this->loadModel('Users');
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['Students']]);
         
-        $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['id' => $thesisSupplement->thesis_topic_id]])->first();
-        if($thesisTopic->student_id != ($user->has('student') ? $user->student->id : '-1')){
-            $this->Flash->error(__('A szakdolgozat/diplomamunka nem Önhöz tartozik.'));
-            return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);
+        
+        $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['id' => $thesisSupplement->thesis_topic_id, 'deleted !=' => true]])->first();
+        $ok = true;
+        if(empty($thesisTopic)){
+            $this->Flash->error(__('A melléklet nem elérhető.') . ' ' . __('A dolgozat nem létezik.'));
+            $ok = false;
+        }elseif($thesisTopic->student_id != ($user->has('student') ? $user->student->id : '-1')){
+            $this->Flash->error(__('A melléklet nem elérhető.') . ' ' . __('A dolgozat nem Önhöz tartozik.'));
+            $ok = false;
         }
+        
+        if($ok === true) return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);
         
         $response = $this->getResponse()->withFile(ROOT . DS . 'files' . DS . 'thesis_supplements' . DS . $thesisSupplement->file,
                                                    ['download' => true, 'name' => $thesisSupplement->file]);
@@ -49,16 +56,16 @@ class ThesisSupplementsController extends AppController
         $this->loadModel('Users');
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['Students']]);
         
-        $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id],
+        $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id, 'ThesisTopics.deleted !=' => true],
                                                                             'contain' => ['ThesisSupplements']])->first();
         
         $ok = true;
         if(empty($thesisTopic)){
             $ok = false;
-            $this->Flash->error(__('A szakdolgozat/diplomamunka mellékletek nem elérhetőek.') . ' ' . __('A szakdolgozat/diplomamunka nem létezik.'));
+            $this->Flash->error(__('A dolgozat mellékletek nem elérhetőek.') . ' ' . __('A dolgozat nem létezik.'));
         }elseif($thesisTopic->student_id != ($user->has('student') ? $user->student->id : '-1')){
             $ok = false;
-            $this->Flash->error(__('A szakdolgozat/diplomamunka mellékletek nem elérhetőek.') . ' ' . __('A szakdolgozat/diplomamunka nem Önhöz tartozik.'));
+            $this->Flash->error(__('A dolgozat mellékletek nem elérhetőek.') . ' ' . __('A dolgozat nem Önhöz tartozik.'));
         }
         
         if($ok === false) return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);
@@ -75,8 +82,8 @@ class ThesisSupplementsController extends AppController
         }
         
         if($i < 1){//Ha nem volt melléklet
-            $this->Flash->error(__('A szakdolgozat/diplomamunka mellékletek nem elérhezőek.') . ' ' . __('A szakdolgozathou/diplomamunkához nem tartoznak mellékletek.'));
-            return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);            
+            $this->Flash->error(__('A dolgozat mellékletek nem elérhezőek.') . ' ' . __('A dolgozathoz nem tartoznak mellékletek.'));
+            return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);
         }
 
         # finish the zip stream
@@ -102,12 +109,14 @@ class ThesisSupplementsController extends AppController
         $this->loadModel('Users');
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['Students']]);
         
-        $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['id' => $thesisSupplement->thesis_topic_id]])->first();
+        $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['id' => $thesisSupplement->thesis_topic_id, 'ThesisTopics.deleted !=' => true]])->first();
         $ok = true;
         if($thesisTopic->student_id != ($user->has('student') ? $user->student->id : '-1')){
             $ok = false;
             $this->Flash->error(__('A melléklet nem törölhető.') . ' ' . __('A dolgozat nem Önhöz tartozik.'));
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [16, 17, 19])){
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected')])){
             $ok = false;
             $this->Flash->error(__('A melléklet nem törölhető.') . ' ' . __('A dolgozat állapota alapján már nem változtathatók a mellékletek.'));
         }

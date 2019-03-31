@@ -1,8 +1,8 @@
 <div class="container">
     <div class="row">
         <div class="col-12 text-center page-title">
-            <?= $this->Html->link('<i class="fas fa-arrow-alt-circle-left fa-lg"></i>' . '&nbsp;' . __('Vissza'), ['controller' => 'ThesisTopics', 'action' => 'index'], ['escape' => false, 'class' => 'backBtn float-left border-radius-45px', 'title' => __('Vissza')]) ?>
-            <h4><?= __('Témaengedélyező kitöltése') ?></h4>
+            <?= $this->Html->link('<i class="fas fa-arrow-alt-circle-left fa-lg"></i>' . '&nbsp;' . __('Vissza'), ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id], ['escape' => false, 'class' => 'backBtn float-left border-radius-45px', 'title' => __('Vissza')]) ?>
+            <h4><?= __('Téma módosítása') ?></h4>
         </div>
         <div class="col-12">
             <?= $this->Flash->render() ?>
@@ -51,8 +51,8 @@
                 }*/
             ?>
             <?= $this->Form->create($thesisTopic, ['id' => 'thesisTopicEditForm']) ?>
-            <?= $this->Form->control('title', ['class' => 'form-control', 'label' => ['text' => __('Cím')], 'readonly' => !empty($thesisTopic->offered_topic_id)]) ?>
-            <?php if(!empty($thesisTopic->offered_topic_id)){ ?>
+            <?= $this->Form->control('title', ['class' => 'form-control', 'label' => ['text' => __('Cím')], 'readonly' => $thesisTopic->has('offered_topic') && $thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking')]) ?>
+            <?php if($thesisTopic->has('offered_topic') && $thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking')){ ?>
                 <label class="mt-3">Leírás</label>
                 <div class="offered-topic-description mb-3">
                     <?= $thesisTopic->description ?>
@@ -71,7 +71,7 @@
             <?= $this->Form->control('internal_consultant_id', ['class' => 'form-control', 'label' => ['text' => __('Belső konzulens'), 'options' => $internalConsultants]]) ?>
             <?php
                 $value = $thesisTopic->cause_of_no_external_consultant === null ? 1 : 0;
-                if($thesisTopic->has('offered_topic')){
+                if($thesisTopic->has('offered_topic') && $thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking')){
                     $has_external_consultant = false;
                     if($thesisTopic->offered_topic->has_external_consultant === true){
                         $has_external_consultant = true;
@@ -79,29 +79,29 @@
                 }
             ?>
             <?= $this->Form->control('has_external_consultant', ['id' => 'has_external_consultant', 'class' => 'form-control', 'type' => 'select', 'value' => (($thesisTopic->has('offered_topic') && $thesisTopic->offered_topic->has_external_consultant === true) ? 1 : $value), 'empty' => false, 'options' => [__('Nincs'), __('Van')], 'label' => ['text' => __('Külső konzulens')],
-                                                                 'disabled' => ($thesisTopic->has('offered_topic') && $thesisTopic->offered_topic->has_external_consultant === true)]) ?>
+                                                                 'disabled' => ($thesisTopic->has('offered_topic') && $thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking') && $thesisTopic->offered_topic->has_external_consultant === true)]) ?>
             <?= $this->Form->control('external_consultant_name', ['class' => 'form-control', 'label' => ['text' => __('Külső konzulens neve')],
-                                                                  'readonly' => ($thesisTopic->has('offered_topic') && $thesisTopic->offered_topic->has_external_consultant === true),
+                                                                  'readonly' => ($thesisTopic->has('offered_topic') && $thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking') && $thesisTopic->offered_topic->has_external_consultant === true),
                                                                   'templates' => ['inputContainer' => '<div class="form-group external-consultants-data-field">{{content}}</div>',
                                                                                   'inputContainerError' => '<div class="form-group external-consultants-data-field">{{content}}{{error}}</div>']]) ?>
             <?= $this->Form->control('external_consultant_workplace', ['class' => 'form-control external-consultants-data-field', 'label' => ['text' => __('Külő konzulens munkahelye')],
-                                                                       'readonly' => ($thesisTopic->has('offered_topic') && $thesisTopic->offered_topic->has_external_consultant === true),
+                                                                       'readonly' => ($thesisTopic->has('offered_topic') && $thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking') && $thesisTopic->offered_topic->has_external_consultant === true),
                                                                        'templates' => ['inputContainer' => '<div class="form-group external-consultants-data-field">{{content}}</div>',
                                                                                        'inputContainerError' => '<div class="form-group external-consultants-data-field">{{content}}{{error}}</div>']]) ?>
             <?= $this->Form->control('external_consultant_position', ['class' => 'form-control external-consultants-data-field', 'label' => ['text' => __('Külső konzulens poziciója')],
-                                                                      'readonly' => ($thesisTopic->has('offered_topic') && $thesisTopic->offered_topic->has_external_consultant === true),
+                                                                      'readonly' => ($thesisTopic->has('offered_topic') && $thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking') && $thesisTopic->offered_topic->has_external_consultant === true),
                                                                       'templates' => ['inputContainer' => '<div class="form-group external-consultants-data-field">{{content}}</div>',
                                                                                       'inputContainerError' => '<div class="form-group external-consultants-data-field">{{content}}{{error}}</div>']]) ?>
             <?= $this->Form->control('external_consultant_address', ['class' => 'form-control external-consultants-data-field', 'label' => ['text' => __('Külső konzulens címe')],
-                                                                     'readonly' => ($thesisTopic->has('offered_topic') && $thesisTopic->offered_topic->has_external_consultant === true),
+                                                                     'readonly' => ($thesisTopic->has('offered_topic') && $thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking') && $thesisTopic->offered_topic->has_external_consultant === true),
                                                                      'templates' => ['inputContainer' => '<div class="form-group external-consultants-data-field">{{content}}</div>',
                                                                                       'inputContainerError' => '<div class="form-group external-consultants-data-field">{{content}}{{error}}</div>']]) ?>
             <?= $this->Form->control('external_consultant_phone_number', ['class' => 'form-control external-consultants-data-field', 'label' => ['text' => __('Külső konzulens telefonszáma')],
-                                                                          'readonly' => ($thesisTopic->has('offered_topic') && $thesisTopic->offered_topic->has_external_consultant === true),
+                                                                          'readonly' => ($thesisTopic->has('offered_topic') && $thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking') && $thesisTopic->offered_topic->has_external_consultant === true),
                                                                           'templates' => ['inputContainer' => '<div class="form-group external-consultants-data-field">{{content}}</div>',
                                                                                       'inputContainerError' => '<div class="form-group external-consultants-data-field">{{content}}{{error}}</div>']]) ?>
             <?= $this->Form->control('external_consultant_email', ['type' => 'email', 'class' => 'form-control external-consultants-data-field', 'label' => ['text' => __('Külső konzulens email címe')], 'placeholer' => __('+36701234567 formátumban.'),
-                                                                   'readonly' => ($thesisTopic->has('offered_topic') && $thesisTopic->offered_topic->has_external_consultant === true),
+                                                                   'readonly' => ($thesisTopic->has('offered_topic') && $thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking') && $thesisTopic->offered_topic->has_external_consultant === true),
                                                                    'templates' => ['inputContainer' => '<div class="form-group external-consultants-data-field">{{content}}</div>',
                                                                                       'inputContainerError' => '<div class="form-group external-consultants-data-field">{{content}}{{error}}</div>']]) ?>
             <?= $this->Form->control('cause_of_no_external_consultant', ['class' => 'form-control', 'label' => ['text' => __('Külső konzulens kijelölésétől való eltekintés indoklása')],

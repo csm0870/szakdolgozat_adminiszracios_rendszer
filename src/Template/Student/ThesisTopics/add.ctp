@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-12 text-center page-title">
             <?= $this->Html->link('<i class="fas fa-arrow-alt-circle-left fa-lg"></i>' . '&nbsp;' . __('Vissza'), ['controller' => 'ThesisTopics', 'action' => 'index'], ['escape' => false, 'class' => 'backBtn float-left border-radius-45px', 'title' => __('Vissza')]) ?>
-            <h4><?= __('Témaengedélyező kitöltése') ?></h4>
+            <h4><?= __('Téma hozzáadása') ?></h4>
         </div>
         <?php if($can_fill_in_topic === true){ ?>
         <div class="col-12">

@@ -9,7 +9,7 @@
         </div>
         <div class="col-12 mb-4 mt-2">
             <?php
-                if($thesisTopic->thesis_topic_status_id == 23 && $thesisTopic->has('review')){
+                if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview') && $thesisTopic->has('review')){
                     echo '<br/><strong>' .  __('Állapot') . ': ' . '</strong>';
                     if($thesisTopic->review->review_status == 4){
                         echo __('A bírálati lap feltöltés véglegesítve. A bírálat a tanszékvezető ellenőrzésére vár.');

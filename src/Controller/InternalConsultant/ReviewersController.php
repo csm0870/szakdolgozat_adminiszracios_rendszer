@@ -37,7 +37,7 @@ class ReviewersController extends AppController
         $saved = true;
         $error_ajax = "";
         $reviewer = $this->Reviewers->newEntity();
-        if ($this->request->is('post')) {
+        if ($this->getRequest()->is('post')) {
             $reviewer = $this->Reviewers->patchEntity($reviewer, $this->request->getData());
             if ($this->Reviewers->save($reviewer)){
                 $this->Flash->success(__('Mentés sikeres.'));
@@ -89,7 +89,7 @@ class ReviewersController extends AppController
         
         $saved = true;
         $error_ajax = "";
-        if ($this->request->is(['patch', 'post', 'put'])) {
+        if ($this->getRequest()->is(['patch', 'post', 'put'])) {
             $reviewer = $this->Reviewers->patchEntity($reviewer, $this->request->getData());
             if ($this->Reviewers->save($reviewer)){
                 $this->Flash->success(__('Mentés sikeres.'));
@@ -127,7 +127,7 @@ class ReviewersController extends AppController
         
         $this->loadModel('Users');
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
-        $thesisTopic = $this->Reviewers->Reviews->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id]])->first();
+        $thesisTopic = $this->Reviewers->Reviews->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id, 'ThesisTopics.deleted !=' => true]])->first();
         
         $error_msg = '';
         $ok = true;
@@ -137,7 +137,7 @@ class ReviewersController extends AppController
         }elseif($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : -1)){ ////Nem ehhez a belső konzulenshez tartozik
             $error_msg = __('Bírálói javaslat tétele nem lehetséges.') . ' ' . __('A szakdolgozatnak/diplomamunkának nem Ön a belső konzulense.');
             $ok = false;
-        }elseif($thesisTopic->thesis_topic_status_id != 20){ //Nem "Bíráló kijelölésére vár státuszban van" státuszban van
+        }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant')){ //Nem "Bíráló kijelölésére vár státuszban van" státuszban van
             $error_msg = __('Bírálói javaslat tétele nem lehetséges.') . ' ' . __('A szakdolgozat/diplomamunka nem a belső konzulens általi biráló személyének kijelölésére vár.');
             $ok = false;
         }
@@ -171,7 +171,7 @@ class ReviewersController extends AppController
                     $error_ajax = __('Mentés sikertelen. Próbálja újra!');
                 }else{
                     if($this->Reviewers->Reviews->save($review)){
-                        $thesisTopic->thesis_topic_status_id = 21; //Bíráló kijelölve
+                        $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByHeadOfDepartment'); //Bíráló kijelölve
                         if($this->Reviewers->Reviews->ThesisTopics->save($thesisTopic)){
                             $this->Flash->success(__('Mentés sikeres.'));
                         }else{

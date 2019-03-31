@@ -13,14 +13,14 @@
             ?>
             
                 <div class="col-12">
-                    <p class="<?= $thesisTopic->thesis_topic_status_id == 19 || ($thesisTopic->thesis_topic_status_id == 17 && $thesisTopic->cause_of_rejecting_thesis_supplements !== null) ? 'mb-1' : 'mb-4' ?>">
+                    <p class="mb-4">
                         <strong><?= __('Állapot') . ': ' ?></strong><?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : ''?>
-                    </p>
-                    <?php if($thesisTopic->thesis_topic_status_id == 19 || ($thesisTopic->thesis_topic_status_id == 17 && $thesisTopic->cause_of_rejecting_thesis_supplements !== null)){ ?>
-                        <p class="mb-3">
+                        <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected') ||
+                            ($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement') && $thesisTopic->cause_of_rejecting_thesis_supplements !== null)){ ?>
+                            <br/>
                             <strong><?= __('Elutasítás oka') . ': ' ?></strong><?= h($thesisTopic->cause_of_rejecting_thesis_supplements) ?>
-                        </p>
-                    <?php } ?>
+                        <?php } ?>
+                    </p>
                 </div>
             <div class="col-12">
                 <fieldset class="border-1-grey p-3 mb-2">
@@ -44,11 +44,11 @@
             </div>
             <div class="col-12">
                 <div class="row">
-                    <div class="col-12 <?= $thesisTopic->thesis_topic_status_id == 17 ? 'col-sm-6' : '' ?> text-center">
+                    <div class="col-12 <?= $thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement') ? 'col-sm-6' : '' ?> text-center">
                         <?= $this->Form->button(__('Mentés'), ['type' => 'submit', 'class' => 'btn btn-primary border-radius-45px submitBtn']) ?>
                     </div>
                     <div class=" col-12 col-sm-6 text-center">
-                        <?= $thesisTopic->thesis_topic_status_id == 17 ? $this->Html->link(__('Feltöltés véglegesítése'), '#', ['class' => 'btn btn-success finalizeUpoadedThesisBtn border-radius-45px']) : ''?>
+                        <?= $thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement') ? $this->Html->link(__('Feltöltés véglegesítése'), '#', ['class' => 'btn btn-success finalizeUpoadedThesisBtn border-radius-45px']) : ''?>
                     </div>
                 </div>
             </div>
@@ -116,7 +116,7 @@
             });
         });
         
-        <?php if($thesisTopic->thesis_topic_status_id == 17 ){ ?>
+        <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement')){ ?>
             /**
             * Confirmation modal megnyitása submit előtt
             */

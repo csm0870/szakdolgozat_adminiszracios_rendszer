@@ -28,13 +28,19 @@
                                 <tbody>
                                     <?php foreach($thesisTopics as $thesisTopic){ ?>
                                         <tr>
-                                            <td><?= '<searchable-text>' . h($thesisTopic->title) . '</searchable-text>' . (in_array($thesisTopic->thesis_topic_status_id, [1, 2, 3, 4, 5, 6, 7]) ? '' : ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id]))) ?></td>
+                                            <td><?= '<searchable-text>' . h($thesisTopic->title) . '</searchable-text>' . (in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalize'),
+                                                                                                                                                                           \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking'),
+                                                                                                                                                                           \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingRejectedByInternalConsultant'),
+                                                                                                                                                                           \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking'),
+                                                                                                                                                                           \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingCanceledByStudent'),
+                                                                                                                                                                           \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopic'),
+                                                                                                                                                                           \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByInternalConsultant')]) ? '' : ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id]))) ?></td>
                                             <td><?= $thesisTopic->has('internal_consultant') ? '<searchable-text>' . h($thesisTopic->internal_consultant->name) . '</searchable-text>' : '' ?></td>
                                             <td><?= $thesisTopic->has('student') ? '<searchable-text>' . (h($thesisTopic->student->name) . (empty($thesisTopic->student->neptun) ? '' : ('<br/>(' . h($thesisTopic->student->neptun) . ')'))) . '</searchable-text>' : '' ?></td>
                                             <td>
                                                 <?= $thesisTopic->has('thesis_topic_status') ? '<searchable-text>' . h($thesisTopic->thesis_topic_status->name) . '</searchable-text>' : '' ?>
                                                 <?php
-                                                    if($thesisTopic->thesis_topic_status_id == 23 && $thesisTopic->has('review')){
+                                                    if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview') && $thesisTopic->has('review')){
                                                         if($thesisTopic->confidential === true && $thesisTopic->review->confidentiality_contract_status != 4){
                                                             if($thesisTopic->review->confidentiality_contract_status == null || $thesisTopic->review->confidentiality_contract_status == 1) echo '(' . __('A titoktartási szerződés feltöltésére vár.') . ')';
                                                             elseif($thesisTopic->review->confidentiality_contract_status == 2) echo '(' . __('A titoktartási szerződés feltöltve, tanszékvezető ellenőrzésére vár.') . ')';

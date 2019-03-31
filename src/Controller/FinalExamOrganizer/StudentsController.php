@@ -17,12 +17,13 @@ class StudentsController extends AppController
      */
     public function index(){
         $query = $this->Students->find();
-        $students = $query->matching('ThesisTopics', function($q){ return $q->where(['ThesisTopics.thesis_topic_status_id' => 25, // Elfogadott dolgozat
-                                                                                     'ThesisTopics.accepted_thesis_data_applyed_to_neptun' => true /* A dolgozat és a bírálat adatai már fel vannak vive a Neptun rendszerbe */]);})
+        $students = $query->matching('ThesisTopics', function($q){ return $q->where(['ThesisTopics.thesis_topic_status_id' => \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted'), // Elfogadott dolgozat
+                                                                                     'ThesisTopics.accepted_thesis_data_applyed_to_neptun' => true /* A dolgozat és a bírálat adatai már fel vannak vive a Neptun rendszerbe */,
+                                                                                     'ThesisTopics.deleted !=' => true]);})
                           ->contain(['Courses', 'CourseTypes', 'CourseLevels'])
                           //Azon hallgatók, akik nem mérnökinformatikusok, vagy mérnökinformatikus, de van elfogadott záróvizsga tárgyuk
                           ->where(['OR' => ['Students.course_id !=' => 1, 'AND' => ['Students.course_id' => 1, 'Students.final_exam_subjects_status' => 3]]]);
-                                                                                     
+                                                               
         $this->set(compact('students'));
     }
     

@@ -187,8 +187,13 @@ class StudentsTable extends Table
         $can_add_topic = true;
         foreach($thesisTopics as $thesisTopic){
             //Ha csak elutasított témája van
-            if(!in_array($thesisTopic->thesis_topic_status_id, [3, 5, 7, 9, 11, 14])){
-                $can_add_topic = false;
+            if(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingRejectedByInternalConsultant'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingCanceledByStudent'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByInternalConsultant'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByHeadOfDepartment'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByExternalConsultant'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByHeadOfDepartmentCauseOfFirstThesisSubjectFailed')])){
+    $can_add_topic = false;
                 break;
             }
         }
@@ -212,7 +217,16 @@ class StudentsTable extends Table
         $can_modify_data = true;
         foreach($thesisTopics as $thesisTopic){
             //Ha csak elutasított témája van vagy véglegesítésre váró
-            if(!in_array($thesisTopic->thesis_topic_status_id, [1,2, 3, 4, 5, 7, 9, 11, 14])){
+            if(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalize'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingRejectedByInternalConsultant'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingCanceledByStudent'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByInternalConsultant'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByHeadOfDepartment'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ProposalForAmendmentOfThesisTopicAddedByHeadOfDepartment'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByExternalConsultant'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByHeadOfDepartmentCauseOfFirstThesisSubjectFailed')])){
                 $can_modify_data = false;
                 break;
             }
@@ -244,8 +258,8 @@ class StudentsTable extends Table
                     $notification = $Notifications->newEntity();
                     $notification->user_id = $internalConsultant->user_id;
                     $notification->unread = true;
-                    $notification->subject = 'Záróvizsga-tárgyak ellenőrzése.';
-                    $notification->message = 'A ' . h($entity->name) . ' (' . h($entity->neptun) . ') nevű hallgató megadta a záróvizsga-tárgy javaslatait. Ellenőrízze a tárgyakat!' .
+                    $notification->subject = 'Egy hallgató záróvizsga-tárgy javaslatokat adott meg. Ellenőrizze a megfelelőségüket!';
+                    $notification->message = 'A ' . h($entity->name) . ' (' . h($entity->neptun) . ') nevű hallgató megadta a záróvizsga-tárgy javaslatait.' .
                                              '<br/><a href="' . \Cake\Routing\Router::url(['controller' => 'FinalExamSubjects', 'action' => 'details', $entity->id, 'prefix' => 'internal_consultant'], true) . '">' . 'Részletek megtekintése' . '</a>';
                 
                     $Notifications->save($notification);
@@ -269,7 +283,28 @@ class StudentsTable extends Table
                                              '<br/><a href="' . \Cake\Routing\Router::url(['controller' => 'FinalExamSubjects', 'action' => 'index', 'prefix' => 'student'], true) . '">' . 'Részletek megtekintése' . '</a>';
                 
                     $Notifications->save($notification);
+                    
+                    //Ha már van elfogadott témája, akkor már mehet ZV-ra
+                    if($this->ThesisTopics->exists(['student_id' => $entity->id, 'thesis_topic_status_id' => \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])){
+                        $student = $this->get($entity->id, ['contain' => ['Courses', 'CourseTypes', 'CourseLevels']]);
+                        //Záróvizsga összeállítók
+                        $final_exam_organizers = $this->Users->find('all', ['conditions' => ['group_id' => 8]]);
+                        foreach($final_exam_organizers as $final_exam_organizer){
+                            $notification = $Notifications->newEntity();
+                            $notification->user_id = $final_exam_organizer->id;
+                            $notification->unread = true;
+                            $notification->subject = 'Egy hallgató megfelelt a záróvizsga követelményeknek. Záróvizsgára mehet.';
+                            $notification->message = 'Hallgató: ' . h($student->name) . ' (' . h($student->neptun) . ')' . '<br/>' .
+                                                     ($student->has('course') ? 'Szak: ' . h($student->course->name) . '<br/>' : '') .
+                                                     ($student->has('course_type') ? 'Tagozat: ' . h($student->course_type->name) . '<br/>' : '') .
+                                                     ($student->has('course_level') ? 'Képzési szint: ' . h($student->course_level->name) . '<br/>' : '') .
+                                                     'Ez az üzenet nem jelenti azt, hogy a hallgató jelentkezett már záróvizsgára.' . '<br/>';
+                            $Notifications->save($notification);
+                        }
+                    }
                 }
+                
+                
             }
         }
     }

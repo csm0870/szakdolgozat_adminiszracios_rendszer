@@ -21,7 +21,16 @@ class ThesisTopicsController extends AppController
      * Szakdolgozatkezelő témalista(szakdolgozatlista)
      */
     public function index(){
-        $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['deleted !=' => true, 'thesis_topic_status_id IN' => [16, 17, 18, 19, 20, 21, 22, 23, 24, 25]],
+        $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['deleted !=' => true, 'thesis_topic_status_id IN' => [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable'),
+                                                                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),
+                                                                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements'),
+                                                                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected'),
+                                                                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant'),
+                                                                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByHeadOfDepartment'),
+                                                                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
+                                                                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')]],
                                                           'contain' => ['Students', 'InternalConsultants', 'ThesisTopicStatuses'], 'order' => ['ThesisTopics.modified' => 'DESC']]);
 
         $this->set(compact('thesisTopics'));
@@ -34,7 +43,7 @@ class ThesisTopicsController extends AppController
      * @return type
      */
     public function details($id = null){
-        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id],
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id, 'ThesisTopics.deleted !=' => true],
                                                          'contain' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels'],
                                                                        'ThesisTopicStatuses', 'InternalConsultants', 'StartingYears', 'ExpectedEndingYears', 'Languages', 'ThesisSupplements',
                                                                        'Reviews' => ['Reviewers']]])->first();
@@ -44,7 +53,16 @@ class ThesisTopicsController extends AppController
         if(empty($thesisTopic)){ //Nem létezik a téma
             $this->Flash->error(__('Részeletek nem elérhetőek.') . ' ' . __('Nem létezik a téma.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22, 23, 24, 25])){ //A szakdolgozati feltöltés nincs véglegesítve
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByHeadOfDepartment'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])){ //A szakdolgozati feltöltés nincs véglegesítve
             $this->Flash->error(__('Részeletek nem elérhetőek.') . ' ' . __('A dolgozat még nincs abban az állapotban, hogy elérheti.'));
             $ok = false;
         }
@@ -64,7 +82,7 @@ class ThesisTopicsController extends AppController
         $this->getRequest()->allowMethod('ajax');
         $this->viewBuilder()->setClassName('Ajax.Ajax');
         
-        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id]])->first();
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id, 'ThesisTopics.deleted !=' => true]])->first();
         
         $error_msg = '';
         
@@ -72,7 +90,7 @@ class ThesisTopicsController extends AppController
         if(empty($thesisTopic)){
             $ok = false;
             $error_msg = __('A mellékletek nem bírálhatóak.') . ' ' . __('A téma nem létezik.');
-        }elseif($thesisTopic->thesis_topic_status_id != 18){ //A szakdolgozati feltöltés nincs véglegesítve
+        }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements')){ //A szakdolgozati feltöltés nincs véglegesítve
             $ok = false;
             $error_msg = __('A mellékletek nem bírálhatóak.') . ' ' . __('A szakdolgozat felöltése még nincs véglegesítve.');
         }
@@ -92,9 +110,9 @@ class ThesisTopicsController extends AppController
                 $thesisTopic->review->setError('custom', __('A döntésnek "0" (nem) vagy "1" (igen) értéket kell felvennie!'));
             }else{
                 if($accepted == 0){
-                    $thesisTopic->thesis_topic_status_id = 19; //Elutasítva
+                    $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected'); //Elutasítva
                     $thesisTopic->cause_of_rejecting_thesis_supplements = $this->getRequest()->getData('cause_of_rejecting_thesis_supplements');
-                }else $thesisTopic->thesis_topic_status_id = 20; //Elfogadva
+                }else $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant'); //Elfogadva
             }
             
             if($this->ThesisTopics->save($thesisTopic)){
@@ -132,7 +150,7 @@ class ThesisTopicsController extends AppController
         $this->getRequest()->allowMethod('ajax');
         $this->viewBuilder()->setClassName('Ajax.Ajax');
         
-        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id],
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id, 'ThesisTopics.deleted !=' => true],
                                                          'contain' => ['InternalConsultants', 'Reviews' => ['Reviewers']]])->first();
         
         $error_msg = '';
@@ -140,7 +158,7 @@ class ThesisTopicsController extends AppController
         if(empty($thesisTopic)){
             $ok = false;
             $error_msg = __('Az adatok felvitele nem rögzíthető.') . ' ' . __('Nem létezik a téma.');
-        }elseif($thesisTopic->thesis_topic_status_id != 25){ //A dolgozat még nincs elfogadva
+        }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')){ //A dolgozat még nincs elfogadva
             $ok = false;
              __('Az adatok felvitele nem rögzíthető.') . ' ' . __('A dolgozat még nincs elfogadott állapotban.');
         }elseif($thesisTopic->accepted_thesis_data_applyed_to_neptun === true){ //Az adatok már fel vannak vive

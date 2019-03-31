@@ -19,23 +19,35 @@ class ThesisTopicsController extends AppController
      * @return type
      */
     public function exportPdf($id = null){
-        $thesisTopic = $this->ThesisTopics->get($id, ['contain' => ['Students' => ['Courses', 'CourseLevels', 'CourseTypes'],
-                                                                    'InternalConsultants' => ['Departments', 'InternalConsultantPositions'],
-                                                                    'StartingYears', 'ExpectedEndingYears', 'Languages']]);
+        $group_id = $this->Auth->user('group_id');
         
-        if($this->Auth->user('group_id') == 6){
-            //Hallgatói adatellenőrzés
-            $this->loadModel('Students');
-            $data = $this->Students->checkStundentData($this->Auth->user('id'));
-            if($data['success'] === false){
-                $this->Flash->error(__('Adja meg az adatit a továbblépéshez!'));
-                return $this->redirect(['controller' => 'Students', 'action' => 'edit', $data['student_id'], 'prefix' => 'student']);
-            }
-            
-            if($thesisTopic->student_id != $data['student_id']){
-                $this->Flash->error(__('A téma nem Önhöz tartozik.'));
-                return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index', 'prefix' => 'student']);
-            }
+        $prefix = '';
+        if($group_id == 1){
+            $prefix = 'admin';
+        }elseif($group_id == 2){
+            $prefix = 'internal_consultant';
+        }elseif($group_id == 3){
+            $prefix = 'head_of_department';
+        }elseif($group_id == 4){
+            $prefix = 'topic_manager';
+        }elseif($group_id == 5){
+            $prefix = 'thesis_manager';
+        }elseif($group_id == 6){
+            $prefix = 'student';
+        }elseif($group_id == 7){
+            $prefix = 'reviewer';
+        }elseif($group_id == 8){
+            $prefix = 'final_exam_organizer';
+        }
+        
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id, 'ThesisTopics.deleted !=' => true],
+                                                         'contain' => ['Students' => ['Courses', 'CourseLevels', 'CourseTypes'],
+                                                                       'InternalConsultants' => ['Departments', 'InternalConsultantPositions'],
+                                                                       'StartingYears', 'ExpectedEndingYears', 'Languages']])->first();
+        
+        if(empty($thesisTopic)){
+            $this->Flash->error(__('A téma nem létezik.'));
+            return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index', 'prefix' => $prefix]);
         }
         
         $this->viewBuilder()->setLayout('default');
@@ -102,10 +114,16 @@ class ThesisTopicsController extends AppController
             }
         }
         
-        if($thesisTopic->confidential !== true){
+        $ok = true;
+        if(empty($thesisTopic)){
+            $this->Flash->error(__('A titoksítási kérelem nem elérhető.') . ' ' . __('A téma nem létezik.'));
+            $ok = false;
+        }elseif($thesisTopic->confidential !== true){
             $this->Flash->error(__('A titkosítási kérelem nem elérhető.') . ' ' . __('A téma nem titkos.'));
-            return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index', 'prefix' => $prefix]);
+            $ok = false;
         }
+        
+        if($ok === false) return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index', 'prefix' => $prefix]);
         
         $hun_months = ["január", "február", "március", "április", "május", "június",
                        "július", "augusztus", "szeptember", "október", "november", "december"];

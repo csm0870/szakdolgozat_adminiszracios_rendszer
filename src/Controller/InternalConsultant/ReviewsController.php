@@ -18,14 +18,15 @@ class ReviewsController extends AppController
      * @param type $thesis_topic_id Téma azonosítója
      */
     public function checkReview($thesis_topic_id = null){
-        $thesisTopic = $this->Reviews->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id],
+        $thesisTopic = $this->Reviews->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id, 'ThesisTopics.deleted !=' => true],
                                                                   'contain' => ['Reviews' => ['Reviewers', 'Questions']]])->first();
         
         $ok = true;
         if(empty($thesisTopic)){ //Nem létezik a téma
             $this->Flash->error(__('A bírálat nem elérhető.') . ' ' . __('Nem létező dolgozat.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [24, 25])){ //Nem "a dolgozat bírálva", vagy "A dolgozat elfogadva" státuszban van
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])){ //Nem "a dolgozat bírálva", vagy "A dolgozat elfogadva" státuszban van
             $this->Flash->error(__('A bírálat nem elérhető.') . ' ' . __('A dolgozat még nem lett bírálva, vagy bírálat alatt van.'));
             $ok = false;
         }elseif($thesisTopic->has('review') == false){ //Nincs bírálat a dolgozathoz

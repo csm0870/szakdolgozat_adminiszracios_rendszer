@@ -22,7 +22,7 @@
                 }
                 
                 echo '<br/><strong>' .  __('Állapot') . ': ' . '</strong>';
-                if($thesisTopic->thesis_topic_status_id == 23 && $thesisTopic->has('review')){
+                if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview') && $thesisTopic->has('review')){
                     if($thesisTopic->confidential === true && $thesisTopic->review->confidentiality_contract_status != 4){
                         if($thesisTopic->review->confidentiality_contract_status == null) echo __('A titoktartási szerződés feltöltésére vár.');
                         elseif($thesisTopic->review->confidentiality_contract_status == 1) echo __('A titoktartási szerződés feltölve, véglegesítésre vár.');
@@ -39,7 +39,7 @@
                             echo '<br/><strong>Elutasítás oka:</strong>&nbsp;' . h($thesisTopic->review->cause_of_rejecting_review);
                         }
                         
-                        if(in_array($thesisTopic->review->review_status, [1, 2, 3]) && $thesisTopic->review->cause_of_rejecting_review !== null){
+                        if(in_array($thesisTopic->review->review_status, [1, 2, 3, 4]) && $thesisTopic->review->cause_of_rejecting_review !== null){
                             echo '<br/><strong>Az előző bírálat elutasításának oka:</strong>&nbsp;' . h($thesisTopic->review->cause_of_rejecting_review);
                         }
                     }

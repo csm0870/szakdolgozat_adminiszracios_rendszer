@@ -74,7 +74,7 @@ class OfferedTopicsController extends AppController
         }elseif($user->internal_consultant->id != $offeredTopic->internal_consultant_id){ //Ha nem az adott belső konzulenshez tartozik
             $ok = false;
             $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A téma nem Önhöz tartozik.'));
-        }elseif($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id == 4){ //Ha téma foglalva van és a hallgató véglegesítésére vár
+        }elseif($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking')){ //Ha téma foglalva van és a hallgató véglegesítésére vár
             $ok = false;
             $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A téma foglalásának véglegesítését még nem tette meg a hallgató.'));
         }
@@ -116,15 +116,15 @@ class OfferedTopicsController extends AppController
         }elseif($user->internal_consultant->id != $offeredTopic->internal_consultant_id){
             $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A téma nem Önhöz tartozik.'));
             return $this->redirect(['action' => 'index']);
-        }elseif($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id == 4){ //Ha téma foglalva van és a hallgató véglegesítésére vár
+        }elseif($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking')){ //Ha téma foglalva van és a hallgató véglegesítésére vár
             $ok = false;
             $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A téma foglalásának véglegesítését még nem tette meg a hallgató.'));
         }
         
         if ($this->OfferedTopics->delete($offeredTopic)){
             //Ha a témaajánlatot valaki választotta és belső konzulens döntésre vár a foglalás
-            if($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id == 2){
-                $offeredTopic->thesis_topic->thesis_topic_status_id = 3;
+            if($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking')){
+                $offeredTopic->thesis_topic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingRejectedByInternalConsultant');
                 $this->OfferedTopics->ThesisTopics->save($offeredTopic->thesis_topic);
             }
             
@@ -181,7 +181,7 @@ class OfferedTopicsController extends AppController
             }elseif($offeredTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : -1)){ ////Nem ehhez a belső konzulenshez tartozik
                 $ok = false;
                 $this->Flash->error(__('A témáról nem dönthet.') . ' ' . __('A témának nem Önhöz tartozik.'));
-            }elseif($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id != 2){ //Nem "A témafoglalás belső konzulensi döntésre vár" státuszban van
+            }elseif($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking')){ //Nem "A témafoglalás belső konzulensi döntésre vár" státuszban van
                 $ok = false;
                 $this->Flash->error(__('A témáról nem dönthet.') . ' ' . __('Nem belső konzulens döntésére vár.'));
             }
@@ -189,10 +189,10 @@ class OfferedTopicsController extends AppController
             if($ok === false) return $this->redirect(['action' => 'index']);
             
             if($accepted == 0){
-                $offeredTopic->thesis_topic->thesis_topic_status_id = 3;
+                $offeredTopic->thesis_topic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingRejectedByInternalConsultant');
                 $offeredTopic->thesis_topic->offered_topic_id = null;
             }else{
-                $offeredTopic->thesis_topic->thesis_topic_status_id = 4;
+                $offeredTopic->thesis_topic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking');
             }
 
             if($this->OfferedTopics->ThesisTopics->save($offeredTopic->thesis_topic)){

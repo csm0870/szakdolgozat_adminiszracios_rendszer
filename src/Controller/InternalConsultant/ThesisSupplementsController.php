@@ -27,11 +27,17 @@ class ThesisSupplementsController extends AppController
         $this->loadModel('Users');
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         
-        $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['id' => $thesisSupplement->thesis_topic_id]])->first();
-        if($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : '-1')){
-            $this->Flash->error(__('A dolgozat nem Önhöz tartozik.'));
-            return;
+        $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['id' => $thesisSupplement->thesis_topic_id, 'ThesisTopics.deleted !=' => true]])->first();
+        $ok = true;
+        if(empty($thesisTopic)){
+            $this->Flash->error(__('A melléklet nem elérhető.') . ' ' . __('A dolgozat nem létezik.'));
+            $ok = false;
+        }elseif($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : '-1')){
+            $this->Flash->error(__('A melléklet nem elérhető.') . ' ' . __('A dolgozat nem Önhöz tartozik.'));
+            $ok = false;
         }
+        
+        if($ok === true) return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);
         
         $response = $this->getResponse()->withFile(ROOT . DS . 'files' . DS . 'thesis_supplements' . DS . $thesisSupplement->file,
                                                    ['download' => true, 'name' => $thesisSupplement->file]);
@@ -49,7 +55,7 @@ class ThesisSupplementsController extends AppController
         $this->loadModel('Users');
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         
-        $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id],
+        $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id, 'ThesisTopics.deleted !=' => true],
                                                                             'contain' => ['ThesisSupplements']])->first();
         
         $ok = true;

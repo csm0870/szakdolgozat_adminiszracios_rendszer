@@ -60,7 +60,7 @@
                             <strong><?= __('Képzés típusa') . ': ' ?></strong><?= $offeredTopic->has('thesis_topic') ? ($offeredTopic->thesis_topic->has('student') ? ($offeredTopic->thesis_topic->student->has('course_type') ? h($offeredTopic->thesis_topic->student->course_type->name) : '') : '') : '' ?>
                         </p>
                     </fieldset>
-                    <?php if($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id == 2){ ?>
+                    <?php if($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking')){ ?>
                         <div class="row mt-3 mb-4">
                             <div class="col-12 col-sm-6 text-center">
                                 <?php

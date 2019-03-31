@@ -1,5 +1,5 @@
 <div class="form-modal">
-    <?= $ok === true ? $this->Form->create($thesisTopic, ['id' => 'acceptThesisSupplements']) : '' ?>
+    <?= $ok === true ? $this->Form->create(null, ['id' => 'acceptThesisSupplements']) : '' ?>
     <div class="form-header text-center">
         <?= __('Szakdolgozat/Diplomamunka mellékleteinek elfogadása') ?>
     </div>
@@ -25,7 +25,7 @@
                 </tr>
                 <tr class="rejected_supplements_row">
                     <td>
-                        <?= $this->Form->control('cause_of_rejecting_thesis_supplements', ['label' => false, 'style' => 'width: 100%', 'error' => false,
+                        <?= $this->Form->control('cause_of_rejecting_thesis_supplements', ['label' => false, 'style' => 'width: 100%', 'error' => false, 'type' => 'textarea',
                                                                                             'id' => 'cause_of_rejecting_thesis_supplements_input']) ?>
                     </td>
                 </tr>

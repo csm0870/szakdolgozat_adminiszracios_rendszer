@@ -19,7 +19,11 @@ class ThesisTopicsController extends AppController
         $this->loadModel('Users');
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         //Csak a véglegesített témákat látja
-        $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['deleted !=' => true, 'thesis_topic_status_id NOT IN' => [1, 2, 3, 4, 5]],
+        $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['deleted !=' => true, 'thesis_topic_status_id NOT IN' => [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalize'),
+                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking'),
+                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingRejectedByInternalConsultant'),
+                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking'),
+                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingCanceledByStudent')]],
                                                           'contain' => ['Students', 'InternalConsultants', 'ThesisTopicStatuses'], 'order' => ['ThesisTopics.modified' => 'DESC']]);
 
         $this->set(compact('thesisTopics'));
@@ -39,7 +43,7 @@ class ThesisTopicsController extends AppController
                 return $this->redirect(['action' => 'index']);
             }
 
-            $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['id' => $thesisTopic_id]])->first();
+            $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['id' => $thesisTopic_id, 'deleted !=' => true]])->first();
 
             $ok = true;
             
@@ -49,7 +53,7 @@ class ThesisTopicsController extends AppController
             }elseif($thesisTopic->cause_of_no_external_consultant !== null){ //Nincs külső konzulens
                 $this->Flash->error(__('A téma elfogadásáról nem dönthet.') . ' ' . __('A témának nincs kölső konzulense.'));
                 $ok = false;
-            }elseif($thesisTopic->thesis_topic_status_id != 10){ //Nem külső konzulensi aláírás ellenőrzésére vár
+            }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingExternalConsultantSignatureOfThesisTopic')){ //Nem külső konzulensi aláírás ellenőrzésére vár
                 $this->Flash->error(__('A téma elfogadásáról nem dönthet.') . ' ' . __('A téma nem külső konzulensi aláírás ellenőrzsére vár.'));
                 return $this->redirect(['action' => 'index']);
             }
@@ -57,7 +61,7 @@ class ThesisTopicsController extends AppController
             if(!$ok) return $this->redirect(['action' => 'index']);
             
             //Elfogadás vagy elutasítás
-            $thesisTopic->thesis_topic_status_id = $accepted == 0 ? 11 : 12;
+            $thesisTopic->thesis_topic_status_id = $accepted == 0 ? \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByExternalConsultant') : \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicAccepted');
 
             if($this->ThesisTopics->save($thesisTopic)){
                 $this->Flash->success($accepted == 0 ? __('Elutasítás sikeres.') : __('Elfogadás sikeres.'));
@@ -75,7 +79,7 @@ class ThesisTopicsController extends AppController
      * @param type $id Téma azonosítója
      */
     public function details($id = null){
-        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id],
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id, 'ThesisTopics.deleted !=' => true],
                                                          'contain' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels'], 'ThesisTopicStatuses', 'InternalConsultants', 'StartingYears', 'ExpectedEndingYears', 'Languages']])->first();
     
         $ok = true;
@@ -83,7 +87,11 @@ class ThesisTopicsController extends AppController
         if(empty($thesisTopic)){ //Nem létezik a téma
             $this->Flash->error(__('A téma részletei nem elérhetők.') . ' ' . __('Nem létező téma.'));
             $ok = false;
-        }elseif(in_array($thesisTopic->thesis_topic_status_id, [1, 2, 3, 4, 5])){ //Ha a téma még nincs véglegesítve
+        }elseif(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalize'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingRejectedByInternalConsultant'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingCanceledByStudent')])){ //Ha a téma még nincs véglegesítve
             $this->Flash->error(__('A téma részletei nem elérhetők.') . ' ' . __('A téma'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.' );
             $ok = false;
         }
@@ -133,7 +141,8 @@ class ThesisTopicsController extends AppController
             $query = $this->ThesisTopics->find();
             $data_for_courses[] = $query->where(['ThesisTopics.starting_year_id' => $year->id,
                                                  'ThesisTopics.starting_semester' => $semester,
-                                                 'ThesisTopics.thesis_topic_status_id' => 12 /* Elfogadott téma */])
+                                                 'ThesisTopics.thesis_topic_status_id' => \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicAccepted'), /* Elfogadott téma */
+                                                 'ThesisTopics.deleted !=' => true])
                                         ->matching('Students', function ($q) use($course_id) { return $q->where(['Students.course_id' => $course_id]);})
                                         ->count();
             $labels_for_courses[] = $course;
@@ -144,7 +153,8 @@ class ThesisTopicsController extends AppController
             $query = $this->ThesisTopics->find();
             $data_for_course_types[] = $query->where(['ThesisTopics.starting_year_id' => $year->id,
                                                       'ThesisTopics.starting_semester' => $semester,
-                                                      'ThesisTopics.thesis_topic_status_id' => 12 /* Elfogadott téma */])
+                                                      'ThesisTopics.thesis_topic_status_id' => \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicAccepted'), /* Elfogadott téma */
+                                                      'ThesisTopics.deleted !=' => true])
                                              ->matching('Students', function ($q) use($course_type_id) { return $q->where(['Students.course_type_id' => $course_type_id]);})
                                              ->count();
                                              
@@ -156,7 +166,8 @@ class ThesisTopicsController extends AppController
             $query = $this->ThesisTopics->find();
             $data_for_course_levels[] = $query->where(['ThesisTopics.starting_year_id' => $year->id,
                                                        'ThesisTopics.starting_semester' => $semester,
-                                                       'ThesisTopics.thesis_topic_status_id' => 12 /* Elfogadott téma */])
+                                                       'ThesisTopics.thesis_topic_status_id' => \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicAccepted'), /* Elfogadott téma */
+                                                       'ThesisTopics.deleted !=' => true])
                                                ->matching('Students', function ($q) use($course_level_id) { return $q->where(['Students.course_level_id' => $course_level_id]);})
                                                ->count();
             
@@ -217,7 +228,7 @@ class ThesisTopicsController extends AppController
         
         $headers = ['Neptun kód', 'Név', 'Belső konzulens', 'Téma címe', 'Szak', 'Képzés típusa', 'Képzés szintje', 'Tanév', 'Félév'];
         
-        $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.starting_year_id' => $year->id, 'thesis_topic_status_id' => 12], //Elfogadott témák
+        $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.starting_year_id' => $year->id, 'ThesisTopics.deleted !=' => true, 'ThesisTopics.thesis_topic_status_id' => \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicAccepted')], //Elfogadott témák
                                                           'contain' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels'],
                                                                         'StartingYears', 'InternalConsultants']]);
         $data = [];

@@ -8,8 +8,8 @@
         </div>
         <div class="col-12">
             <?php
-                $this->Form->templates(['inputContainer' => '<div class="form-group">{{content}}</div>',
-                                        'inputContainerError' => '<div class="form-group">{{content}}{{error}}</div>']);
+                $this->Form->setTemplates(['inputContainer' => '<div class="form-group">{{content}}</div>',
+                                           'inputContainerError' => '<div class="form-group">{{content}}{{error}}</div>']);
                 
                 echo $this->Form->create($student, ['id' => 'studentEditForm']);
                 echo $this->Form->control('name', ['class' => 'form-control', 'label' => ['text' => __('Név')], 'readonly' => !$can_modify_data]);

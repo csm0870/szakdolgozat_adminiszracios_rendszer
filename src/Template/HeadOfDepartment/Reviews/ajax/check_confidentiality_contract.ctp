@@ -1,5 +1,5 @@
 <div class="form-modal headOfDepartment-checkConfidentialityContract">
-    <?= $ok ? $this->Form->create($thesisTopic->review, ['id' => 'checkConfidentialityContractForm']) : '' ?>
+    <?= $ok ? $this->Form->create(null, ['id' => 'checkConfidentialityContractForm']) : '' ?>
     <div class="form-header text-center">
         <?= __('Titoktartási szerződés elfogadása') ?>
     </div>
@@ -32,7 +32,7 @@
                 </tr>
                 <tr class="rejected_confidentiality_contract_row">
                     <td>
-                        <?= $this->Form->control('cause_of_rejecting_confidentiality_contract', ['label' => false, 'style' => 'width: 100%', 'error' => false,
+                        <?= $this->Form->control('cause_of_rejecting_confidentiality_contract', ['label' => false, 'style' => 'width: 100%', 'error' => false, 'type' => 'textarea',
                                                                                                  'id' => 'cause_of_rejecting_confidentiality_contract_input']) ?>
                     </td>
                 </tr>

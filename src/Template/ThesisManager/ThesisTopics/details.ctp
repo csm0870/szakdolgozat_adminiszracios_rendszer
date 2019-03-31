@@ -8,21 +8,30 @@
         <div class="col-12">
             <fieldset class="border-1-grey p-3 mb-3">
                     <legend class="w-auto"><?= __('A téma adatai') ?></legend>
-                    <p class="<?= $thesisTopic->thesis_topic_status_id == 19 ? 'mb-2' : 'mb-4' ?>">
+                    <p class="mb-4">
                         <strong><?= __('Állapot') . ': ' ?></strong><?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : ''?>
                         <?php
-                            if($thesisTopic->thesis_topic_status_id == 25 && $thesisTopic->accepted_thesis_data_applyed_to_neptun !== true){
+                            if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted') && $thesisTopic->accepted_thesis_data_applyed_to_neptun !== true){
                                 echo '(' . __('Az elfogadott dolgozat adatait fel kell vinni a Neptun rendszerbe.') . ')';
                                 echo '<br/>';
                                 echo $this->Html->link(__('Adatok felvitele') . ' ->', '#', ['class' => 'mt-2 applyAcceptedThesisDataBtn', 'style' => 'display: inline-block']);
                             }
+                            
+                            if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements') &&
+                               $thesisTopic->cause_of_rejecting_thesis_supplements !== null){
+                                echo ' (' . __('a mellékletek a módosítás utáni állapotban vannak') . ')';
+                            }
                         ?>
-                    </p>
-                    <?php if($thesisTopic->thesis_topic_status_id == 19){ ?>
-                        <p class="mb-4">
+                        <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected')){ ?>
+                            <br/>
                             <strong><?= __('Elutasítás oka') . ': ' ?></strong><?= h($thesisTopic->cause_of_rejecting_thesis_supplements) ?>
-                        </p>
-                    <?php } ?>
+                        <?php } ?>
+                        <?php if(($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement') || $thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements')) &&
+                                  $thesisTopic->cause_of_rejecting_thesis_supplements !== null){ ?>
+                            <br/>
+                            <strong><?= __('A mellékletek elutasításának oka') . ': ' ?></strong><?= h($thesisTopic->cause_of_rejecting_thesis_supplements) ?>
+                        <?php } ?>
+                    </p>
                     <p class="mb-1">
                         <strong><?= __('Belső konzulens') . ': ' ?></strong><?= $thesisTopic->has('internal_consultant') ? h($thesisTopic->internal_consultant->name) : '' ?>
                     </p>
@@ -76,15 +85,28 @@
                         </p>
                     <?php } ?>
                 </fieldset>
-                <?php if(in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22, 23, 24, 25])){ ?>
+                <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable'),
+                                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),
+                                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements'),
+                                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected'),
+                                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant'),
+                                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByHeadOfDepartment'),
+                                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
+                                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])){ ?>
                     <fieldset class="border-1-grey p-3 mb-3">
                         <legend class="w-auto"><?= __('Dolgozat értékelése') ?></legend>
                         <p class="mb-2">
                             <strong><?= __('Belső konzulens értékelése') . ': ' ?></strong><?= $thesisTopic->internal_consultant_grade === null ? __('még nincs értékelve') : h($thesisTopic->internal_consultant_grade) ?>
                         </p>
-                        <?php if(in_array($thesisTopic->thesis_topic_status_id, [24, 25]) && $thesisTopic->has('review'))
+                        <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')]) && $thesisTopic->has('review'))
                                     echo $this->Html->link(__('Bírálat megtekintése') . ' ->', ['controller' => 'Reviews', 'action' => 'checkReview', $thesisTopic->id], ['class' => 'mb-2', 'style' => 'display: inline-block']); ?>
-                        <?php if(in_array($thesisTopic->thesis_topic_status_id, [22, 23, 24, 25]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
+                        <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
+                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
                             <p class="mb-1">
                                 <?= $this->Html->link(__('Dolgozat bírálója') . '&nbsp;' . '<i class="fas fa-angle-down fa-lg" id="reviewer_details_arrow_down"></i>' . '<i class="fas fa-angle-up fa-lg d-none" id="reviewer_details_arrow_up"></i>',
                                                       '#', ['id' => 'reviewer_details_link', 'escape' => false]) ?>
@@ -125,7 +147,15 @@
                     </p>
                 </fieldset>
         </div>
-        <?php if(in_array($thesisTopic->thesis_topic_status_id, [17, 18, 19, 20, 21, 22, 23, 24, 25])){ ?>
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByHeadOfDepartment'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])){ ?>
             <div class="col-12">
                 <div id="accordion">
                     <div class="card">
@@ -165,7 +195,7 @@
             <fieldset class="border-1-grey p-3 text-center">
                 <legend class="w-auto"><?= __('Műveletek') ?></legend>
                 <?php
-                    if($thesisTopic->thesis_topic_status_id == 18) echo $this->Form->button(__('Mellékletek elfogadása'), ['class' => 'btn btn-primary acceptThesisSupplementsBtn border-radius-45px mb-2']) . '<br/>';
+                    if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements')) echo $this->Form->button(__('Mellékletek elfogadása'), ['class' => 'btn btn-primary acceptThesisSupplementsBtn border-radius-45px mb-2']) . '<br/>';
 
                     echo $this->Html->link(__('Témaengedélyező PDF letöltése'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-primary border-radius-45px mb-2', 'target' => '_blank']) . '<br/>';
                 ?>
@@ -173,7 +203,7 @@
         </div>
     </div>
 </div>
-<?php if($thesisTopic->thesis_topic_status_id == 18){ ?>
+<?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements')){ ?>
     <!-- Diplomakurzus első félévének teljesítésének rögzítése modal -->
     <div class="modal fade" id="acceptThesisSupplementsModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
@@ -187,7 +217,7 @@
       </div>
     </div>
 <?php } ?>
-<?php if($thesisTopic->thesis_topic_status_id == 25 && $thesisTopic->accepted_thesis_data_applyed_to_neptun !== true){ ?>
+<?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted') && $thesisTopic->accepted_thesis_data_applyed_to_neptun !== true){ ?>
     <!-- Elfogadott dolgozat adatainak felvitele modal -->
     <div class="modal fade" id="applyAcceptedThesisDataModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -205,7 +235,7 @@
     $(function(){
         $('#thesis_topics_index_menu_item').addClass('active');
         
-        <?php if($thesisTopic->thesis_topic_status_id == 18){ ?>
+        <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements')){ ?>
             //Tartalom lekeérése a "diplomakurzus első félévének teljesítésének rögzítése" modalba
             $.ajax({
                 url: '<?= $this->Url->build(['action' => 'acceptThesisSupplements', $thesisTopic->id], true) ?>',
@@ -221,7 +251,15 @@
             });
         <?php } ?>
         
-        <?php if(in_array($thesisTopic->thesis_topic_status_id, [17, 18, 19, 20, 21, 22, 23, 24, 25])){ ?>
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByHeadOfDepartment'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])){ ?>
             /**
              * Accordion megjelenítésekor nyíl cseréje
              */
@@ -239,7 +277,10 @@
             });
         <?php } ?>
             
-        <?php if(in_array($thesisTopic->thesis_topic_status_id, [22, 23, 24, 25]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
             $('#reviewer_details_link').on('click', function(e){
                 e.preventDefault();
                 if($('#reviewer_details_container').css('display') == 'none'){
@@ -254,7 +295,7 @@
             });
         <?php } ?>
             
-        <?php if($thesisTopic->thesis_topic_status_id == 25 && $thesisTopic->accepted_thesis_data_applyed_to_neptun !== true){ ?>
+        <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted') && $thesisTopic->accepted_thesis_data_applyed_to_neptun !== true){ ?>
             //Tartalom lekeérése a "adatok felvitele a Neptun rendszerbe" modalba
             $.ajax({
                 url: '<?= $this->Url->build(['action' => 'applyAcceptedThesisData', $thesisTopic->id], true) ?>',

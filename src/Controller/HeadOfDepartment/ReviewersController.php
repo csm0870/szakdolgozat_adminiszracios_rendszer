@@ -26,16 +26,16 @@ class ReviewersController extends AppController
         $this->getRequest()->allowMethod('ajax');
         $this->viewBuilder()->setClassName('Ajax.Ajax');
         
-        $thesisTopic = $this->Reviewers->Reviews->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id],
+        $thesisTopic = $this->Reviewers->Reviews->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id, 'ThesisTopics.deleted !=' => true],
                                                                              'contain' => ['Reviews' => ['Reviewers']]])->first();
         
         $error_msg = '';
         $ok = true;
         if(empty($thesisTopic)){ //Nem létezik a téma
-            $error_msg = __('Bírálói kijelölése nem lehetséges.') . ' ' . __('Nem létező szakdolgozat/diplomamunka.');
+            $error_msg = __('Bírálói kijelölése nem lehetséges.') . ' ' . __('Nem létező dolgozat.');
             $ok = false;
-        }elseif($thesisTopic->thesis_topic_status_id != 21){ //Nem "Bíráló kijelölésére vár státuszban van" státuszban van
-            $error_msg = __('Bírálói kijelölése nem lehetséges.') . ' ' . __('A szakdolgozat/diplomamunka nem a biráló személyének kijelölésére vár.');
+        }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByHeadOfDepartment')){ //Nem "Bíráló kijelölésére vár státuszban van" státuszban van
+            $error_msg = __('Bírálói kijelölése nem lehetséges.') . ' ' . __('A dolgozat nem a biráló személyének kijelölésére vár.');
             $ok = false;
         }
         
@@ -57,17 +57,17 @@ class ReviewersController extends AppController
                 $saved = false;
                 $error_ajax = __('Mentés sikertelen. Próbálja újra!') . ' ' . __('Bíráló nem létezik.');
             }else{
-                $review_deleted = true;
-                if($thesisTopic->has('review')){ //Ha esetleg már lenne hozzárendelve, akkor töröljük
-                    if(!$this->Reviewers->Reviews->delete($thesisTopic->review)) $review_deleted = false;
+                if(!$thesisTopic->has('review')){ //Ha nem lenne valamiért hozzárendelve
+                    $review = $this->Reviewers->Reviews->newEntity();
+                    $review->thesis_topic_id = $thesisTopic->id;
+                }else{
+                    $review = $thesisTopic->review;
                 }
                 
-                $review = $this->Reviewers->Reviews->newEntity();
-                $review->thesis_topic_id = $thesisTopic->id;
                 $review->reviewer_id = $reviewer_id;
                 
-                if($review_deleted === true && $this->Reviewers->Reviews->save($review)){
-                    $thesisTopic->thesis_topic_status_id = 22; //Bíráló kijelölve, bírálatra vár
+                if($this->Reviewers->Reviews->save($review)){
+                    $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'); //Bíráló kijelölve, bírálatra vár
                     if($this->Reviewers->Reviews->ThesisTopics->save($thesisTopic)){
                         $this->Flash->success(__('Mentés sikeres.'));
                     }else{

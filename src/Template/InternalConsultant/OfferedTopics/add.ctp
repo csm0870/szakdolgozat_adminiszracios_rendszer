@@ -9,8 +9,8 @@
         </div>
         <div class="col-12">
             <?php
-                $this->Form->templates(['inputContainer' => '<div class="form-group">{{content}}</div>',
-                                        'inputContainerError' => '<div class="form-group">{{content}}{{error}}</div>']);
+                $this->Form->setTemplates(['inputContainer' => '<div class="form-group">{{content}}</div>',
+                                           'inputContainerError' => '<div class="form-group">{{content}}{{error}}</div>']);
                 
                 echo $this->Form->create($offeredTopic, ['id' => 'offeredTopicAddForm']);
                 echo $this->Form->control('title', ['class' => 'form-control', 'label' => ['text' => __('Cím')]]);

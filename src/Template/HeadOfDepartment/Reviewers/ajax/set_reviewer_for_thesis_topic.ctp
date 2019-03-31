@@ -31,6 +31,10 @@
                         </p>
                         <?= $this->Html->link(__('Másik bírálót választok') . ' ->', '#', ['class' => 'notAcceptBtn']) ?>
                     </div>
+            <?php }else{ ?>
+                <div class="mb-4">
+                    <strong><?= __('Nincs belső konzulensi javaslat.') ?></strong>
+                </div>
             <?php } ?>
             <table>
                 <tr>

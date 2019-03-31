@@ -28,13 +28,13 @@ class ThesisSupplementsController extends AppController
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['Reviewers']]);
         $reviewer_id = $user->has('reviewer') ? $user->reviewer->id : '';
         
-        $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesisSupplement->thesis_topic_id]])->first();
+        $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesisSupplement->thesis_topic_id, 'ThesisTopics.deleted !=' => true]])->first();
     
         $ok = true;
         if(empty($thesisTopic)){ //Nem létezik a téma
             $this->Flash->error(__('A melléklet nem elérhető.') . ' ' . __('Nem létező dolgozat.'));
             $ok = false;
-        }elseif($thesisTopic->thesis_topic_status_id != 23){ //Nem "Bíálat alatt" státuszban van
+        }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview')){ //Nem "Bíálat alatt" státuszban van
             $this->Flash->error(__('A melléklet nem elérhető.') . ' ' . __('A dolgozat nem bírálható állapotban van.'));
             $ok = false;
         }else{
@@ -74,13 +74,13 @@ class ThesisSupplementsController extends AppController
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['Reviewers']]);
         $reviewer_id = $user->has('reviewer') ? $user->reviewer->id : '';
         
-        $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id]])->first();
+        $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id, 'ThesisTopics.deleted !=' => true]])->first();
     
         $ok = true;
         if(empty($thesisTopic)){ //Nem létezik a téma
             $this->Flash->error(__('A mellékletek nem elérhetőek.') . ' ' . __('Nem létező dolgozat.'));
             $ok = false;
-        }elseif($thesisTopic->thesis_topic_status_id != 23){ //Nem "Bíálat alatt" státuszban van
+        }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview')){ //Nem "Bíálat alatt" státuszban van
             $this->Flash->error(__('A mellékletek nem elérhetőek.') . ' ' . __('A dolgozat nem bírálható állapotban van.'));
             $ok = false;
         }else{

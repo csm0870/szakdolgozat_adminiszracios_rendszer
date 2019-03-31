@@ -15,7 +15,7 @@ class ThesisTopicsController extends AppController
     
     public function beforeFilter(\Cake\Event\Event $event) {
         parent::beforeFilter($event);
-        if($this->getRequest()->getParam('action') == 'decideToContinueAfterFailedFirstThesisSubject') $this->viewBuilder()->setLayout(false);
+        if(in_array($this->getRequest()->getParam('action'), ['decideToContinueAfterFailedFirstThesisSubject', 'proposalForAmendment'])) $this->viewBuilder()->setLayout(false);
     }
     
     /**
@@ -25,7 +25,13 @@ class ThesisTopicsController extends AppController
         $this->loadModel('Users');
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         //Csak azokat a témákat látja, amelyet a belső konzulens már elfogadott
-        $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['deleted !=' => true, 'thesis_topic_status_id NOT IN' => [1, 2, 3, 4, 5, 6, 7] /* Már eljutott a tanszékvezetőig */],
+        $thesisTopics = $this->ThesisTopics->find('all', ['conditions' => ['deleted !=' => true, 'thesis_topic_status_id NOT IN' => [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalize'),
+                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking'),
+                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingRejectedByInternalConsultant'),
+                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking'),
+                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingCanceledByStudent'),
+                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopic'),
+                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByInternalConsultant')] /* Már eljutott a tanszékvezetőig */],
                                                           'contain' => ['Students', 'InternalConsultants', 'ThesisTopicStatuses', 'Reviews'], 'order' => ['ThesisTopics.modified' => 'DESC']]);
 
         $this->set(compact('thesisTopics'));
@@ -45,13 +51,13 @@ class ThesisTopicsController extends AppController
                 return $this->redirect(['action' => 'index']);
             }
 
-            $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['id' => $thesisTopic_id]])->first();
+            $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesisTopic_id, 'ThesisTopics.deleted !=' => true]])->first();
             
             $ok = true;
             if(empty($thesisTopic)){
                 $this->Flash->error(__('Erről a témáról nem dönthet.') . ' ' . __('A téma nem létezik.'));
                 $ok = false;
-            }elseif($thesisTopic->thesis_topic_status_id != 8){ //Nem "A téma tanszékvezetői döntésre vár" státuszban van
+            }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForHeadOfDepartmentAcceptingOfThesisTopic')){ //Nem "A téma tanszékvezetői döntésre vár" státuszban van
                 $this->Flash->error(__('Erről a témáról nem dönthet.') . ' ' . __('Nem tanszékvezetői döntésre vár.'));
                 $ok = false;
             }
@@ -59,7 +65,7 @@ class ThesisTopicsController extends AppController
             if(!$ok) return $this->redirect(['action' => 'index']);
             
             //Elutasítás vagy elfogadás esetén, ha van külső konzulens, akkor külső konzulensi ellenőrzésre vár státuszú lesz, ha nincs, akkor pedig elfogadva
-            $thesisTopic->thesis_topic_status_id = $accepted == 0 ? 9 : ($thesisTopic->cause_of_no_external_consultant === null ? 10 : 12);
+            $thesisTopic->thesis_topic_status_id = $accepted == 0 ? \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByHeadOfDepartment') : ($thesisTopic->cause_of_no_external_consultant === null ? \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingExternalConsultantSignatureOfThesisTopic') :  \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicAccepted'));
 
             if($this->ThesisTopics->save($thesisTopic)){
                 $this->Flash->success($accepted == 0 ? __('Elutasítás sikeres.') : __('Elfogadás sikeres.'));
@@ -76,7 +82,7 @@ class ThesisTopicsController extends AppController
      * @param type $id Téma azonosítója
      */
     public function details($id = null){
-        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id],
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id, 'ThesisTopics.deleted !=' => true],
                                                          'contain' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels'],
                                                                        'ThesisTopicStatuses', 'InternalConsultants', 'StartingYears', 'ExpectedEndingYears', 'Languages', 'ThesisSupplements',
                                                                        'Reviews' => ['Reviewers' => ['Users' => ['RawPasswords']]]]])->first();
@@ -86,14 +92,86 @@ class ThesisTopicsController extends AppController
         if(empty($thesisTopic)){ //Nem létezik a téma
             $this->Flash->error(__('A téma részletei nem elérhetők.') . ' ' . __('Nem létező téma.'));
             $ok = false;
-        }elseif(in_array($thesisTopic->thesis_topic_status_id, [1, 2, 3, 4, 5, 6, 7])){ //Tanszékvezető döntése alatti státuszokban van
-            $this->Flash->error(__('A téma részletei nem elérhetők.') . ' ' . __('A téma'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.' );
+        }elseif(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalize'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingRejectedByInternalConsultant'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingCanceledByStudent'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopic'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByInternalConsultant')])){ //Tanszékvezető döntése alatti státuszokban van
+            $this->Flash->error(__('A téma részletei nem elérhetők.') . ' ' . __('A téma nincs abban az állapotban.'));
             $ok = false;
         }
         
         if(!$ok) return $this->redirect (['action' => 'index']);
         
         $this->set(compact('thesisTopic'));
+    }
+    
+    /**
+     * Téma módosítási javaslat
+     * 
+     * @param type $id Téma azonosítója
+     */
+    public function proposalForAmendment($id = null){
+        $this->getRequest()->allowMethod('ajax');
+        $this->viewBuilder()->setClassName('Ajax.Ajax');
+        
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id, 'ThesisTopics.deleted !=' => true]])->first();
+        
+        $error_msg = '';
+        $ok = true;
+        
+        if(empty($thesisTopic)){ //Nem létezik a téma
+            $error_msg = __('Nem adhat módosítási javaslatot.') . ' ' . __('Nem létező téma.');
+            $ok = false;
+        }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForHeadOfDepartmentAcceptingOfThesisTopic')){ //Nem "A téma a tanszékvezető döntésére vár" státuszban van
+            $error_msg = __('Nem adhat módosítási javaslatot.') . ' ' . __('A téma nem a tanszékvezető döntésére vár.');
+            $ok = false;
+        }
+        
+        //Ha a feltételeknek nem megfelelő téma
+        if($ok === false){
+            $this->set(compact('ok', 'error_msg'));
+            return;
+        }
+                
+        $saved = true;
+        $error_ajax = "";
+        if($this->getRequest()->is(['post', 'patch', 'put'])){
+            $proposal_for_amendment = $this->getRequest()->getData('proposal_for_amendment');
+            
+            if(empty($proposal_for_amendment)){
+                $thesisTopic->setError('custom', __('A javaslatot kötelező kitölteni.'));
+            }else{ //Ajánlott témánál pedig a belső konzulenshez kerüljön vissza sztem
+                $thesisTopic->proposal_for_amendment = $proposal_for_amendment;
+                
+                $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.ProposalForAmendmentOfThesisTopicAddedByHeadOfDepartment');
+            }
+            
+            if($this->ThesisTopics->save($thesisTopic)){
+                $this->Flash->success(__('Mentés sikeres.'));
+            }else{
+                $saved = false;
+                $error_ajax = __('Mentés sikertelen. Kérjük próbálja újra!');
+                
+                $errors = $thesisTopic->getErrors();
+                if(!empty($errors)){
+                    foreach($errors as $error){
+                        if(is_array($error)){
+                            foreach($error as $err){
+                                $error_ajax.= '<br/>' . $err;
+                            }
+                        }else{
+                            $error_ajax.= '<br/>' . $error;
+                        }
+                    }
+                }
+            }
+        }
+        
+        $this->set(compact('thesisTopic' ,'ok', 'error_msg', 'saved', 'error_ajax'));
+        $this->set('_serialize', ['saved', 'error_ajax']);
     }
     
     /**
@@ -104,23 +182,22 @@ class ThesisTopicsController extends AppController
         $this->getRequest()->allowMethod('ajax');
         $this->viewBuilder()->setClassName('Ajax.Ajax');
         
-        $this->loadModel('Users');
-        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id], 'contain' => ['ThesisTopicStatuses']])->first();
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id, 'ThesisTopics.deleted !=' => true]])->first();
         
         $error_msg = '';
-        $no_thesis_topic = false;
+        $ok = true;
         
         if(empty($thesisTopic)){ //Nem létezik a téma
             $error_msg = __('Nem dönthet.') . ' ' . __('Nem létező téma.');
-            $no_thesis_topic = true;
-        }elseif($thesisTopic->thesis_topic_status_id != 13){ //Nem "Első diplomakurzus sikertelen, tanszékvezető döntésére vár" státuszban van
-            $error_msg = __('Nem dönthet.') . ' ' . __('A téma'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" státuszban van.';
-            $no_thesis_topic = true;
+            $ok = false;
+        }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.FirstThesisSubjectFailedWaitingForHeadOfDepartmentDecision')){ //Nem "Első diplomakurzus sikertelen, tanszékvezető döntésére vár" státuszban van
+            $error_msg = __('Nem dönthet.') . ' ' . __('A téma nem "Első diplomakurzus sikertlen" állapotban van.');
+            $ok = false;
         }
         
         //Ha a feltételeknek nem megfelelő téma
-        if($no_thesis_topic){
-            $this->set(compact('no_thesis_topic', 'error_msg'));
+        if($ok === false){
+            $this->set(compact('ok', 'error_msg'));
             return;
         }
                 
@@ -133,9 +210,9 @@ class ThesisTopicsController extends AppController
                 $thesisTopic->setError('custom', __('A döntésnek "0"(nem) vagy "1"(igen) értéket kell felvennie!'));
             }else{
                 if($decide_to_continue == 0){ //Új témát kell választania
-                    $thesisTopic->thesis_topic_status_id = 14; //Téma elutasítva (első diplomakurzus sikertelen)
+                    $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByHeadOfDepartmentCauseOfFirstThesisSubjectFailed'); //Téma elutasítva (első diplomakurzus sikertelen)
                 }else{ //Javíthatja a diplomakurzust a jelenlegi témával
-                    $thesisTopic->thesis_topic_status_id = 12; //Elfogadva
+                    $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicAccepted'); //Elfogadva
                 }
             }
             
@@ -160,7 +237,7 @@ class ThesisTopicsController extends AppController
             }
         }
         
-        $this->set(compact('thesisTopic' ,'no_thesis_topic', 'error_msg', 'saved', 'error_ajax'));
+        $this->set(compact('thesisTopic' ,'ok', 'error_msg', 'saved', 'error_ajax'));
         $this->set('_serialize', ['saved', 'error_ajax']);
     }
 }

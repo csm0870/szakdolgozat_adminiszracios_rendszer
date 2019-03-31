@@ -165,15 +165,6 @@ class ReviewsTable extends Table
      * @param type $options
      */
     public function beforeSave($event, $entity, $options){
-        //Ha a bíráló véglegesíti a feltöltött titoktartási szerződést
-        if($entity->getOriginal('confidentiality_contract_status') == 1 && $entity->confidentiality_contract_status == 2){
-            $entity->cause_of_rejecting_confidentiality_contract = null;
-        }
-        
-        //Ha a bíráló véglegesíti a feltöltött bírálati lapot, vagyis a bírálatot véglegesíti
-        if($entity->getOriginal('review_status') == 3 && $entity->review_status == 4){
-            $entity->cause_of_rejecting_review = null;
-        }
     }
     
     /**
@@ -233,7 +224,7 @@ class ReviewsTable extends Table
                 $notification->unread = true;
                 $notification->subject = 'A tanszékvezető elutasította a feltöltött titoktartási szerződését.';
                 $notification->message = 'Dolgozat címe: ' . h($thesisTopic->title) . '<br/>' .
-                                         'Titkos: ' . ($entity->confidential === true ? 'igen' : 'nem') . '<br/>' .
+                                         'Titkos: ' . ($thesisTopic->confidential === true ? 'igen' : 'nem') . '<br/>' .
                                          (!empty($language) ? 'Nyelv: ' . h($language->name) . '<br/>' : '') .
                                          'Újra feltöltheti a titoktartási szerződést.' . '<br/>' .
                                          '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id, 'prefix' => 'reviewer'], true) . '">' . 'Részletek megtekintése' . '</a>';
@@ -259,7 +250,7 @@ class ReviewsTable extends Table
                 $notification->unread = true;
                 $notification->subject = 'A tanszékvezető elfogadta a feltöltött titoktartási szerződését. Bírálja a dolgozatot!';
                 $notification->message = 'Dolgozat címe: ' . h($thesisTopic->title) . '<br/>' .
-                                         'Titkos: ' . ($entity->confidential === true ? 'igen' : 'nem') . '<br/>' .
+                                         'Titkos: ' . ($thesisTopic->confidential === true ? 'igen' : 'nem') . '<br/>' .
                                          (!empty($language) ? 'Nyelv: ' . h($language->name) . '<br/>' : '') .
                                          '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id, 'prefix' => 'reviewer'], true) . '">' . 'Részletek megtekintése' . '</a>';
 
@@ -311,7 +302,7 @@ class ReviewsTable extends Table
                 $notification->unread = true;
                 $notification->subject = 'A tanszékvezető elutasított a bírálatot. Bírálja újra a dolgozatot!';
                 $notification->message = 'Dolgozat címe: ' . h($thesisTopic->title) . '<br/>' .
-                                         'Titkos: ' . ($entity->confidential === true ? 'igen' : 'nem') . '<br/>' .
+                                         'Titkos: ' . ($thesisTopic->confidential === true ? 'igen' : 'nem') . '<br/>' .
                                          (!empty($language) ? 'Nyelv: ' . h($language->name) . '<br/>' : '') .
                                          '<a href="' . \Cake\Routing\Router::url(['controller' => 'Reviews', 'action' => 'review', $thesisTopic->id, 'prefix' => 'reviewer'], true) . '">' . 'Részletek megtekintése' . '</a>';
 
@@ -336,7 +327,7 @@ class ReviewsTable extends Table
                 $notification->unread = true;
                 $notification->subject = 'A tanszékvezető elfogadta a bírálatot. További teendője nincs.';
                 $notification->message = 'Dolgozat címe: ' . h($thesisTopic->title) . '<br/>' .
-                                         'Titkos: ' . ($entity->confidential === true ? 'igen' : 'nem') . '<br/>' .
+                                         'Titkos: ' . ($thesisTopic->confidential === true ? 'igen' : 'nem') . '<br/>' .
                                          (!empty($language) ? 'Nyelv: ' . h($language->name) : '');
 
                 $Notifications->save($notification);

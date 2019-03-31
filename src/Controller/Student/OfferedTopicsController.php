@@ -135,13 +135,13 @@ class OfferedTopicsController extends AppController
             $thesisTopic->cause_of_no_external_consultant = __('A belső konzulens nem jelölt ki külső konzulenst, de adható hozzá.');
         }
         
-        $thesisTopic->thesis_topic_status_id = 2;
+        $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking');
         $thesisTopic->offered_topic_id = $offeredTopic->id;
         $thesisTopic->student_id = $data['student_id'];
 
         if($this->ThesisTopics->save($thesisTopic)){
             $this->Flash->success(__('Lefoglalás sikeres.'));
-            return $this->redirect(['action' => 'index']);
+            return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);
         }
         
         $this->Flash->error(__('Lefoglalás sikertelen. Próbálja újra!') . print_r($thesisTopic->getErrors(), true));

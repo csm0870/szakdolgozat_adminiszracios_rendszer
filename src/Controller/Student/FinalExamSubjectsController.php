@@ -31,7 +31,17 @@ class FinalExamSubjectsController extends AppController
         
         $student = $this->FinalExamSubjects->Students->find('all', ['conditions' => ['Students.id' => $data['student_id']], 'contain' => ['FinalExamSubjects']])->first();
         //Olyan témák száma, amivel már lehet ZV tárgyak megadni
-        $thesisTopics = $this->FinalExamSubjects->Students->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.thesis_topic_status_id IN' => [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25], 'deleted' => false, 'student_id' => $student->id]]);
+        $thesisTopics = $this->FinalExamSubjects->Students->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.thesis_topic_status_id IN' => [\Cake\Core\Configure::read('ThesisTopicStatuses.FirstThesisSubjectSucceeded'),
+                                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable'),
+                                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),
+                                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements'),
+                                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected'),
+                                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant'),
+                                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByHeadOfDepartment'),
+                                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
+                                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')], 'deleted !=' => true, 'student_id' => $student->id]]);
         
         if($student->course_id != 1){ //Ha nem mérnökinformatikus
             $ok = false;

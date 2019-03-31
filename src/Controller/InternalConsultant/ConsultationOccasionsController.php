@@ -35,7 +35,7 @@ class ConsultationOccasionsController extends AppController
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         
         $this->loadModel('ThesisTopics');
-        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $consultation->thesis_topic_id], 'contain' => ['ThesisTopicStatuses']])->first();
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $consultation->thesis_topic_id, 'ThesisTopics.deleted !=' => true]])->first();
         
         $ok = true;
         
@@ -45,8 +45,11 @@ class ConsultationOccasionsController extends AppController
         }elseif($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : -1)){ ////Nem ehhez a belső konzulenshez tartozik
             $this->Flash->error(__('A konzultációs csoportotokat nem láthatja.') . ' ' . __('A témának, amelyhez tartozik, nem Ön a belső konzulense.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [12, 13, 14, 15])){ //Nem "Az első diplimakurzus teljesítve" státuszban van
-            $this->Flash->error(__('A konzultációs csoportotokat nem láthatja.') . ' ' . __('A téma'). ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" ' . 'státuszban van.');
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicAccepted'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.FirstThesisSubjectFailedWaitingForHeadOfDepartmentDecision'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByHeadOfDepartmentCauseOfFirstThesisSubjectFailed'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.FirstThesisSubjectSucceeded')])){
+            $this->Flash->error(__('A konzultációs csoportotokat nem láthatja.') . ' ' . __('A téma, amelyhez tartozik, nincs abban az állapotban, hogy eléreje az alkalmakat.'));
             $ok = false;
         }
         
@@ -99,7 +102,7 @@ class ConsultationOccasionsController extends AppController
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         
         $this->loadModel('ThesisTopics');
-        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $consultation->thesis_topic_id], 'contain' => ['ThesisTopicStatuses']])->first();
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $consultation->thesis_topic_id, 'ThesisTopics.deleted !=' => true]])->first();
         
         if(empty($thesisTopic)){ //Nem létezik a téma
             $error_msg = __('A konzultációs alkalom nem adható hozzá.') . ' ' . __('A téma, amelyhez tartozik nem létezik.');
@@ -107,8 +110,9 @@ class ConsultationOccasionsController extends AppController
         }elseif($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : -1)){ ////Nem ehhez a belső konzulenshez tartozik
             $error_msg = __('A konzultációs alkalom nem adható hozzá.') . ' ' . __('A témának, amelyhez tartozik nem Ön a belső konzulense.');
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [12, 15])){
-            $error_msg = __('A konzultációs alkalom nem adható hozzá.') . ' ' . __('A téma, amelyhez tartozik') . ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" ' . __('státuszban van.');
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicAccepted'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.FirstThesisSubjectSucceeded')])){
+            $error_msg = __('A konzultációs alkalom nem adható hozzá.') . ' ' . __('A téma, amelyhez tartozik, nincs abban az állapotban, hogy hozzáadhatna konzultácós alkalmat.');
             $ok = false;
         }
         
@@ -180,7 +184,7 @@ class ConsultationOccasionsController extends AppController
             $error_msg = __('A konzultációs alkalom nem szerkeszthető.') . ' ' . __('A konzultációs csoport, amihez tartozik már véglegesített.');
             $ok = false;
         }elseif($consultation->current === false){ //Régi szakdolgozathoz tartozik
-            $error_msg = __('A konzultációs alkalom nem szerkeszthető.') . ' ' . __('A konzultációs csoport, amihez tartozik régebbi szakdolgozathoz tartozik.');
+            $error_msg = __('A konzultációs alkalom nem szerkeszthető.') . ' ' . __('A konzultációs csoport, amihez tartozik régebbi dolgozat verzióhoz tartozik.');
             $ok = false;
         }
         
@@ -193,7 +197,7 @@ class ConsultationOccasionsController extends AppController
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         
         $this->loadModel('ThesisTopics');
-        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $consultation->thesis_topic_id], 'contain' => ['ThesisTopicStatuses']])->first();
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $consultation->thesis_topic_id, 'ThesisTopics.deleted !=' => true]])->first();
         
         if(empty($thesisTopic)){ //Nem létezik a téma
             $error_msg = __('A konzultációs alkalom nem szerkeszthető.') . ' ' . __('A téma, amelyhez tartozik nem létezik.');
@@ -201,8 +205,9 @@ class ConsultationOccasionsController extends AppController
         }elseif($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : -1)){ ////Nem ehhez a belső konzulenshez tartozik
             $error_msg = __('A konzultációs alkalom nem szerkeszthető.') . ' ' . __('A témának, amelyhez tartozik nem Ön a belső konzulense.');
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [12, 15])){ //Nem "Az első diplimakurzus teljesítve" státuszban van
-            $error_msg = __('A konzultációs alkalom nem szerkeszthető.') . ' ' . __('A téma, amelyhez tartozik') . ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" ' . __('státuszban van.');
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicAccepted'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.FirstThesisSubjectSucceeded')])){
+            $error_msg = __('A konzultációs alkalom nem szerkeszthető.') . ' ' . __('A téma, amelyhez tartozik, nincs abban az éllapotban, hogy szerkeszthető lenne a konzultációs alkalom.');
             $ok = false;
         }
 
@@ -274,7 +279,7 @@ class ConsultationOccasionsController extends AppController
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         
         $this->loadModel('ThesisTopics');
-        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $consultation->thesis_topic_id], 'contain' => ['ThesisTopicStatuses']])->first();
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $consultation->thesis_topic_id, 'ThesisTopics.deleted !=' => true]])->first();
         
         $ok = true;
         if(empty($thesisTopic)){ //Nem létezik a téma
@@ -283,8 +288,9 @@ class ConsultationOccasionsController extends AppController
         }elseif($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : -1)){ ////Nem ehhez a belső konzulenshez tartozik
             $this->Flash->error(__('A konzultációs alkalom nem törölhető.') . ' ' . __('A témának, amelyhez tartozik nem Ön a belső konzulense.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [12, 15])){ //Nem "Az első diplimakurzus teljesítve" státuszban van
-            $this->Flash->error(__('A konzultációs alkalom nem törölhető.') . ' ' . __('A téma, amelyhez tartozik') . ' "' . ($thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '') . '" ' . __('státuszban van.'));
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicAccepted'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.FirstThesisSubjectSucceeded')])){
+            $this->Flash->error(__('A konzultációs alkalom nem törölhető.') . ' ' . __('A téma, amelyhez tartozik, nincs abban az állapotban, hogy törölhető lenne a konzultációs alkalom.'));
             $ok = false;
         }
 

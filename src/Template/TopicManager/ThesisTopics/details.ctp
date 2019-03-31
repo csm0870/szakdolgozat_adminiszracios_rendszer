@@ -91,7 +91,7 @@
                         <?php
                                                                             
                             //Ha van külső konzulens, akkor elfogadhatja annak aláírását
-                            if($thesisTopic->cause_of_no_external_consultant === null && $thesisTopic->thesis_topic_status_id == 10){
+                            if($thesisTopic->cause_of_no_external_consultant === null && $thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingExternalConsultantSignatureOfThesisTopic')){
                                 echo $this->Form->create(null, ['id' => 'acceptThesisTopicForm', 'style' => 'display: inline-block', 'url' => ['action' => 'accept']]);
                                 echo $this->Form->button(__('Téma elfogadás'), ['type' => 'submit', 'class' => 'btn btn-success btn-accept border-radius-45px mb-2']);
                                 echo $this->Form->input('thesis_topic_id', ['type' => 'hidden', 'value' => $thesisTopic->id]);
@@ -119,7 +119,7 @@
         $('#topics_menu_item').addClass('active');
         $('#thesis_topics_index_menu_item').addClass('active');
         
-        <?php if($thesisTopic->cause_of_no_external_consultant === null && $thesisTopic->thesis_topic_status_id == 10){ ?>
+        <?php if($thesisTopic->cause_of_no_external_consultant === null && $thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingExternalConsultantSignatureOfThesisTopic')){ ?>
             //Confirmation modal elfogadás előtt
             $('.headOfDepartment-thesisTopics-details .btn-accept').on('click', function(e){
                 e.preventDefault();

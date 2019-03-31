@@ -34,7 +34,8 @@
                                                     echo __('Jelentkezett halgató') . ': ' . h($offeredTopic->thesis_topic->student->name);
 
                                                     echo '<br/><strong>' . __('Foglalás állapota') . ': ' . '</strong>';
-                                                    if(in_array($offeredTopic->thesis_topic->thesis_topic_status_id, [2, 4])){
+                                                    if(in_array($offeredTopic->thesis_topic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking'),
+                                                                                                                      \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking')])){
                                                         if($offeredTopic->thesis_topic->has('thesis_topic_status')) echo h($offeredTopic->thesis_topic->thesis_topic_status->name);
                                                         echo '<br/>' . $this->Html->link(__('Részletek') . '&nbsp;->', ['controller' => 'OfferedTopics', 'action' => 'details', $offeredTopic->id], ['escape' => false]);
                                                     }else{
@@ -46,7 +47,7 @@
                                         </td>
                                         <td class="text-center">
                                             <?php
-                                                if(($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id == 2) || !$offeredTopic->has('thesis_topic')){
+                                                if(($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking')) || !$offeredTopic->has('thesis_topic')){
                                                     echo $this->Html->link('<i class="fas fa-edit fa-lg"></i>', ['controller' => 'OfferedTopics', 'action' => 'edit', $offeredTopic->id], ['class' => 'iconBtn editBtn', 'escape' => false, 'title' => __('Szerkesztés')]);
                                                     echo $this->Html->link('<i class="fas fa-trash fa-lg"></i>', '#', ['escape' => false, 'title' => __('Törlés'), 'class' => 'iconBtn deleteBtn', 'data-id' => $offeredTopic->id]);
                                                     echo $this->Form->postLink('', ['action' => 'delete', $offeredTopic->id], ['style' => 'display: none', 'id' => 'deleteOfferedTopic_' . $offeredTopic->id]);

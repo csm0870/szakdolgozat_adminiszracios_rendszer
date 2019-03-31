@@ -33,7 +33,16 @@
                                             <td>
                                                 <?=
                                                     '<searchable-text>' . h($thesisTopic->title) . '</searchable-text>' . 
-                                                    (in_array($thesisTopic->thesis_topic_status_id, [16, 17, 18, 19, 20, 21, 22, 23, 24, 25]) ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '')
+                                                    (in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable'),
+                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),
+                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements'),
+                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected'),
+                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant'),
+                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByHeadOfDepartment'),
+                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
+                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')]) ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '')
                                                 ?>
                                             </td>
                                             <td><?= $thesisTopic->has('internal_consultant') ? '<searchable-text>' . h($thesisTopic->internal_consultant->name) . '</searchable-text>' : '' ?></td>

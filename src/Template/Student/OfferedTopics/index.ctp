@@ -22,7 +22,7 @@
                             <tbody>
                                 <?php foreach($offeredTopics as $offeredTopic){ ?>
                                     <tr>
-                                        <td style="vertical-align: middle"><?= '<searchable-text>' . h($offeredTopic->title) . '</searchable-text><br/>' .  $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $offeredTopic->id]) ?></td>
+                                        <td style="vertical-align: middle"><?= '<searchable-text>' . h($offeredTopic->title) . '</searchable-text><br/>' .  $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'OfferedTopics', 'action' => 'details', $offeredTopic->id]) ?></td>
                                         <td style="vertical-align: middle"><?= $offeredTopic->has('internal_consultant') ? '<searchable-text>' . h($offeredTopic->internal_consultant->name) . '</searchable-text>' : '-' ?></td>
                                     </tr>
                                 <?php } ?>

@@ -24,10 +24,10 @@
                             <tbody>
                                 <?php foreach($thesisTopics as $thesisTopic){ ?>
                                     <tr>
-                                        <td><?= '<searchable-text>' . h($thesisTopic->title) . '</searchable-text>' . ($thesisTopic->thesis_topic_status_id == 23 ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '') ?></td>
+                                        <td><?= '<searchable-text>' . h($thesisTopic->title) . '</searchable-text>' . ($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview') ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '') ?></td>
                                         <td>
                                             <?php
-                                                if($thesisTopic->thesis_topic_status_id == 23 && $thesisTopic->has('review')){
+                                                if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview') && $thesisTopic->has('review')){
                                                     echo '<searchable-text>';
                                                     if($thesisTopic->confidential === true && $thesisTopic->review->confidentiality_contract_status != 4){
                                                         if($thesisTopic->review->confidentiality_contract_status == null) echo __('A titoktartási szerződés feltöltésére vár.');
