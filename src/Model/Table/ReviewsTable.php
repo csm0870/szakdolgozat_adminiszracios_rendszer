@@ -74,7 +74,6 @@ class ReviewsTable extends Table
 
         $validator
             ->scalar('cause_of_structure_and_style_point')
-            ->maxLength('cause_of_structure_and_style_point', 280, __('Maximum 280 karaktert adhat meg.'))
             ->allowEmpty('cause_of_structure_and_style_point');
 
         $validator
@@ -83,7 +82,6 @@ class ReviewsTable extends Table
 
         $validator
             ->scalar('cause_of_processing_literature_point')
-            ->maxLength('cause_of_processing_literature_point', 280, __('Maximum 280 karaktert adhat meg.'))
             ->allowEmpty('cause_of_processing_literature_point');
 
         $validator
@@ -92,7 +90,6 @@ class ReviewsTable extends Table
 
         $validator
             ->scalar('cause_of_writing_up_the_topic_point')
-            ->maxLength('cause_of_writing_up_the_topic_point', 280, __('Maximum 280 karaktert adhat meg.'))
             ->allowEmpty('cause_of_writing_up_the_topic_point');
 
         $validator
@@ -101,12 +98,10 @@ class ReviewsTable extends Table
 
         $validator
             ->scalar('cause_of_practical_applicability_point')
-            ->maxLength('cause_of_practical_applicability_point', 280, __('Maximum 280 karaktert adhat meg.'))
             ->allowEmpty('cause_of_practical_applicability_point');
 
         $validator
             ->scalar('general_comments')
-            ->minLength('general_comments', 490, __('Legalább 490 karaktert adjon meg.'))
             ->allowEmpty('general_comments');
 
         $validator

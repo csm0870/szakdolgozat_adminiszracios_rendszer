@@ -34,9 +34,7 @@ class ReviewsController extends AppController
         if(empty($thesisTopic)){ //Nem létezik a téma
             $this->Flash->error(__('A bírálat nem tehető meg.') . ' ' . __('Nem létező dolgozat.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
-                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])){
+        }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview')){
             $this->Flash->error(__('A bírálat nem tehető meg.') . ' ' . __('A dolgozat nincs abban az állapotban, hogy a bírálható legyen.'));
             $ok = false;
         }else{
@@ -60,12 +58,21 @@ class ReviewsController extends AppController
         if(!$ok) return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);
         
         if($this->getRequest()->is(['post', 'patch', 'put'])){
-            if(in_array($thesisTopic->review->review_status, [2, 3, 4])){ //Már véglegesítve van a bírálat
-                $this->Flash->error(__('A bírálat nem tehető meg.') . ' ' . __('A bírálat már véglegesítve van.'));
-                $ok = false;
-            }elseif($thesisTopic->review->review_status == 6){ //Már el van fogadva van a bírálat
-                $this->Flash->error(__('A bírálat nem tehető meg.') . ' ' . __('A bírálat már el van fogadva.'));
-                $ok = false;
+            $is_finalize = $this->getRequest()->getData('is_finalize');
+            //Véglegesítésről van-e szó
+            if(!empty($is_finalize) && $is_finalize == 1){
+                if($thesisTopic->review->review_status != 1){ //Ha még nincs mentvebírálat
+                    $this->Flash->error(__('A bírálat nem véglegesíthető.') . ' ' . __('Először meg kell tenni a bírálatot.'));
+                    $ok = false;
+                }
+            }else{
+                if(in_array($thesisTopic->review->review_status, [2, 3, 4])){ //Már véglegesítve van a bírálat
+                    $this->Flash->error(__('A bírálat nem tehető meg.') . ' ' . __('A bírálat már véglegesítve van.'));
+                    $ok = false;
+                }elseif($thesisTopic->review->review_status == 6){ //Már el van fogadva van a bírálat
+                    $this->Flash->error(__('A bírálat nem tehető meg.') . ' ' . __('A bírálat már el van fogadva.'));
+                    $ok = false;
+                }
             }
             if(!$ok) return $this->redirect(['action' => 'review', $thesisTopic->id]);
             
@@ -108,7 +115,6 @@ class ReviewsController extends AppController
             }
             
             //Azok a mezők kikapsolása, amit itt nem menthet a biztonság kedvéért
-            unset($thesisTopic->review->grade);
             unset($thesisTopic->review->confidentiality_contract);
             unset($thesisTopic->review->confidentiality_contract_status);
             unset($thesisTopic->review->cause_of_rejecting_confidentiality_contract);
@@ -119,45 +125,37 @@ class ReviewsController extends AppController
             //Kérdések ellenőrzése, hogy legalább 3 van-e
             $questions = $this->getRequest()->getData('questions');
             
-            $questions_ok = true;
+            //Azon kérdések azonosítójai, amelyek a kérésben vannak
             $question_ids_in_request = [];
-            if(empty($questions)) $questions_ok = false;
-            else{
-                $i = 0;
-                foreach($questions as $question){
-                    if(!empty($question['question'])){
-                        $i++;
-                        if(isset($question['id'])){
-                            $question_ids_in_request[] = $question['id'];
-                        }
+            foreach($questions as $question){
+                if(!empty($question['question'])){
+                    if(isset($question['id'])){
+                        $question_ids_in_request[] = $question['id'];
                     }
                 }
-                if($i < 3) $questions_ok = false;
             }
             
-            if($questions_ok){
-                $current_question_ids = [];
-                
-                foreach($thesisTopic->review->questions as $question){
-                    $current_question_ids[] = $question->id;
-                }
-                
-                //Azon ID-k, amelyek a kérésbe nincsenek, de léteznek, ezek törölve lesznek
-                $question_ids_to_delete = array_diff($current_question_ids, $question_ids_in_request);
-                
-                foreach($question_ids_to_delete as $id){
-                    $question = $this->Reviews->Questions->find('all', ['conditions' => ['id' => $id, 'review_id' => $thesisTopic->review->id]])->first();
-                    if(!empty($question)) $this->Reviews->Questions->delete($question);
-                }
-                $thesisTopic->review->review_status = 1; //Bírálat feltöltve
-                if($this->Reviews->save($thesisTopic->review)){
-                    $this->Flash->success(__('Mentés sikeres.'));
-                    return $this->redirect(['action' => 'review', $thesisTopic->id]);
-                }
-                $this->Flash->error(__('Mentés sikertelen. Próbálja újra!'));
-            }else{
-                $this->Flash->error(__('Legalább 3 kérdést kell írnia.'));
+            //Az eddig mentett kérdések azonosítójai
+            $current_question_ids = [];
+            foreach($thesisTopic->review->questions as $question){
+                $current_question_ids[] = $question->id;
             }
+
+            //Azon ID-k, amelyek a kérésbe nincsenek, de léteznek, ezek törölve lesznek
+            $question_ids_to_delete = array_diff($current_question_ids, $question_ids_in_request);
+            foreach($question_ids_to_delete as $id){
+                $question = $this->Reviews->Questions->find('all', ['conditions' => ['id' => $id, 'review_id' => $thesisTopic->review->id]])->first();
+                if(!empty($question)) $this->Reviews->Questions->delete($question);
+            }
+            
+            if(!empty($is_finalize) && $is_finalize == 1) $thesisTopic->review->review_status = 2; //Bírálat véglegesítve
+            else $thesisTopic->review->review_status = 1; //Bírálat feltöltve
+            
+            if($this->Reviews->save($thesisTopic->review)){
+                $this->Flash->success(__('Mentés sikeres.'));
+                return $this->redirect(['action' => 'review', $thesisTopic->id]);
+            }
+            $this->Flash->error(__('Mentés sikertelen. Próbálja újra!'));
         }
         
         $this->loadModel('Documents');
@@ -174,7 +172,7 @@ class ReviewsController extends AppController
      * 
      * @param type $thesis_topic_id
      */
-    public function finalizeReview($thesis_topic_id = null){
+    /*public function finalizeReview($thesis_topic_id = null){
         $this->loadModel('Users');
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['Reviewers']]);
         $reviewer_id = $user->has('reviewer') ? $user->reviewer->id : '';
@@ -206,10 +204,7 @@ class ReviewsController extends AppController
         if($thesisTopic->confidential === true && $thesisTopic->review->confidentiality_contract_status != 4){ //Ha a titoktartási szerződés még nincs elfogadva
             $this->Flash->error(__('A bírálat nem véglegesíthető.') . ' ' . __('Először a feltöltött titoktartási szerződés el kell fogadnia a tanszékvezetőnek.'));
             $ok = false;
-        }elseif($thesisTopic->review->review_status != 1){ //Ha a bírálat még nincs feltöltve. vagy nincs elutasítva
-            $this->Flash->error(__('A bírálat nem véglegesíthető.') . ' ' . __('Először meg kell tenni a bírálatot.'));
-            $ok = false;
-        }
+        }else
         
         if(!$ok) return $this->redirect(['action' => 'review', $thesisTopic->id]);
         
@@ -218,7 +213,7 @@ class ReviewsController extends AppController
         else $this->Flash->error(__('Mentés sikertelen. Próbálja újra!'));
         
         return $this->redirect(['action' => 'review', $thesisTopic->id]);
-    }
+    }*/
     
     /**
      * Bírálati lap feltöltése

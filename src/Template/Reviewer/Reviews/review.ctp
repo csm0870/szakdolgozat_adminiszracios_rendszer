@@ -58,33 +58,33 @@
                     echo $this->Form->control('structure_and_style_point', ['class' => 'form-control', 'id' => 'structure_and_style_point_input', 'label' => ['text' => __('A dolgozat szerkezete, stílusa')],
                                                                             'placeholder' => __('max. 10 pont'), 'min' => 0, 'max' => 10, 'required' => true, 'readonly' => in_array($thesisTopic->review->review_status, [2, 3, 4, 6])]);
                     echo $this->Form->control('cause_of_structure_and_style_point', ['class' => 'form-control', 'label' => ['text' => __('A dolgozat szerkezetére, stílusára adott pontszám indoklása')],
-                                                                                     'required' => true, 'maxlength' => 280, 'readonly' => in_array($thesisTopic->review->review_status, [2, 3, 4, 6]),
+                                                                                     'required' => true, 'readonly' => in_array($thesisTopic->review->review_status, [2, 3, 4, 6]),
                                                                                      'templates' => ['inputContainer' => '<div class="form-group mb-5">{{content}}</div>',
                                                                                                      'inputContainerError' => '<div class="form-group mb-5">{{content}}{{error}}</div>']]);
                     echo $this->Form->control('processing_literature_point', ['class' => 'form-control', 'id' => 'processing_literature_point_input', 'label' => ['text' => __('Szakirodalom feldolgozása')],
                                                                               'placeholder' => __('max. 10 pont'), 'min' => 0, 'max' => 10, 'required' => true, 'readonly' => in_array($thesisTopic->review->review_status, [2, 3, 4, 6])]);
                     echo $this->Form->control('cause_of_processing_literature_point', ['class' => 'form-control', 'label' => ['text' => __('Szakirodalom feldolgozására adott pontszám indoklása')],
-                                                                                       'required' => true, 'maxlength' => 280, 'readonly' => in_array($thesisTopic->review->review_status, [2, 3, 4, 6]),
+                                                                                       'required' => true, 'readonly' => in_array($thesisTopic->review->review_status, [2, 3, 4, 6]),
                                                                                        'templates' => ['inputContainer' => '<div class="form-group mb-5">{{content}}</div>',
                                                                                                        'inputContainerError' => '<div class="form-group mb-5">{{content}}{{error}}</div>']]);
                     echo $this->Form->control('writing_up_the_topic_point', ['class' => 'form-control', 'id' => 'writing_up_the_topic_point_input', 'label' => ['text' => __('A téma kidolgozásának színvonala')],
                                                                              'placeholder' => __('max. 20 pont'), 'min' => 0, 'max' => 20, 'required' => true, 'readonly' => in_array($thesisTopic->review->review_status, [2, 3, 4, 6])]);
                     echo $this->Form->control('cause_of_writing_up_the_topic_point', ['class' => 'form-control', 'label' => ['text' => __('A téma kidolgozásának színvonalára adott pontszám indoklása')],
-                                                                                   'required' => true, 'maxlength' => 280, 'readonly' => in_array($thesisTopic->review->review_status, [2, 3, 4, 6]),
+                                                                                   'required' => true, 'readonly' => in_array($thesisTopic->review->review_status, [2, 3, 4, 6]),
                                                                                    'templates' => ['inputContainer' => '<div class="form-group mb-5">{{content}}</div>',
                                                                                                    'inputContainerError' => '<div class="form-group mb-5">{{content}}{{error}}</div>']]);
                     echo $this->Form->control('practical_applicability_point', ['class' => 'form-control', 'id' => 'practical_applicability_point_input', 'label' => ['text' => __('A dolgozat gyakorlati alkalmazhatósága')],
                                                                                 'placeholder' => __('max. 10 pont'), 'min' => 0, 'max' => 10, 'required' => true, 'readonly' => in_array($thesisTopic->review->review_status, [2, 3, 4, 6])]);
                     echo $this->Form->control('cause_of_practical_applicability_point', ['class' => 'form-control', 'label' => ['text' => __('A dolgozat gyakorlati alkalmazhatóságára adott pontszám indoklása')],
-                                                                                   'required' => true, 'maxlength' => 280, 'readonly' => in_array($thesisTopic->review->review_status, [2, 3, 4, 6]),
+                                                                                   'required' => true, 'readonly' => in_array($thesisTopic->review->review_status, [2, 3, 4, 6]),
                                                                                    'templates' => ['inputContainer' => '<div class="form-group">{{content}}</div>',
                                                                                                    'inputContainerError' => '<div class="form-group">{{content}}{{error}}</div>']]);
                     echo '<p class="text-right mb-1">'  . '<strong>' . __('Összpontszám') . '</strong>:&nbsp;<span id="total_points">0<span></p>';
                     echo '<p class="text-right">'  . '<strong>' . __('Jegy') . '</strong>:&nbsp;<span id="grade">1<span></p>';
                     echo $this->Form->control('general_comments', ['class' => 'form-control', 'label' => ['text' => __('Általános megjegyzések')], 'readonly' => in_array($thesisTopic->review->review_status, [2, 3, 4, 6]),
-                                                                   'placeholder' => __('minimum 10 sor a word dokumentum szerint'), 'required' => true, 'minlength' => 490]);
+                                                                   'required' => true]);
 
-                    echo '<h5 class="mt-5 mb-4">' . __('Kérdések') . ' (' . __('minimum 3 darab') . '):' .  '</h5>';
+                    echo '<h5 class="mt-5 mb-4">' . __('Kérdések') . ' (' . __('ajánlott 3 darab') . '):' .  '</h5>';
 
                     echo '<div id="question_container">';
                     $i = 1;
@@ -94,12 +94,12 @@
                                                                               'label' => ['class' => 'order-labels', 'text' => "<span class='label-orders' data-order='$i'>$i</span>." . (in_array($thesisTopic->review->review_status, [2, 3, 4, 6]) ? '' : ('&nbsp;&nbsp;&nbsp;' . $this->Html->link('(' . __('kérdés törlése') . ')', '#', ['class' => 'removeQuestion']))), 'data-order' => $i, 'escape' => false], 'required' => $i <= 3 ? true : false]);
                         ++$i;
                     }
-
+                    /* Ha még nem három kérdés lenne, akkor kiegészítjük még 3 üressel
                     if(!in_array($thesisTopic->review->review_status, [2, 4])){
                         for($j = $i; $j < 4; $j++){
                             echo $this->Form->control("questions[$j][question]", ['type' => 'textarea', 'class' => 'form-control', 'label' => ['class' => 'order-labels', 'text' => "<span class='label-orders' data-order='$j'>$j</span>." . '&nbsp;&nbsp;&nbsp;' . $this->Html->link('(' . __('kérdés törlése') . ')', '#', ['class' => 'removeQuestion']), 'escape' => false], 'required' => true]);
                         }
-                    }
+                    }*/
                     echo '</div>';
                     
                     if(!in_array($thesisTopic->review->review_status, [2, 3, 4, 6])){
@@ -201,7 +201,7 @@
                 calculatePintsAndGrade();
             });
 
-            var count_of_questions = <?= $j - 1 ?>;
+            var count_of_questions = <?= $i - 1 ?>;
 
             /**
              * Kérdés hozzáadása
@@ -209,8 +209,11 @@
             $('#add_question').on('click', function(e){
                 e.preventDefault();
                 ++count_of_questions;
-
-                var delete_link = count_of_questions > 3 ? '&nbsp;&nbsp;&nbsp;<a href="#" class="removeQuestion" data-id="' + count_of_questions + '">(kérdés törlése)</a>' : '';
+                
+                //Akkor nem törölhetjük, ha még nincs összesen 3 kérdés, mivel 3 kötelező
+                //var delete_link = count_of_questions > 3 ? '&nbsp;&nbsp;&nbsp;<a href="#" class="removeQuestion" data-id="' + count_of_questions + '">(kérdés törlése)</a>' : '';
+                
+                var delete_link = '&nbsp;&nbsp;&nbsp;<a href="#" class="removeQuestion" data-id="' + count_of_questions + '">(kérdés törlése)</a>';
 
                 $('#question_container').append('<div class="form-group">' +
                                                     '<label><span class="label-orders" data-order="' + count_of_questions + '"></span>.' + delete_link + '</label>' +
@@ -265,14 +268,16 @@
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Véglegesítés') ?>').css('background-color', '#71D0BD');
                 //Save gomb eventjeinek resetelése cserével
                 $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-                $('#confirmationModal .msg').text('<?= __('Bírálat véglegesítése. Ha módosított az adatokon, és úgy nyomja meg a véglegesítést, akkor azok nem mentődnek el, csak a mentés gombra kattintva módosulnak az adatok. Végelgesítés után az adatok már nem módosíthatóak. Véglegesítés után egy word dokumentum generálódik, amelyet ki kell nyomtatni, aláírni, majd PDF-ben feltölteni.') ?>');
+                $('#confirmationModal .msg').text('<?= __('Bírálat véglegesítése. Végelgesítés után az adatok már nem módosíthatóak. Véglegesítés után egy word dokumentum generálódik, amelyet ki kell nyomtatni, aláírni, majd PDF-ben feltölteni.') ?>');
 
                 $('#confirmationModal').modal('show');
 
                 $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
                     e.preventDefault();
                     $('#confirmationModal').modal('hide');
-                    location.href = '<?= $this->Url->build(['action' => 'finalizeReview', $thesisTopic->id], true) ?>';
+                    //Jelezzük egy inputtal, hogy véglegesítésről van szó
+                    $('#reviewForm').append('<input type="hidden" name="is_finalize" value="1"/>');
+                    $('#reviewForm').trigger('submit');
                 });
             });
         <?php } ?>
