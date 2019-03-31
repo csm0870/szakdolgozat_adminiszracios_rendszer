@@ -118,7 +118,7 @@ class FinalExamSubjectsController extends AppController
                     }else{
                         $count_of_current_subjects++;
                         if($count_of_current_subjects + $count_of_new_subjects > 3){
-                            $this->Flash->error(__('Maximum 3 záróvizgsa tárgyat adhat hozzá.'));
+                            $this->Flash->error(__('Maximum 3 záróvizsga tárgyat adhat hozzá.'));
                             break;
                         }
                         $final_exam_subject = $this->FinalExamSubjects->newEntity();
@@ -182,29 +182,24 @@ class FinalExamSubjectsController extends AppController
             return $this->redirect(['controller' => 'Students', 'action' => 'edit', $data['student_id']]);
         }
         
-        $ok = true;
-        $error_msg = '';
-        
         $student = $this->FinalExamSubjects->Students->find('all', ['conditions' => ['Students.id' => $data['student_id']], 'contain' => ['FinalExamSubjects']])->first();
         
+        $ok = true;
         if($student->course_id != 1){ //Ha nem mérnökinformatikus
             $ok = false;
-            $error_msg = __('Záróvizsga-tárgyak nem véglegesíthetők.') . ' ' . __('Csak mérnökinformatikus hallgatónak lehetnek záróvizsga-tárgyai.');
+            $this->Flash->error(__('Záróvizsga-tárgyak nem véglegesíthetők.') . ' ' . __('Csak mérnökinformatikus hallgatónak lehetnek záróvizsga-tárgyai.'));
         }elseif(count($student->final_exam_subjects) != 3){ //Ha nem három ZV-tárgy van
             $ok = false;
-            $error_msg = __('Záróvizsga-tárgyak nem véglegesíthetők.') . ' ' . __('Három záróvizsga-tárgyat kell választani.');
+            $this->Flash->error( __('Záróvizsga-tárgyak nem véglegesíthetők.') . ' ' . __('Három záróvizsga-tárgyat kell választania.'));
         }elseif($student->final_exam_subjects_status == 2){ //Ha már véglegesítve vannak a tárgyak
             $ok = false;
-            $error_msg = __('Záróvizsga-tárgyak nem véglegesíthetők.') . ' ' . __('Már véglegesítve vannak.');
+            $this->Flash->error(__('Záróvizsga-tárgyak nem véglegesíthetők.') . ' ' . __('Már véglegesítve vannak.'));
         }elseif($student->final_exam_subjects_status == 3){ //Ha már el van fogadva a tárgyak
             $ok = false;
-            $error_msg = __('Záróvizsga-tárgyak nem véglegesíthetők.') . ' ' . __('Már el vannak fogadva.');
+            $this->Flash->error(__('Záróvizsga-tárgyak nem véglegesíthetők.') . ' ' . __('Már el vannak fogadva.'));
         }
         
-        if($ok === false){
-            $this->set(compact('ok', 'error_msg'));
-            return;
-        }
+        if($ok === false) return $this->redirect(['action' => 'index']);
         
         $student->final_exam_subjects_status = 2;
         if($this->FinalExamSubjects->Students->save($student)){
