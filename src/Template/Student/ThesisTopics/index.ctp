@@ -38,13 +38,13 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-12">
+                <div class="col-12 mt-2 text-center">
                     <?php
                         if(!empty($can_fill_in_topic) && $can_fill_in_topic === true){
                             if(!empty($can_add_topic) && $can_add_topic === true)
                                 echo $this->Html->link(__('Új téma hozzáadása'), ['controller' => 'ThesisTopics', 'action' => 'add'], ['class' => 'btn btn-outline-secondary btn-block border-radius-45px']);
                         }else{ ?>
-                            <h5 style="color: red"><?= __('Nincs kitöltési időszak!') ?></h5>
+                            <h5 style="color: red"><?= __('Nincs témaleadási időszak!') ?></h5>
                     <?php } ?>
                 </div>
             </div>

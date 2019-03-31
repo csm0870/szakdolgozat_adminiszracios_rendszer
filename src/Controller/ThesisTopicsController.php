@@ -45,10 +45,21 @@ class ThesisTopicsController extends AppController
                                                                        'InternalConsultants' => ['Departments', 'InternalConsultantPositions'],
                                                                        'StartingYears', 'ExpectedEndingYears', 'Languages']])->first();
         
+        $ok = true;
         if(empty($thesisTopic)){
             $this->Flash->error(__('A téma nem létezik.'));
-            return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index', 'prefix' => $prefix]);
+            $ok = false;
+        }elseif(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalize'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingRejectedByInternalConsultant'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingCanceledByStudent'),
+                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ProposalForAmendmentOfThesisTopicAddedByHeadOfDepartment')])){
+            $this->Flash->error(__('A PDF nem elérhető.') . ' ' . __('A téma még nem lett leadva.'));
+            $ok = false;
         }
+        
+        if($ok === false) return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index', 'prefix' => $prefix]);
         
         $this->viewBuilder()->setLayout('default');
         $this->viewBuilder()->setClassName('CakePdf.Pdf');

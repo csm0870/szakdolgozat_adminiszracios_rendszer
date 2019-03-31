@@ -160,6 +160,10 @@ class ThesisTopicsTable extends Table
             ->scalar('external_consultant_address')
             ->maxLength('external_consultant_address', 80)
             ->allowEmpty('external_consultant_address');
+        
+        $validator
+            ->date('handed_in_date')
+            ->allowEmpty('handed_in_date');
 
         $validator
             ->scalar('proposal_for_amendment')
@@ -291,6 +295,14 @@ class ThesisTopicsTable extends Table
         //======================================================================
         // ÁLLAPOTVÁLTOZÁSOKKOR AZ EGYES ADATOK RESETELÉSE (eleje)
         //======================================================================
+        
+        //A hallgató véglegesíti a témát
+        if(($entity->getOriginal('thesis_topic_status_id') == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalize') ||
+            $entity->getOriginal('thesis_topic_status_id') == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking') ||
+            $entity->getOriginal('thesis_topic_status_id') == \Cake\Core\Configure::read('ThesisTopicStatuses.ProposalForAmendmentOfThesisTopicAddedByHeadOfDepartment')) &&
+            $entity->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopic')){
+            $entity->handed_in_date = date('Y-m-d');
+        }
         
         //A téma elfogadott állapotba kerül
         if(($entity->getOriginal('thesis_topic_status_id') == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForHeadOfDepartmentAcceptingOfThesisTopic') ||

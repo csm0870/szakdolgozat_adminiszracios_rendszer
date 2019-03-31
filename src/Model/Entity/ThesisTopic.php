@@ -75,6 +75,7 @@ class ThesisTopic extends Entity
         'external_consultant_phone_number' => true,
         'external_consultant_address' => true,
         'external_consultant_address' => true,
+        'handed_in_date' => true,
         'proposal_for_amendment' => true,
         'internal_consultant_grade' => true,
         'first_thesis_subject_failed_suggestion' => true,

@@ -104,7 +104,7 @@
     <div class="footer">
         <?php $hun_months = ["január", "február", "március", "április", "május", "június",
                              "július", "augusztus", "szeptember", "október", "november", "december"];?>
-        Győr, <?= date('Y') . '. ' . $hun_months[intval(date('n')) - 1] . ' ' . date('j') . '.'?>
+        Győr, <?= empty($thesisTopic->handed_in_date) ? '' : ($this->Time->format($thesisTopic->handed_in_date ,'yyyy') . '. ' . $hun_months[intval($this->Time->format($thesisTopic->handed_in_date, 'M')) - 1] . ' ' . $this->Time->format($thesisTopic->handed_in_date, 'd') . '.') ?>
         <div class="signatures">
             <table>
                 <tr>
