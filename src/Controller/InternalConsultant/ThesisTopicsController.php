@@ -115,7 +115,7 @@ class ThesisTopicsController extends AppController
             $ok = false;
         }
         
-        if(!$ok) return $this->redirect (['action' => 'index']);
+        if(!$ok) return $this->redirect(['action' => 'index']);
         
         $this->set(compact('thesisTopic'));
     }

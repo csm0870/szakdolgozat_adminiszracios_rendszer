@@ -14,6 +14,7 @@ use Cake\ORM\Entity;
  * @property string|null $phone_number
  * @property string|null $specialisation
  * @property int|null $final_exam_subjects_status
+ * @property int|null $passed_final_exam
  * @property \Cake\I18n\FrozenTime|null $created
  * @property \Cake\I18n\FrozenTime|null $modified
  * @property int|null $course_id
@@ -51,6 +52,7 @@ class Student extends Entity
         'phone_number' => true,
         'specialisation' => true,
         'final_exam_subjects_status' => true, // null, 0 - még nincsenek tárgyak, 1 - már ki vannak választva a tárgyak, de még módosíthatja a hallgató, 2 - a hallgató véglegesítette a tárgyakat, 3 - belső konzulens elfogadta a tárgyakat
+        'passed_final_exam' => true,
         'created' => true,
         'modified' => true,
         'course_id' => true,

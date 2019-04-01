@@ -119,6 +119,10 @@ class StudentsTable extends Table
 
         $validator
             ->allowEmpty('final_exam_subjects_status');
+        
+        $validator
+            ->boolean('passed_final_exam')
+            ->allowEmpty('passed_final_exam');
 
         return $validator;
     }
@@ -236,6 +240,32 @@ class StudentsTable extends Table
     }
     
     /**
+     * Mentés előtti callback
+     * 
+     * @param type $event
+     * @param type $entity
+     * @param type $options
+     */
+    public function beforeSave($event, $entity, $options){
+        //======================================================================
+        // ÁLLAPOTVÁLTOZÁSOKKOR AZ EGYES ADATOK RESETELÉSE (eleje)
+        //======================================================================
+        
+        //Ha a belső konzulens elfogadta a ZV-tárgyakat, és mérnökinformatikus, és Ha már van elfogadott témája és fel vannak vive az adatai a Neptun rendszerbe, vagyis már mehet ZV-ra
+        if($entity->getOriginal('final_exam_subjects_status') == 2 && $entity->final_exam_subjects_status == 3 && $entity->course_id == 1 &&
+           $this->ThesisTopics->exists(['student_id' => $entity->id,
+                                        'thesis_topic_status_id' => \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted'),
+                                        'accepted_thesis_data_applyed_to_neptun' => true])){
+            
+                $entity->passed_final_exam = false;
+        }
+        
+        //======================================================================
+        // ÁLLAPOTVÁLTOZÁSOKKOR AZ EGYES ADATOK RESETELÉSE (vége)
+        //======================================================================
+    }
+    
+    /**
      * Mentés után callback
      * 
      * Értesítések létrehozása
@@ -245,6 +275,10 @@ class StudentsTable extends Table
      * @param type $options
      */
     public function afterSave($event, $entity, $options){
+        //======================================================================
+        // ÉRTESÍTÉSEK KEZDETE
+        //======================================================================
+        
         if($entity->isNew() == false){
             //Ha a halllgató véglegesíti
             if($entity->getOriginal('final_exam_subjects_status') == 1 && $entity->final_exam_subjects_status == 2){
@@ -284,8 +318,10 @@ class StudentsTable extends Table
                 
                     $Notifications->save($notification);
                     
-                    //Ha már van elfogadott témája, akkor már mehet ZV-ra
-                    if($this->ThesisTopics->exists(['student_id' => $entity->id, 'thesis_topic_status_id' => \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])){
+                    //Ha már van elfogadott témája és fel vannak vive az adatai a Neptun rendszerbe, akkor már mehet ZV-ra
+                    if($this->ThesisTopics->exists(['student_id' => $entity->id,
+                                                    'thesis_topic_status_id' => \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted'),
+                                                    'accepted_thesis_data_applyed_to_neptun' => true])){
                         $student = $this->get($entity->id, ['contain' => ['Courses', 'CourseTypes', 'CourseLevels']]);
                         //Záróvizsga összeállítók
                         $final_exam_organizers = $this->Users->find('all', ['conditions' => ['group_id' => 8]]);
@@ -303,9 +339,11 @@ class StudentsTable extends Table
                         }
                     }
                 }
-                
-                
             }
         }
+        
+        //======================================================================
+        // ÉRTESÍTÉSEK VÉGE
+        //======================================================================
     }
 }

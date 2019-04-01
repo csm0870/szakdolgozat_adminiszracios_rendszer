@@ -29,7 +29,7 @@
                                 </thead>
                                 <tbody>
                                     <?php foreach($students as $student){ ?>
-                                        <tr>
+                                        <tr class="students" data-id="<?= $student->id ?>" style="cursor: pointer">
                                             <td><?= '<searchable-text>' . h($student->name) . '</searchable-text>' ?></td>
                                             <td><?= '<searchable-text>' . h($student->neptun) . '</searchable-text>' ?></td>
                                             <td><?= $student->has('course') ? '<searchable-text>' . h($student->course->name) . '</searchable-text>' : '' ?></td>
@@ -49,6 +49,12 @@
     $(function(){
         $('#students_menu_item').addClass('active');
         $('#students_index_menu_item').addClass('active');
+        
+        //Táblázat sorára kattintáskor az adott hallgató részleteire ugrás
+        $('.students').on('click', function(){
+            var id = $(this).data('id');
+            location.href = '<?= $this->Url->build(['action' => 'details'], true) ?>' + '/' + id;
+        });
         
         // DataTable
         var table = $('#data_table').DataTable({

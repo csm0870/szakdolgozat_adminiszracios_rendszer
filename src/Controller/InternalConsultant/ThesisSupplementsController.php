@@ -37,7 +37,7 @@ class ThesisSupplementsController extends AppController
             $ok = false;
         }
         
-        if($ok === true) return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);
+        if($ok === false) return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);
         
         $response = $this->getResponse()->withFile(ROOT . DS . 'files' . DS . 'thesis_supplements' . DS . $thesisSupplement->file,
                                                    ['download' => true, 'name' => $thesisSupplement->file]);

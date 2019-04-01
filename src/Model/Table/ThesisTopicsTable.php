@@ -1359,6 +1359,10 @@ class ThesisTopicsTable extends Table
                 }
                 
                 if($can_go_to_final_exam === true){
+                    //Halgatónál beállítjuk, hogy még nem ment át a ZV-n
+                    $student->passed_final_exam = false;
+                    $this->Students->save($student);
+                    
                     //Záróvizsga összeállítók
                     $final_exam_organizers = $this->Students->Users->find('all', ['conditions' => ['group_id' => 8]]);
                     foreach($final_exam_organizers as $final_exam_organizer){

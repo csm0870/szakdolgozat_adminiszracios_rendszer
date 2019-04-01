@@ -27,7 +27,6 @@ class ThesisSupplementsController extends AppController
         $this->loadModel('Users');
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['Students']]);
         
-        
         $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['id' => $thesisSupplement->thesis_topic_id, 'deleted !=' => true]])->first();
         $ok = true;
         if(empty($thesisTopic)){
@@ -38,7 +37,7 @@ class ThesisSupplementsController extends AppController
             $ok = false;
         }
         
-        if($ok === true) return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);
+        if($ok === false) return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);
         
         $response = $this->getResponse()->withFile(ROOT . DS . 'files' . DS . 'thesis_supplements' . DS . $thesisSupplement->file,
                                                    ['download' => true, 'name' => $thesisSupplement->file]);

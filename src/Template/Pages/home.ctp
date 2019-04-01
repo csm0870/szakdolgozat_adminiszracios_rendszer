@@ -8,7 +8,7 @@
                 <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'login', 1], true) ?>">
                     <div class="login-type-container">
                         <div class="login-type">
-                            <?= __('Hallgatói belépés') ?>
+                            <?= __('Belépés hallgatók számára') ?>
                         </div>
                     </div>
                 </a>
@@ -17,7 +17,7 @@
                 <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'login', 2], true) ?>">
                     <div class="login-type-container">
                         <div class="login-type">
-                            <?= __('Oktatói belépés') ?>
+                            <?= __('Belépés mindenki más számára') ?>
                         </div>
                     </div>
                 </a>
