@@ -1,7 +1,7 @@
 <?= $this->Html->css('topic_pdf', ['fullBase' => true]) ?>
 <div class="topic-form">
     <div class="header">
-        Adatlap <?= $thesisTopic->is_thesis ? 'szakdolgozat' : 'diplomamunka' ?> téma engedélyezéséhez
+        Adatlap <?= $thesisTopic->is_thesis === true ? 'szakdolgozat' : 'diplomamunka' ?> téma engedélyezéséhez
     </div>
     <div class="data-group student-data">
         <div class="title">Hallgató adatai</div>

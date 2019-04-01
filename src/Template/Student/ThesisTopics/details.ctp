@@ -32,6 +32,9 @@
                     <strong><?= __('Titkos') . ': ' ?></strong><?= $thesisTopic->confidential === true ? __('Igen') : __('Nem') ?>
                 </p>
                 <p class="mb-1">
+                    <strong><?= __('Téma típusa') . ': ' ?></strong><?= $thesisTopic->is_thesis === true ? __('Szakdolgozat') : __('Diplomamunka')  ?>
+                </p>
+                <p class="mb-1">
                     <strong><?= __('Kezdési tanév') . ': ' ?></strong><?= $thesisTopic->has('starting_year') ? h($thesisTopic->starting_year->year) : '' ?>
                 </p>
                 <p class="mb-1">
@@ -121,7 +124,7 @@
                         <div class="card-header" id="headingOne">
                             <h5 class="mb-0">
                                 <button class="btn btn-link" data-toggle="collapse" data-target="#supplementCollapse" aria-expanded="true" aria-controls="collapseOne">
-                                    <?= ($thesisTopic->is_thesis === null ? __('Szakdolgozat') : ($thesisTopic->is_thesis === true) ? __('Szakdolgozat') : __('Diplomamunka')) . '&nbsp;' .  __('mellékletek') ?>
+                                    <?= ($thesisTopic->is_thesis === true ? __('Szakdolgozat') : __('Diplomamunka')) . '&nbsp;' .  __('mellékletek') ?>
                                     <i class="fas fa-angle-down fa-lg" id="supplement_arrow_down"></i>
                                     <i class="fas fa-angle-up fa-lg d-none" id="supplement_arrow_up"></i>
                                 </button>

@@ -15,13 +15,15 @@
             ?>
             <?= $this->Form->create($thesisTopic, ['id' => 'thesisTopicAddForm']) ?>
             <?= $this->Form->control('title', ['class' => 'form-control', 'label' => ['text' => __('Cím')]]) ?>
-            <?= $this->Form->control('description', ['class' => 'form-control tinymce', 'required' => false, 'label' => ['text' => __('Leírás') . ' (' . __('feladatok részletezése') . ')'], 'placeholder' => __('A leírással együtt az adatlap férjen rá egyetlen oldalra!')]) ?>
+            <?= $this->Form->control('description', ['class' => 'form-control tinymce-input', 'label' => ['text' => __('Leírás') . ' (' . __('feladatok részletezése') . ')'], 'placeholder' => __('A leírással együtt az adatlap férjen rá egyetlen oldalra!'),
+                                                     'templates' => ['inputContainer' => '<div class="form-group tinymce-container">{{content}}</div>']]) ?>
             <?= $this->Form->control('starting_year_id', ['class' => 'form-control', 'options' => $years, 'label' => ['text' => __('Kezdési tanév')]]) ?>
             <?= $this->Form->control('starting_semester', ['class' => 'form-control', 'type' => 'select', 'options' => [__('Ősz'), __('Tavasz')], 'label' => ['text' => __('Kezdési félév')]]) ?>
             <?= $this->Form->control('expected_ending_year_id', ['class' => 'form-control', 'options' => $years, 'label' => ['text' => __('Várható leadási tanév')]]) ?>
             <?= $this->Form->control('expected_ending_semester', ['class' => 'form-control', 'type' => 'select', 'options' => [__('Ősz'), __('Tavasz')], 'label' => ['text' => __('Várható leadási félév')]]) ?>
             <?= $this->Form->control('language_id', ['class' => 'form-control', 'options' => $languages, 'label' => ['text' => __('Nyelv')]]) ?>
-            <?= $this->Form->control('confidential', ['hiddenField' => false, 'label' => ['text' => __('Titkos')], 'templates' => ['nestingLabel' => '{{hidden}}<label{{attrs}}>{{text}}</label>&nbsp;{{input}}']]) ?>
+            <?= $this->Form->control('confidential', ['label' => ['text' => __('Titkos')], 'templates' => ['nestingLabel' => '{{hidden}}<label{{attrs}}>{{text}}</label>&nbsp;{{input}}']]) ?>
+            <?= $this->Form->control('is_thesis', ['class' => 'form-control', 'type' => 'select', 'value' => 0, 'empty' => false, 'options' => [__('Diplomamunka'), __('Szakdolgozat')] ,'label' => ['text' => __('Típus')]]) ?>
             <?= $this->Form->control('internal_consultant_id', ['class' => 'form-control', 'label' => ['text' => __('Belső konzulens'), 'options' => $internalConsultants]]) ?>
             <?= $this->Form->control('has_external_consultant', ['id' => 'has_external_consultant', 'class' => 'form-control', 'type' => 'select', 'value' => 1, 'empty' => false, 'options' => [__('Nincs'), __('Van')], 'label' => ['text' => __('Külső konzulens')]]) ?>
             <?= $this->Form->control('external_consultant_name', ['class' => 'form-control', 'label' => ['text' => __('Külső konzulens neve')],
@@ -45,7 +47,6 @@
             <?= $this->Form->control('cause_of_no_external_consultant', ['class' => 'form-control', 'label' => ['text' => __('Külső konzulens kijelölésétől való eltekintés indoklása')],
                                                                          'templates' => ['inputContainer' => '<div id="cause_of_no_external_consultant" class="form-group">{{content}}</div>',
                                                                                          'inputContainerError' => '<div id="cause_of_no_external_consultant" class="form-group">{{content}}{{error}}</div>']]) ?>
-            <?= $this->Form->control('is_thesis', ['class' => 'form-control', 'type' => 'select', 'value' => 0, 'empty' => false, 'options' => [__('Diplomamunka'), __('Szakdolgozat')] ,'label' => ['text' => __('Típus')]]) ?>
             <?= $this->Form->button(__('Mentés'), ['class' => 'btn btn-primary submitBtn border-radius-45px', 'type' => 'submit']) ?>
             <?= $this->Form->end() ?>
         </div>
@@ -109,12 +110,18 @@
         });
         
         tinymce.remove();
-        tinymce.init({ selector:'.tinymce',
+        tinymce.init({ selector:'.tinymce-input',
                        forced_root_block : false,
                        language : 'hu_HU',
                        entity_encoding : 'raw',
                        branding: false,
                        menubar: false,
+                       setup: function (editor){
+                                //Tinymce-be gépeléskor beírjuk a textarea-ba azonnal a szöveget
+                                editor.on('change', function(e){
+                                    editor.save();
+                                });
+                              },
                        plugins: [
                                     "autoresize advlist lists link textcolor colorpicker",
                                     "insertdatetime media table contextmenu paste wordcount"

@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-12 text-center page-title">
             <?= $this->Html->link('<i class="fas fa-arrow-alt-circle-left fa-lg"></i>' . '&nbsp;' . __('Vissza'), ['controller' => 'OfferedTopics', 'action' => 'index'], ['escape' => false, 'class' => 'backBtn float-left border-radius-45px', 'title' => __('Vissza')]) ?>
-            <h4><?= __('Téma foglalás kezelése') ?></h4>
+            <h4><?= __('Témafoglalás kezelése') ?></h4>
         </div>
         <?= $this->Flash->render() ?>
         <div class="col-12">
@@ -17,6 +17,15 @@
                             <strong><?= __('Téma leírása') . ':' ?></strong><br/>
                             <?= $offeredTopic->description ?>
                         </div>
+                        <p class="mb-1">
+                            <strong><?= __('Nyelv') . ': ' ?></strong><?= $offeredTopic->has('language') ? h($offeredTopic->language->name) : '' ?>
+                        </p>
+                        <p class="mb-1">
+                            <strong><?= __('Titkos') . ': ' ?></strong><?= $offeredTopic->confidential === true ? __('Igen') : __('Nem') ?>
+                        </p>
+                        <p class="mb-1">
+                            <strong><?= __('Téma típusa') . ': ' ?></strong><?= $offeredTopic->is_thesis === true ? __('Szakdolgozat') : __('Diplomamunka')  ?>
+                        </p>
                         <?php if($offeredTopic->has_external_consultant === true){ ?>
                             <p class="mb-1">
                                 <strong><?= __('Külső konzulens neve') . ': ' ?></strong><?= h($offeredTopic->external_consultant_name) ?>

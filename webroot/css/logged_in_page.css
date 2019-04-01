@@ -73,6 +73,20 @@ html, body{
     color: red;
 }
 
+.tinymce-container{
+    position: relative;
+}
+
+.tinymce-input{
+    position: absolute;
+    top: 0;
+    left: 50%;
+    display: block !important;
+    width: 0px !important;
+    height: 150px !important;
+    opacity: 0;
+}
+
 /* Overlay */
 .overlay{
     position: absolute;

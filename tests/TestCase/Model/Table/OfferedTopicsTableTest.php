@@ -26,6 +26,7 @@ class OfferedTopicsTableTest extends TestCase
     public $fixtures = [
         'app.offered_topics',
         'app.internal_consultants',
+        'app.languages',
         'app.thesis_topics'
     ];
 

@@ -49,7 +49,7 @@ class OfferedTopicsController extends AppController
             return $this->redirect(['controller' => 'Students', 'action' => 'edit', $data['student_id']]);
         }
         
-        $offeredTopic = $this->OfferedTopics->find('all', ['conditions' => ['OfferedTopics.id' => $id], 'contain' => ['InternalConsultants']])->first();
+        $offeredTopic = $this->OfferedTopics->find('all', ['conditions' => ['OfferedTopics.id' => $id], 'contain' => ['InternalConsultants', 'Languages']])->first();
         
         $ok = true; 
         if(empty($offeredTopic)){
@@ -69,8 +69,9 @@ class OfferedTopicsController extends AppController
         
         if($ok === false) return $this->redirect(['action' => 'index']);
         
+        $languages = $this->OfferedTopics->Languages->find('list');
         $can_add_topic = $this->Students->canAddTopic($data['student_id']);
-        $this->set(compact('offeredTopic', 'can_add_topic'));
+        $this->set(compact('offeredTopic', 'can_add_topic', 'languages'));
     }
     
     /**
@@ -121,6 +122,9 @@ class OfferedTopicsController extends AppController
         $thesisTopic = $this->ThesisTopics->newEntity();
         $thesisTopic->title = $offeredTopic->title;
         $thesisTopic->description = $offeredTopic->description;
+        $thesisTopic->confidential = $offeredTopic->confidential;
+        $thesisTopic->is_thesis = $offeredTopic->is_thesis;
+        $thesisTopic->language_id = $offeredTopic->language_id;
         $thesisTopic->internal_consultant_id = $offeredTopic->internal_consultant_id;
         
         if($offeredTopic->has_external_consultant === true){ //Ha van külső konzulens

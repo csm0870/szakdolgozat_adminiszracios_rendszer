@@ -51,7 +51,7 @@ class ThesisTopicsController extends AppController
         $ok = true;
         //Megnézzük, hogy megfelelő-e a téma a diplomamunka/szakdolgozat feltöltéséhez
         if(empty($thesisTopic)){ //Nem létezik a téma
-            $this->Flash->error(__('Részeletek nem elérhetőek.') . ' ' . __('Nem létezik a téma.'));
+            $this->Flash->error(__('Részeletek nem elérhetőek.') . ' ' . __('Nem létezik a dolgozat.'));
             $ok = false;
         }elseif(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),
@@ -89,10 +89,10 @@ class ThesisTopicsController extends AppController
         $ok = true;
         if(empty($thesisTopic)){
             $ok = false;
-            $error_msg = __('A mellékletek nem bírálhatóak.') . ' ' . __('A téma nem létezik.');
+            $error_msg = __('A mellékletek nem bírálhatóak.') . ' ' . __('A dolgozat nem létezik.');
         }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements')){ //A szakdolgozati feltöltés nincs véglegesítve
             $ok = false;
-            $error_msg = __('A mellékletek nem bírálhatóak.') . ' ' . __('A szakdolgozat felöltése még nincs véglegesítve.');
+            $error_msg = __('A mellékletek nem bírálhatóak.') . ' ' . __('A dolgozat felöltése még nincs véglegesítve.');
         }
         
         //Ha a feltételeknek megfelelő téma nem található
@@ -157,7 +157,7 @@ class ThesisTopicsController extends AppController
         $ok = true;
         if(empty($thesisTopic)){
             $ok = false;
-            $error_msg = __('Az adatok felvitele nem rögzíthető.') . ' ' . __('Nem létezik a téma.');
+            $error_msg = __('Az adatok felvitele nem rögzíthető.') . ' ' . __('Nem létezik a dolgozat.');
         }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')){ //A dolgozat még nincs elfogadva
             $ok = false;
              __('Az adatok felvitele nem rögzíthető.') . ' ' . __('A dolgozat még nincs elfogadott állapotban.');

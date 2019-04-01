@@ -177,7 +177,7 @@ class ThesisTopicsController extends AppController
         //Első oldal
         
         //Cím
-        $section->addTitle(($thesisTopic->is_thesis == 0 ? 'Diplomamunka' : 'Szakdolgozat') . ' téma titkos kezelésének kezdeményezése', $headingOne);
+        $section->addTitle(($thesisTopic->is_thesis === true ? 'Szakdolgozat' : 'Diplomamunka') . ' téma titkos kezelésének kezdeményezése', $headingOne);
         
         $section->addTextBreak(1);
         
@@ -192,7 +192,7 @@ class ThesisTopicsController extends AppController
         $section->addText('   Tagozat: ' . ($thesisTopic->has('student') ? ($thesisTopic->student->has('course_type') ? $thesisTopic->student->course_type->name : '') : '' ));
         $section->addTextBreak(1);
         //Szakdolgozat adatai
-        $section->addText('A ' . ($thesisTopic->is_thesis == 0 ? 'diplomamunka' : 'szakdolgozat') . ' adatai', ['underline' => \PhpOffice\PhpWord\Style\Font::UNDERLINE_SINGLE]);
+        $section->addText('A ' . ($thesisTopic->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' adatai', ['underline' => \PhpOffice\PhpWord\Style\Font::UNDERLINE_SINGLE]);
         $section->addText('   Cím: ' . $thesisTopic->title);
         $section->addText('   Nyelv: ' . ($thesisTopic->has('language') ? $thesisTopic->language->name : ''));
         $section->addTextBreak(1);
@@ -207,7 +207,7 @@ class ThesisTopicsController extends AppController
         $section->addTextBreak(1);
         //Kezdeményezés szövege
         $textrun1 = $section->addTextRun();
-        $textrun1->addText(($thesisTopic->is_thesis == 0 ? 'Diplomamunka' : 'Szakdolgozat') . ' kidolgozása során ');
+        $textrun1->addText(($thesisTopic->is_thesis === true ? 'Szakdolgozat' : 'Diplomamunka') . ' kidolgozása során ');
         $textrun1->addText('[cégünk/társaságunk/intézményünk]', $redTextFont);
         $textrun1->addText(' a fent említett Hallgató számára bizalmas információkba való betekintést is enged, és ezek egy része a készülő dolgozatba is belekerül. Ezek ipari, üzleti titoknak minősülnek, ezért bizalmas kezelésüket garantálni kell.');
         $section->addTextBreak(1);
@@ -249,7 +249,7 @@ class ThesisTopicsController extends AppController
         //Jóváhagyás
         $section->addText('Jóváhagyás', $subTitleFont, $subTitlePara);
         $section->addTextBreak(1);
-        $section->addText('A Széchenyi István Egyetem Gépészmérnöki, Informatikai és Villamosmérnöki Kara és a ' . ($thesisTopic->is_thesis == 0 ? 'diplomamunka' : 'szakdolgozat') .  ' témájában illetékes tanszék nevében nyilatkozunk arról, hogy a fenti „Adatok” részben meghatározott ' . ($thesisTopic->is_thesis == 0 ? 'diplomamunka' : 'szakdolgozat') . ' a Kar Záróvizsga Szabályzatának megfelelően titkosan kezeljük. (A Szabályzat idevágó részét lentebb idézzük.)');
+        $section->addText('A Széchenyi István Egyetem Gépészmérnöki, Informatikai és Villamosmérnöki Kara és a ' . ($thesisTopic->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') .  ' témájában illetékes tanszék nevében nyilatkozunk arról, hogy a fenti „Adatok” részben meghatározott ' . ($thesisTopic->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' a Kar Záróvizsga Szabályzatának megfelelően titkosan kezeljük. (A Szabályzat idevágó részét lentebb idézzük.)');
         $section->addTextBreak(1);
         $textrun3 = $section->addTextRun();
         $textrun3->addText('A titkosítási időszak vége: ');
@@ -282,7 +282,7 @@ class ThesisTopicsController extends AppController
         //Tudomásul vétel
         $section->addText('Tudomásul vétel', $subTitleFont, $subTitlePara);
         $section->addTextBreak(1);
-        $section->addText('Alulírott hallgató tudomásul veszem, hogy ' . ($thesisTopic->is_thesis == 0 ? 'diplomamunkám' : 'szakdolgozatom') .  ' kidolgozása során olyan információkhoz (gyakorlati tapasztalat, know-how, gyártástechnikai, szállítási és szolgáltatásokkal kapcsolatos információ, marketing, ügyfelekre vonatkozó és személyzeti adat) jutok, melyeket bizalmasan kell kezelnem. Vállalom, hogy a munka során megismert adatokat, tényeket, információkat csak azután adhatom át belső konzulensemnek és csak azután adhatom le dolgozatomat, miután a Partner-intézmény erre feljogosított képviselője írásban engedélyt ad. A titkosságot a fenti dátumig megőrzöm.');
+        $section->addText('Alulírott hallgató tudomásul veszem, hogy ' . ($thesisTopic->is_thesis === true ? 'szakdolgozatom' : 'diplomamunkám') .  ' kidolgozása során olyan információkhoz (gyakorlati tapasztalat, know-how, gyártástechnikai, szállítási és szolgáltatásokkal kapcsolatos információ, marketing, ügyfelekre vonatkozó és személyzeti adat) jutok, melyeket bizalmasan kell kezelnem. Vállalom, hogy a munka során megismert adatokat, tényeket, információkat csak azután adhatom át belső konzulensemnek és csak azután adhatom le dolgozatomat, miután a Partner-intézmény erre feljogosított képviselője írásban engedélyt ad. A titkosságot a fenti dátumig megőrzöm.');
         $section->addTextBreak(1);
         $section->addText('Győr, ' . date('Y') . '. ' . $hun_months[intval(date('n')) - 1] . ' ' . date('j') . '.');
         $section->addTextBreak(1);

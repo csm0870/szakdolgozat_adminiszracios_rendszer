@@ -14,8 +14,12 @@
                 
                 echo $this->Form->create($offeredTopic, ['id' => 'offeredTopicEditForm']);
                 echo $this->Form->control('title', ['class' => 'form-control', 'label' => ['text' => __('Cím')]]);
-                echo $this->Form->control('description', ['class' => 'form-control tinymce', 'required'  => false, 'label' => ['text' => __('Leírás')]]);
-                echo $this->Form->control('has_external_consultant', ['class' => 'form-control', 'id' => 'has_external_consultant_select', 'options' => [__('Nincs'), __('Van')] ,'label' => ['text' => __('Van-e külső konzulens jelölt')]]);
+                echo $this->Form->control('description', ['class' => 'form-control tinymce-input', 'label' => ['text' => __('Leírás')],
+                                                          'templates' => ['inputContainer' => '<div class="form-group tinymce-container">{{content}}</div>']]);
+                echo $this->Form->control('language_id', ['class' => 'form-control', 'options' => $languages, 'label' => ['text' => __('Nyelv')]]);
+                echo $this->Form->control('confidential', ['label' => ['text' => __('Titkos')], 'templates' => ['nestingLabel' => '{{hidden}}<label{{attrs}}>{{text}}</label>&nbsp;{{input}}']]);
+                echo $this->Form->control('is_thesis', ['class' => 'form-control', 'type' => 'select', 'value' => 0, 'empty' => false, 'options' => [__('Diplomamunka'), __('Szakdolgozat')] ,'label' => ['text' => __('Típus')], 'value' =>  $offeredTopic->is_thesis === true ? 1 : 0]);
+                echo $this->Form->control('has_external_consultant', ['class' => 'form-control', 'id' => 'has_external_consultant_select', 'options' => [__('Nincs'), __('Van')] ,'label' => ['text' => __('Van-e külső konzulens jelölt') . ' (' . __('ha van, akkor azon már a hallgató nem változtathat') . ')']]);
                 echo $this->Form->control('external_consultant_name', ['class' => 'form-control', 'label' => ['text' => __('Külső konzulens neve')],
                                                                        'templates' => ['inputContainer' => '<div class="form-group external-consultants-data-field">{{content}}</div>',
                                                                        'inputContainerError' => '<div class="form-group external-consultants-data-field">{{content}}{{error}}</div>']]);
@@ -91,12 +95,18 @@
         });
         
         tinymce.remove();
-        tinymce.init({ selector:'.tinymce',
+        tinymce.init({ selector:'.tinymce-input',
                        language : 'hu_HU',
                        forced_root_block : false,
                        entity_encoding : 'raw',
                        branding: false,
                        menubar: false,
+                       setup: function (editor){
+                                //Tinymce-be gépeléskor beírjuk a textarea-ba azonnal a szöveget
+                                editor.on('change', function(e){
+                                    editor.save();
+                                });
+                              },
                        plugins: [
                                     "autoresize advlist lists link textcolor colorpicker",
                                     "insertdatetime media table contextmenu paste wordcount"

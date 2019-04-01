@@ -50,7 +50,8 @@ class OfferedTopicsController extends AppController
             }
         }
         
-        $this->set(compact('offeredTopic'));
+        $languages = $this->OfferedTopics->Languages->find('list');
+        $this->set(compact('offeredTopic', 'languages'));
     }
 
     /**
@@ -91,7 +92,8 @@ class OfferedTopicsController extends AppController
             $this->Flash->error(__('Mentés sikertelen.'));
         }
         
-        $this->set(compact('offeredTopic'));
+        $languages = $this->OfferedTopics->Languages->find('list');
+        $this->set(compact('offeredTopic', 'languages'));
     }
 
     /**
@@ -112,14 +114,21 @@ class OfferedTopicsController extends AppController
         
         if(empty($offeredTopic)){ //Ha nem létezik a téma
             $ok = false;
-            $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A téma nem létezik.'));
+            $this->Flash->error(__('A téma nem törölhető.') . ' ' . __('A téma nem létezik.'));
         }elseif($user->internal_consultant->id != $offeredTopic->internal_consultant_id){
-            $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A téma nem Önhöz tartozik.'));
+            $this->Flash->error(__('A téma nem törölhető.') . ' ' . __('A téma nem Önhöz tartozik.'));
             return $this->redirect(['action' => 'index']);
         }elseif($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking')){ //Ha téma foglalva van és a hallgató véglegesítésére vár
             $ok = false;
-            $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A téma foglalásának véglegesítését még nem tette meg a hallgató.'));
+            $this->Flash->error(__('A téma nem törölhető.') . ' ' . __('A téma foglalásának véglegesítését még nem tette meg a hallgató.'));
+        }elseif($offeredTopic->has('thesis_topic') && !in_array($offeredTopic->thesis_topic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking'),
+                                                                                                                      \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingRejectedByInternalConsultant'),
+                                                                                                                      \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingCanceledByStudent')])){ //Ha téma foglalva van és a hallgató véglegesítésére vár
+            $ok = false;
+            $this->Flash->error(__('A téma nem törölhető.') . ' ' . __('A téma le van foglalva.'));
         }
+        
+        if($ok === false) return $this->redirect(['action' => 'index']);
         
         if ($this->OfferedTopics->delete($offeredTopic)){
             //Ha a témaajánlatot valaki választotta és belső konzulens döntésre vár a foglalás
@@ -138,7 +147,7 @@ class OfferedTopicsController extends AppController
     
     public function details($id = null){
         $offeredTopic = $this->OfferedTopics->find('all', ['conditions' => ['OfferedTopics.id' => $id],
-                                                           'contain' => ['ThesisTopics' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels']]]])->first();
+                                                           'contain' => ['Languages', 'ThesisTopics' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels']]]])->first();
         
         $this->loadModel('Users');
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);

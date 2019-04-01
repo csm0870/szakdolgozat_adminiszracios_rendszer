@@ -936,7 +936,7 @@ class ReviewsController extends AppController
         $section->addText('   Tagozat: ' . ($thesisTopic->has('student') ? ($thesisTopic->student->has('course_type') ? $thesisTopic->student->course_type->name : '') : '' ));
         $section->addTextBreak(2);
         //Szakdolgozat adatai
-        $section->addText('A ' . ($thesisTopic->is_thesis == 0 ? 'diplomamunka' : 'szakdolgozat') . ' adatai', ['underline' => \PhpOffice\PhpWord\Style\Font::UNDERLINE_SINGLE]);
+        $section->addText('A ' . ($thesisTopic->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' adatai', ['underline' => \PhpOffice\PhpWord\Style\Font::UNDERLINE_SINGLE]);
         $section->addText('   Cím: ' . $thesisTopic->title);
         $section->addText('   Nyelv: ' . ($thesisTopic->has('language') ? $thesisTopic->language->name : ''));
         $section->addTextBreak(1);
@@ -959,7 +959,7 @@ class ReviewsController extends AppController
         $section->addText('Nyilatkozat', $subTitleFont, $subTitlePara);
         $section->addTextBreak(1, $subTitleFont, $subTitlePara);
         $section->addText('Alulírott tudomásul veszem, hogy a fent említett Hallgató ' . 
-                           ($thesisTopic->is_thesis == 0 ? 'diplomamunkájának' : 'szakdolgozatának') . 
+                           ($thesisTopic->is_thesis === true ? 'szakdolgozatának' : 'diplomamunkájának') . 
                             ' bírálata során olyan információk birtokába jutok, melyek a fenti Partner-intézmény szellemi tulajdonát képezik, így bizalmasan kezelendők.',
                             ['size' => 11], ['spaceAfter' => \PhpOffice\PhpWord\Shared\Converter::pointToTwip(6)]);
         $section->addText('A dolgozatról illetve annak részeiről másolatot nem készítek, annak példányát munkám végeztével visszaadom vagy visszaküldöm annak (Partner-intézmény, bírálatot kérő tanszék, záróvizsga-bizottság),' .

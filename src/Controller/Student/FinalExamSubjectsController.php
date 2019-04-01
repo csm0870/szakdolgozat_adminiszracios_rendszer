@@ -48,7 +48,7 @@ class FinalExamSubjectsController extends AppController
             $error_msg = __('Csak mérnökinformatikus hallgató választhat záróvizsga-tárgyakat.');
         }elseif(count($student->final_exam_subjects) == 0 && $thesisTopics->count() == 0){ //Ha nincsenek választott tátrgyai és nincs olyan témája, ami alapján olyan helyzetben lenne, hogy ZV-tárgakat választhatna
             $ok = false;
-            $error_msg = __('Nincs olyan állapotban lévő szakdolgozata, ami alapján záróvizsga-tárgyakat választhatna.');
+            $error_msg = __('Nincs olyan állapotban lévő dolgozata, ami alapján záróvizsga-tárgyakat választhatna.');
         }
         
         if(!$ok){

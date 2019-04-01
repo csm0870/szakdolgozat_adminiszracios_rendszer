@@ -10,6 +10,7 @@ use Cake\Validation\Validator;
  * OfferedTopics Model
  *
  * @property \App\Model\Table\InternalConsultantsTable|\Cake\ORM\Association\BelongsTo $InternalConsultants
+ * @property |\Cake\ORM\Association\BelongsTo $Languages
  * @property \App\Model\Table\ThesisTopicsTable|\Cake\ORM\Association\HasMany $ThesisTopics
  *
  * @method \App\Model\Entity\OfferedTopic get($primaryKey, $options = [])
@@ -45,6 +46,9 @@ class OfferedTopicsTable extends Table
         $this->belongsTo('InternalConsultants', [
             'foreignKey' => 'internal_consultant_id'
         ]);
+        $this->belongsTo('Languages', [
+            'foreignKey' => 'language_id'
+        ]);
         $this->hasOne('ThesisTopics', [
             'foreignKey' => 'offered_topic_id'
         ]);
@@ -65,11 +69,23 @@ class OfferedTopicsTable extends Table
         $validator
             ->scalar('title')
             ->maxLength('title', 255)
-            ->notEmpty('title', __('Cím megadása kötelező.'));
+            ->notEmpty('title', __('Cím megadása kötelező.'))
+            ->requirePresence('title', 'create', __('Cím megadása kötelező.'));
 
         $validator
             ->scalar('description')
-            ->notEmpty('description', __('Leírás megadása kötelező.'));
+            ->notEmpty('description', __('Leírás megadása kötelező.'))
+            ->requirePresence('description', 'create', __('Leírás megadása kötelező.'));
+
+        $validator
+            ->boolean('confidential')
+            ->notEmpty('confidential', __('Titkosság megadása kötelező.'))
+            ->requirePresence('confidential', 'create', __('Titkosság megadása kötelező.'));
+
+        $validator
+            ->boolean('is_thesis')
+            ->notEmpty('is_thesis', __('Téma típusának megadása kötelező.'))
+            ->requirePresence('is_thesis', 'create', __('Téma típusának megadása kötelező.'));
 
         $validator
             ->boolean('has_external_consultant')
@@ -104,6 +120,10 @@ class OfferedTopicsTable extends Table
             ->scalar('external_consultant_address')
             ->maxLength('external_consultant_address', 80)
             ->allowEmpty('external_consultant_address');
+        
+        $validator
+            ->notEmpty('language_id', __('Nyelv megadása kötelező.'))
+            ->requirePresence('language_id', 'create', __('Nyelv megadása kötelező.'));
 
         return $validator;
     }
@@ -118,6 +138,7 @@ class OfferedTopicsTable extends Table
     public function buildRules(RulesChecker $rules)
     {
         $rules->add($rules->existsIn(['internal_consultant_id'], 'InternalConsultants'));
+        $rules->add($rules->existsIn(['language_id'], 'Languages'));
 
         return $rules;
     }

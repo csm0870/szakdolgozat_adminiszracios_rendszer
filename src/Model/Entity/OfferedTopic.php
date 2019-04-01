@@ -9,6 +9,8 @@ use Cake\ORM\Entity;
  * @property int $id
  * @property string|null $title
  * @property string|null $description
+ * @property bool|null $confidential
+ * @property bool|null $is_thesis
  * @property bool|null $has_external_consultant
  * @property string|null $external_consultant_name
  * @property string|null $external_consultant_workplace
@@ -17,10 +19,12 @@ use Cake\ORM\Entity;
  * @property string|null $external_consultant_phone_number
  * @property string|null $external_consultant_address
  * @property int|null $internal_consultant_id
+ * @property int|null $language_id
  * @property \Cake\I18n\FrozenTime|null $created
  * @property \Cake\I18n\FrozenTime|null $modified
  *
  * @property \App\Model\Entity\InternalConsultant $internal_consultant
+ * @property \App\Model\Entity\Language $language
  * @property \App\Model\Entity\ThesisTopic $thesis_topic
  */
 class OfferedTopic extends Entity
@@ -38,6 +42,8 @@ class OfferedTopic extends Entity
     protected $_accessible = [
         'title' => true,
         'description' => true,
+        'confidential' => true,
+        'is_thesis' => true,
         'has_external_consultant' => true,
         'external_consultant_name' => true,
         'external_consultant_workplace' => true,
@@ -46,9 +52,11 @@ class OfferedTopic extends Entity
         'external_consultant_phone_number' => true,
         'external_consultant_address' => true,
         'internal_consultant_id' => true,
+        'language_id' => true,
         'created' => true,
         'modified' => true,
         'internal_consultant' => true,
+        'language' => true,
         'thesis_topic' => true
     ];
 }

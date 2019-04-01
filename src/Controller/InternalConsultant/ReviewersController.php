@@ -132,13 +132,13 @@ class ReviewersController extends AppController
         $error_msg = '';
         $ok = true;
         if(empty($thesisTopic)){ //Nem létezik a téma
-            $error_msg = __('Bírálói javaslat tétele nem lehetséges.') . ' ' . __('Nem létező szakdolgozat/diplomamunka.');
+            $error_msg = __('Bírálói javaslat tétele nem lehetséges.') . ' ' . __('Nem létező dolgozat.');
             $ok = false;
         }elseif($thesisTopic->internal_consultant_id != ($user->has('internal_consultant') ? $user->internal_consultant->id : -1)){ ////Nem ehhez a belső konzulenshez tartozik
-            $error_msg = __('Bírálói javaslat tétele nem lehetséges.') . ' ' . __('A szakdolgozatnak/diplomamunkának nem Ön a belső konzulense.');
+            $error_msg = __('Bírálói javaslat tétele nem lehetséges.') . ' ' . __('A dolgozatnak nem Ön a belső konzulense.');
             $ok = false;
         }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant')){ //Nem "Bíráló kijelölésére vár státuszban van" státuszban van
-            $error_msg = __('Bírálói javaslat tétele nem lehetséges.') . ' ' . __('A szakdolgozat/diplomamunka nem a belső konzulens általi biráló személyének kijelölésére vár.');
+            $error_msg = __('Bírálói javaslat tétele nem lehetséges.') . ' ' . __('A dolgozat nem a belső konzulens általi biráló személyének kijelölésére vár.');
             $ok = false;
         }
         

@@ -112,7 +112,7 @@ class ConsultationsController extends AppController
         }else $can_add_consultation_group = false;
         
         if($can_add_consultation_group === false){
-            $this->Flash->error(__('Nem adhat hozzá konzultációs csoportot. A jelenlegi szakdolgozat már rendelkezik eggyel.'));
+            $this->Flash->error(__('Nem adhat hozzá konzultációs csoportot. A jelenlegi dolgozat már rendelkezik eggyel.'));
             return $this->redirect(['action' => 'index', $thesisTopic->id]);
         }
         
@@ -156,7 +156,7 @@ class ConsultationsController extends AppController
             $this->Flash->error(__('Konzultációs csoport már véglegesített, nem törölheti.'));
             $ok = false;
         }elseif($consultation->current === false){ //Régi szakdolgozathoz tartozik
-            $this->Flash->error(__('A konzultációs csoport régebbi szakdolgozathoz tartozik, nem törölheti.'));
+            $this->Flash->error(__('A konzultációs csoport régebbi dolgozathoz tartozik, nem törölheti.'));
             $ok = false;
         }
         
@@ -209,7 +209,7 @@ class ConsultationsController extends AppController
             $error_msg = __('A konzultációs csoport már véglegesítve van.');
         }elseif($consultation->current === false){ //Régi szakdolgozathoz tartozik
             $ok = false;
-            $error_msg = __('A konzultációs csoport régebbi szakdolgozathoz tartozik, nem véglegesíthető.');
+            $error_msg = __('A konzultációs csoport régebbi dolgozathoz tartozik, nem véglegesíthető.');
         }
         
         if(!$ok){

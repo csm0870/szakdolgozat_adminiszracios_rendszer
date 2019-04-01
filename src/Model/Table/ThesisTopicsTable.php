@@ -109,8 +109,8 @@ class ThesisTopicsTable extends Table
 
         $validator
             ->boolean('is_thesis')
-            ->notEmpty('is_thesis', __('Dolgozat típusának megadása kötelező.'))
-            ->requirePresence('is_thesis', 'create', __('Dolgozat típusának megadása kötelező.'));
+            ->notEmpty('is_thesis', __('Téma típusának megadása kötelező.'))
+            ->requirePresence('is_thesis', 'create', __('Téma típusának megadása kötelező.'));
 
         $validator
             ->boolean('confidential')
@@ -402,7 +402,7 @@ class ThesisTopicsTable extends Table
                 $notification->user_id = $internalConsultant->user_id;
                 $notification->unread = true;
                 $notification->subject = 'Egy kiírt témára jelentkezett egy hallgató. Döntsön a foglalásról!';
-                $notification->message = 'Hallgató: ' . h($student->name) . ' (' . h($student->neptun) . ')<br/>' .
+                $notification->message = 'Jelentkezett hallgató: ' . h($student->name) . ' (' . h($student->neptun) . ')<br/>' .
                                          'Téma címe: ' . h($entity->title) . '<br/>' .
                                          '<a href="' . \Cake\Routing\Router::url(['controller' => 'OfferedTopics', 'action' => 'details', $offered_topic->id, 'prefix' => 'internal_consultant'], true) . '">' . 'Részletek megtekintése' . '</a>';
 
@@ -423,7 +423,7 @@ class ThesisTopicsTable extends Table
                 $notification = $Notifications->newEntity();
                 $notification->user_id = $student->user_id;
                 $notification->unread = true;
-                $notification->subject = 'Egy kiírt téma foglalását a belső konzulens visszautasította.';
+                $notification->subject = 'A téma foglalását a belső konzulens visszautasította.';
                 $notification->message = 'A ' . h($entity->title) . ' című téma foglalását a ' . h($internalConsultant->name) . ' nevű belső konzulens visszautasította.' . '<br/>' .
                                          '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'student'], true) . '">' . 'Részletek megtekintése' . '</a>';
 
@@ -444,7 +444,7 @@ class ThesisTopicsTable extends Table
                 $notification = $Notifications->newEntity();
                 $notification->user_id = $student->user_id;
                 $notification->unread = true;
-                $notification->subject = 'Egy kiírt témá foglalását a belső konzulens elfogadta.';
+                $notification->subject = 'Egy kiírt téma foglalását a belső konzulens elfogadta.';
                 $notification->message = 'A ' . h($entity->title) . ' című téma foglalását a ' . h($internalConsultant->name) . ' nevű belső konzulens elfogadta.' . '<br/>' .
                                          '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'student'], true) . '">' . 'Részletek megtekintése' . '</a>';
 

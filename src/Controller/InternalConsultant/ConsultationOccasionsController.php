@@ -59,7 +59,7 @@ class ConsultationOccasionsController extends AppController
             $this->Flash->error(__('A konzultációs alkalmakat nem láthatja.') . ' ' . __('A konzultációs csoport, amihez tartozik már véglegesített. Csak a PDF-ben tekinthető(ek) meg.'));
             return $this->redirect(['controller' => 'Consultations', 'action' => 'index', $thesisTopic->id]);
         }elseif($consultation->current === false){ //Régi szakdolgozathoz tartozik
-            $this->Flash->error(__('A konzultációs alkalmakat nem láthatja.') . ' ' . __('A konzultációs csoport, amihez tartozik régebbi szakdolgozathoz tartozik.'));
+            $this->Flash->error(__('A konzultációs alkalmakat nem láthatja.') . ' ' . __('A konzultációs csoport, amihez tartozik régebbi dolgozathoz tartozik.'));
             return $this->redirect(['controller' => 'Consultations', 'action' => 'index', $thesisTopic->id]);
         }
         
@@ -89,7 +89,7 @@ class ConsultationOccasionsController extends AppController
             $error_msg = __('A konzultációs alkalom nem adható hozzá.') . ' ' . __('A konzultációs csoport, amihez tartozik már véglegesített.');
             $ok = false;
         }elseif($consultation->current === false){ //Régi szakdolgozathoz tartozik
-            $error_msg = __('A konzultációs alkalom nem adható hozzá.') . ' ' . __('A konzultációs csoport, amihez tartozik régebbi szakdolgozathoz tartozik.');
+            $error_msg = __('A konzultációs alkalom nem adható hozzá.') . ' ' . __('A konzultációs csoport, amihez tartozik régebbi dolgozathoz tartozik.');
             $ok = false;
         }
         
@@ -271,7 +271,7 @@ class ConsultationOccasionsController extends AppController
             $this->Flash->error(__('A konzultációs alkalom nem törölhető.') . ' ' . __('A konzultációs csoport, amihez tartozik már véglegesített.'));
             return $this->redirect($this->referer(null, true));
         }elseif($consultation->current === false){ //Régi szakdolgozathoz tartozik
-            $this->Flash->error(__('A konzultációs alkalom nem törölhető.') . ' ' . __('A konzultációs csoport, amihez tartozik régebbi szakdolgozathoz tartozik.'));
+            $this->Flash->error(__('A konzultációs alkalom nem törölhető.') . ' ' . __('A konzultációs csoport, amihez tartozik régebbi dolgozathoz tartozik.'));
             return $this->redirect($this->referer(null, true));
         }
         

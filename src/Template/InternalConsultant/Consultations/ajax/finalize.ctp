@@ -9,7 +9,7 @@
                 <tr>
                     <td>
                         <label>
-                            <?= __('A diplomamunka/szakdolgozat megfelelt a formai követelményeknek, így feltölthető, és bírálatra bocsátható') . ": " ?>
+                            <?= __('A dolgozat megfelelt a formai követelményeknek, így feltölthető, és bírálatra bocsátható') . ": " ?>
                         </label>
                     </td>
                 </tr>
