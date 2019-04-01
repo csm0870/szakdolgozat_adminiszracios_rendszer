@@ -29,21 +29,9 @@
                                 </thead>
                                 <tbody>
                                     <?php foreach($thesisTopics as $thesisTopic){ ?>
-                                        <tr>
+                                        <tr class="thesisTopics" data-id="<?= $thesisTopic->id ?>" style="cursor: pointer">
                                             <td>
-                                                <?=
-                                                    '<searchable-text>' . h($thesisTopic->title) . '</searchable-text>' . 
-                                                    (in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable'),
-                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),
-                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements'),
-                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected'),
-                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant'),
-                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByHeadOfDepartment'),
-                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
-                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
-                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')]) ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '')
-                                                ?>
+                                                <?= '<searchable-text>' . h($thesisTopic->title) . '</searchable-text>' ?>
                                             </td>
                                             <td><?= $thesisTopic->has('internal_consultant') ? '<searchable-text>' . h($thesisTopic->internal_consultant->name) . '</searchable-text>' : '' ?></td>
                                             <td><?= $thesisTopic->has('student') ? ('<searchable-text>' . h($thesisTopic->student->name) . (empty($thesisTopic->student->neptun) ? '' : ('<br/>(' . h($thesisTopic->student->neptun) . ')')) . '</searchable-text>') : '' ?></td>
@@ -64,6 +52,12 @@
 <script>
     $(function(){
         $('#thesis_topics_index_menu_item').addClass('active');
+        
+        //Táblázat sorára kattintáskor az adott téma részleteire ugrás
+        $('.thesisTopics').on('click', function(){
+            var id = $(this).data('id');
+            location.href = '<?= $this->Url->build(['action' => 'details'], true) ?>' + '/' + id;
+        });
         
         // DataTable
         var table = $('#data_table').DataTable({

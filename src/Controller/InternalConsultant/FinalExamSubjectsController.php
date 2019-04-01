@@ -22,7 +22,7 @@ class FinalExamSubjectsController extends AppController
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         
         $students = $this->FinalExamSubjects->Students->find('all', ['conditions' => ['Students.final_exam_subjects_internal_consultant_id' => ($user->has('internal_consultant') ? $user->internal_consultant->id : ''),//Csak a hozzá tartozó hallgatók
-                                                                                      'Students.final_exam_subjects_status IN' => [2, 3, 4], //Véglegesített, elfogadott, elutasított ZV-tárgy kérelmek
+                                                                                      'Students.final_exam_subjects_status IN' => [2, 3], //Véglegesített, elfogadott ZV-tárgy kérelmek
                                                                                       'Students.course_id' => 1]]); //Csak mérnökinformatikus
         $this->set(compact('students'));
     }

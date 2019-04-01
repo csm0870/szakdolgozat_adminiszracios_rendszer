@@ -23,8 +23,8 @@
                             </thead>
                             <tbody>
                                 <?php foreach($thesisTopics as $thesisTopic){ ?>
-                                    <tr>
-                                        <td><?= '<searchable-text>' . h($thesisTopic->title) . '</searchable-text>' . ($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview') ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '') ?></td>
+                                    <tr class="thesisTopics" data-id="<?= $thesisTopic->id ?>" style="cursor: pointer">
+                                        <td><?= '<searchable-text>' . h($thesisTopic->title) . '</searchable-text>' ?></td>
                                         <td>
                                             <?php
                                                 if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview') && $thesisTopic->has('review')){
@@ -60,6 +60,12 @@
 <script>
     $(function(){
         $('#thesis_topics_index_menu_item').addClass('active');
+        
+        //Táblázat sorára kattintáskor az adott téma részleteire ugrás
+        $('.thesisTopics').on('click', function(){
+            var id = $(this).data('id');
+            location.href = '<?= $this->Url->build(['action' => 'details'], true) ?>' + '/' + id;
+        });
         
          // DataTable
         var table = $('#data_table').DataTable({

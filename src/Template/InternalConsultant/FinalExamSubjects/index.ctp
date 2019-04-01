@@ -13,10 +13,9 @@
                                     <th><?= __('Hallgató neve') ?></th>
                                     <th><?= __('Neptun kód') ?></th>
                                     <th><?= __('Állapot') ?></th>
-                                    <th><?= __('Műveletek') ?></th>
                                 </tr>
                                 <?php foreach($students as $student){ ?>
-                                    <tr>
+                                    <tr class="students" data-id="<?= $student->id ?>" style="cursor: pointer">
                                         <td><?= h($student->name) ?></td>
                                         <td><?= h($student->neptun) ?></td>
                                         <td>
@@ -24,9 +23,6 @@
                                                 if($student->final_exam_subjects_status === 2) echo __('Hallgató véglegesítette. Ellenőrzésre vár.');
                                                 elseif($student->final_exam_subjects_status === 3) echo __('Elfogadva.');
                                             ?>
-                                        </td>
-                                        <td class="text-center">
-                                            <?= in_array($student->final_exam_subjects_status, [2, 3, 4]) ? $this->Html->link(__('Részletek'), ['controller' => 'FinalExamSubjects', 'action' => 'details', $student->id], ['class' => 'btn btn-info border-radius-45px']) : '' ?> 
                                         </td>
                                     </tr>
                                 <?php } ?>
@@ -40,5 +36,11 @@
 <script>
     $(function(){
         $('#final_exam_subjects_index_menu_item').addClass('active');
+        
+        //Táblázat sorára kattintáskor az adott téma részleteire ugrás
+        $('.students').on('click', function(){
+            var id = $(this).data('id');
+            location.href = '<?= $this->Url->build(['action' => 'details'], true) ?>' + '/' + id;
+        });
     });
 </script>

@@ -6,7 +6,7 @@
             'ThesisTopicBookingRejectedByInternalConsultant' => 3, //A témafoglalást a belső konzulens visszautasította
             'WaitingForStudentFinalizingOfThesisTopicBooking' => 4, //A témafoglalás a hallgató véglegesítésére vár
             'ThesisTopicBookingCanceledByStudent' => 5, //A témafoglalást a hallgató visszautasította
-            'WaitingForInternalConsultantAcceptingOfThesisTopic' => 6, //A téma a belső konzulens döntére vár
+            'WaitingForInternalConsultantAcceptingOfThesisTopic' => 6, //A téma a belső konzulens döntésére vár
             'ThesisTopicRejectedByInternalConsultant' => 7, //A téma elutasítva (belső konzulens)
             'WaitingForHeadOfDepartmentAcceptingOfThesisTopic' => 8, //Tanszékvezető döntésére vár
             'ThesisTopicRejectedByHeadOfDepartment' => 9, //Téma elutasítva (tanszékvezető)

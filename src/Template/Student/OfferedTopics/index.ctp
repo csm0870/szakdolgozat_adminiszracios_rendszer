@@ -21,8 +21,8 @@
                             </thead>
                             <tbody>
                                 <?php foreach($offeredTopics as $offeredTopic){ ?>
-                                    <tr>
-                                        <td style="vertical-align: middle"><?= '<searchable-text>' . h($offeredTopic->title) . '</searchable-text><br/>' .  $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'OfferedTopics', 'action' => 'details', $offeredTopic->id]) ?></td>
+                                    <tr class="offeredTopics" data-id="<?= $offeredTopic->id ?>" style="cursor: pointer">
+                                        <td style="vertical-align: middle"><?= '<searchable-text>' . h($offeredTopic->title) . '</searchable-text>' ?></td>
                                         <td style="vertical-align: middle"><?= $offeredTopic->has('internal_consultant') ? '<searchable-text>' . h($offeredTopic->internal_consultant->name) . '</searchable-text>' : '-' ?></td>
                                     </tr>
                                 <?php } ?>
@@ -38,6 +38,12 @@
     $(function(){
         $('#offered_topics_index_menu_item').addClass('active');
         $('#topics_menu_item').addClass('active');
+        
+        //Táblázat sorára kattintáskor az adott téma részleteire ugrás
+        $('.offeredTopics').on('click', function(){
+            var id = $(this).data('id');
+            location.href = '<?= $this->Url->build(['action' => 'details'], true) ?>' + '/' + id;
+        });
         
         //Törléskor confirmation modal a megerősítésre
         $('.deleteBtn').on('click', function(e){
