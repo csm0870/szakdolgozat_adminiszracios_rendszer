@@ -109,7 +109,7 @@
                                                                              \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
                                                                              \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
                                                                              \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                             \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])){ ?>
+                                                                             \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])){ ?>
                         <fieldset class="border-1-grey p-3 mb-3">
                             <legend class="w-auto"><?= __('Dolgozat értékelése') ?></legend>
                             <p class="mb-2">
@@ -118,10 +118,10 @@
                             <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
                                                                                      \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
                                                                                      \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
+                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
                                 <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
                                                                                          \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])  && in_array($thesisTopic->review->review_status, [4, 5, 6]))
+                                                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])  && in_array($thesisTopic->review->review_status, [4, 5, 6]))
                                         echo $this->Html->link(__('Bírálat megtekintése') . ' ->', ['controller' => 'Reviews', 'action' => 'checkReview', $thesisTopic->id], ['class' => 'mb-2', 'style' => 'display: inline-block']); ?>
                                 <p class="mb-1">
                                     <?= $this->Html->link(__('Dolgozat bírálója') . '&nbsp;' . '<i class="fas fa-angle-down fa-lg" id="reviewer_details_arrow_down"></i>' . '<i class="fas fa-angle-up fa-lg d-none" id="reviewer_details_arrow_up"></i>',
@@ -182,7 +182,7 @@
                                                                          \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
                                                                          \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
                                                                          \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])){ ?>
+                                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])){ ?>
                     <div class="col-12">
                         <div id="accordion">
                             <div class="card">
@@ -245,7 +245,7 @@
                             
                             if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
                                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                               \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')]) && $thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status == 4)
+                                                                               \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')]) && $thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status == 4)
                                 echo $this->Html->link(__('Bíráló titoktartási szerződésének letöltése'), ['controller' => 'Reviews', 'action' => 'getUploadedConfidentialityContract', $thesisTopic->id], ['class' => 'btn btn-info border-radius-45px mb-2', 'target' => '__blank']) . '<br/>';
                             
                             if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByHeadOfDepartment'))
@@ -411,7 +411,7 @@
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])){ ?>
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])){ ?>
             /**
              * Accordion megjelenítésekor nyíl cseréje
              */
@@ -432,7 +432,7 @@
         <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
             $('#reviewer_details_link').on('click', function(e){
                 e.preventDefault();
                 if($('#reviewer_details_container').css('display') == 'none'){

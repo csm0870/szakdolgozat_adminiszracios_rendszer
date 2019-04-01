@@ -30,7 +30,7 @@ class ThesisTopicsController extends AppController
                                                                                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
                                                                                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
                                                                                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')]],
+                                                                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')]],
                                                           'contain' => ['Students', 'InternalConsultants', 'ThesisTopicStatuses'], 'order' => ['ThesisTopics.modified' => 'DESC']]);
 
         $this->set(compact('thesisTopics'));
@@ -62,7 +62,7 @@ class ThesisTopicsController extends AppController
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])){ //A szakdolgozati feltöltés nincs véglegesítve
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])){ //A szakdolgozati feltöltés nincs véglegesítve
             $this->Flash->error(__('Részeletek nem elérhetőek.') . ' ' . __('A dolgozat még nincs abban az állapotban, hogy elérheti.'));
             $ok = false;
         }
@@ -158,7 +158,7 @@ class ThesisTopicsController extends AppController
         if(empty($thesisTopic)){
             $ok = false;
             $error_msg = __('Az adatok felvitele nem rögzíthető.') . ' ' . __('Nem létezik a dolgozat.');
-        }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')){ //A dolgozat még nincs elfogadva
+        }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')){ //A dolgozat még nincs elfogadva
             $ok = false;
              __('Az adatok felvitele nem rögzíthető.') . ' ' . __('A dolgozat még nincs elfogadott állapotban.');
         }elseif($thesisTopic->accepted_thesis_data_applyed_to_neptun === true){ //Az adatok már fel vannak vive

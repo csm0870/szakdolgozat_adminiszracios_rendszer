@@ -17,7 +17,7 @@ class StudentsController extends AppController
      */
     public function index(){
         $query = $this->Students->find();
-        $students = $query->matching('ThesisTopics', function($q){ return $q->where(['ThesisTopics.thesis_topic_status_id' => \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted'), // Elfogadott dolgozat
+        $students = $query->matching('ThesisTopics', function($q){ return $q->where(['ThesisTopics.thesis_topic_status_id' => \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted'), // Elfogadott dolgozat
                                                                                      'ThesisTopics.accepted_thesis_data_applyed_to_neptun' => true /* A dolgozat és a bírálat adatai már fel vannak vive a Neptun rendszerbe */,
                                                                                      'ThesisTopics.deleted !=' => true]);})
                           ->contain(['Courses', 'CourseTypes', 'CourseLevels'])
@@ -52,7 +52,7 @@ class StudentsController extends AppController
             $has_appropriate_thesis = false;
             foreach($student->thesis_topics as $thesisTopic){
                 //Ha a téma el van fogadva (a dolgozat), nincs törölve, és fel vannak vive az adatok a Neptun rendszerbe
-                if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted') &&
+                if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted') &&
                    $thesisTopic->deleted === false &&
                    $thesisTopic->accepted_thesis_data_applyed_to_neptun === true){
                     $has_appropriate_thesis = true;
@@ -99,7 +99,7 @@ class StudentsController extends AppController
             $has_appropriate_thesis = false;
             foreach($student->thesis_topics as $thesisTopic){
                 //Ha a téma el van fogadva (a dolgozat), nincs törölve, és fel vannak vive az adatok a Neptun rendszerbe
-                if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted') &&
+                if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted') &&
                    $thesisTopic->deleted === false &&
                    $thesisTopic->accepted_thesis_data_applyed_to_neptun === true){
                     $has_appropriate_thesis = true;

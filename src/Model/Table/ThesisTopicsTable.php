@@ -362,7 +362,7 @@ class ThesisTopicsTable extends Table
                 }
                 
                 //Ha mindkét értékelés legalább elégséges, akkor a dolgozat elfogadva, ha nem akkor újra második diplomakurzus
-                if($grade > 1 && $entity->internal_consultant_grade > 1) $entity->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted');
+                if($grade > 1 && $entity->internal_consultant_grade > 1) $entity->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted');
                 else $entity->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.FirstThesisSubjectSucceeded');
             }
         }
@@ -1277,9 +1277,9 @@ class ThesisTopicsTable extends Table
         
         //A dolgozat el lett fogadva (belső konzulens és a bíráló értékelése is megfelelő volt)
         if(($entity->getOriginal('thesis_topic_status_id') == \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed') &&
-            $entity->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')) ||
+            $entity->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')) ||
             $entity->getOriginal('thesis_topic_status_id') == \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed') &&
-            $entity->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')){
+            $entity->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')){
             $Notifications = \Cake\ORM\TableRegistry::get('Notifications');
             
             $student = $this->Students->find('all', ['conditions' => ['Students.id' => $entity->student_id],
@@ -1344,7 +1344,7 @@ class ThesisTopicsTable extends Table
         
         //A szakdolgozatkezelő rögzíti, hogy felvitte a dolgozat adatait a Neptun rendszerbe
         if(($entity->getOriginal('accepted_thesis_data_applyed_to_neptun') !== true &&
-            $entity->accepted_thesis_data_applyed_to_neptun === true) && $entity->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')){
+            $entity->accepted_thesis_data_applyed_to_neptun === true) && $entity->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')){
             
             $Notifications = \Cake\ORM\TableRegistry::get('Notifications');
             $student = $this->Students->find('all', ['conditions' => ['Students.id' => $entity->student_id],

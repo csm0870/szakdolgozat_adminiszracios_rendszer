@@ -380,7 +380,7 @@ class ReviewsController extends AppController
             $ok = false;
         }elseif(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])){ //Nem "Bírálat alatt", "Dolgozat bírálva", "Dolgozat elfogadva" státuszban van
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])){ //Nem "Bírálat alatt", "Dolgozat bírálva", "Dolgozat elfogadva" státuszban van
             $this->Flash->error(__('A feltölött bírálati lap nem elérhető.') . ' ' . __('A téma nincs abban az állapotban, hogy a feltöltött bírálati lap letölthető lehetne.'));
             $ok = false;
         }else{

@@ -157,7 +157,7 @@ class ReviewsController extends AppController
             $ok = false;
         }elseif(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])){ //Nem "Bírálat alatt", vagy "Bírálva státuszban van" státuszban van
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])){ //Nem "Bírálat alatt", vagy "Bírálva státuszban van" státuszban van
             $this->Flash->error(__('A bírálat nem elérhető.') . ' ' . __('A dolgozat még nem lett bírálva, vagy nem bírálat alatt van.'));
             $ok = false;
         }elseif($thesisTopic->has('review') == false){ //Nincs bírálat a dolgozathoz
@@ -283,7 +283,7 @@ class ReviewsController extends AppController
             $ok = false;
         }elseif(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])){ //Nem "Bírálat alatt", vagy "Bírálva státuszban van" státuszban van
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])){ //Nem "Bírálat alatt", vagy "Bírálva státuszban van" státuszban van
             $this->Flash->error(__('A feltölött bírálati lap nem elérhető.') . ' ' . __('A dolgozat még nem lett bírálva, vagy nem bírálatt alatt van.'));
             $ok = false;
         }elseif($thesisTopic->has('review') == false){ //Nincs bírálat a dolgozathoz

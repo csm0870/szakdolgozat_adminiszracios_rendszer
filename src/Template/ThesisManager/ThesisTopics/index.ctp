@@ -42,7 +42,7 @@
                                                                                                      \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
                                                                                                      \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
                                                                                                      \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')]) ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '')
+                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')]) ? ('<br/>' . $this->Html->link(__('Részletek') . ' ->' , ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id])) : '')
                                                 ?>
                                             </td>
                                             <td><?= $thesisTopic->has('internal_consultant') ? '<searchable-text>' . h($thesisTopic->internal_consultant->name) . '</searchable-text>' : '' ?></td>

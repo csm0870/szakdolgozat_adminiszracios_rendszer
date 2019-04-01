@@ -11,7 +11,7 @@
                     <p class="mb-4">
                         <strong><?= __('Állapot') . ': ' ?></strong><?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : ''?>
                         <?php
-                            if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted') && $thesisTopic->accepted_thesis_data_applyed_to_neptun !== true){
+                            if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted') && $thesisTopic->accepted_thesis_data_applyed_to_neptun !== true){
                                 echo '(' . __('Az elfogadott dolgozat adatait fel kell vinni a Neptun rendszerbe.') . ')';
                                 echo '<br/>';
                                 echo $this->Html->link(__('Adatok felvitele') . ' ->', '#', ['class' => 'mt-2 applyAcceptedThesisDataBtn', 'style' => 'display: inline-block']);
@@ -97,19 +97,19 @@
                                                                          \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
                                                                          \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
                                                                          \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])){ ?>
+                                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])){ ?>
                     <fieldset class="border-1-grey p-3 mb-3">
                         <legend class="w-auto"><?= __('Dolgozat értékelése') ?></legend>
                         <p class="mb-2">
                             <strong><?= __('Belső konzulens értékelése') . ': ' ?></strong><?= $thesisTopic->internal_consultant_grade === null ? __('még nincs értékelve') : h($thesisTopic->internal_consultant_grade) ?>
                         </p>
                         <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')]) && $thesisTopic->has('review'))
+                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')]) && $thesisTopic->has('review'))
                                     echo $this->Html->link(__('Bírálat megtekintése') . ' ->', ['controller' => 'Reviews', 'action' => 'checkReview', $thesisTopic->id], ['class' => 'mb-2', 'style' => 'display: inline-block']); ?>
                         <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
                                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
                                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
+                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
                             <p class="mb-1">
                                 <?= $this->Html->link(__('Dolgozat bírálója') . '&nbsp;' . '<i class="fas fa-angle-down fa-lg" id="reviewer_details_arrow_down"></i>' . '<i class="fas fa-angle-up fa-lg d-none" id="reviewer_details_arrow_up"></i>',
                                                       '#', ['id' => 'reviewer_details_link', 'escape' => false]) ?>
@@ -158,7 +158,7 @@
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])){ ?>
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])){ ?>
             <div class="col-12">
                 <div id="accordion">
                     <div class="card">
@@ -227,7 +227,7 @@
       </div>
     </div>
 <?php } ?>
-<?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted') && $thesisTopic->accepted_thesis_data_applyed_to_neptun !== true){ ?>
+<?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted') && $thesisTopic->accepted_thesis_data_applyed_to_neptun !== true){ ?>
     <!-- Elfogadott dolgozat adatainak felvitele modal -->
     <div class="modal fade" id="applyAcceptedThesisDataModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -269,7 +269,7 @@
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])){ ?>
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])){ ?>
             /**
              * Accordion megjelenítésekor nyíl cseréje
              */
@@ -290,7 +290,7 @@
         <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
             $('#reviewer_details_link').on('click', function(e){
                 e.preventDefault();
                 if($('#reviewer_details_container').css('display') == 'none'){
@@ -305,7 +305,7 @@
             });
         <?php } ?>
             
-        <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted') && $thesisTopic->accepted_thesis_data_applyed_to_neptun !== true){ ?>
+        <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted') && $thesisTopic->accepted_thesis_data_applyed_to_neptun !== true){ ?>
             //Tartalom lekeérése a "adatok felvitele a Neptun rendszerbe" modalba
             $.ajax({
                 url: '<?= $this->Url->build(['action' => 'applyAcceptedThesisData', $thesisTopic->id], true) ?>',

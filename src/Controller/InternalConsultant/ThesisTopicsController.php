@@ -67,7 +67,7 @@ class ThesisTopicsController extends AppController
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')])){
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])){
             $this->Flash->error(__('A témát nem törölheti.') . ' ' . __('A dolgozat nem törölhető állapotban van.'));
             return $this->redirect(['action' => 'index']);
         }

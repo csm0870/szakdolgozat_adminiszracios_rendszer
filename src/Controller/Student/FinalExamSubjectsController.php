@@ -41,7 +41,7 @@ class FinalExamSubjectsController extends AppController
                                                                                                                                                      \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
                                                                                                                                                      \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
                                                                                                                                                      \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccpeted')], 'deleted !=' => true, 'student_id' => $student->id]]);
+                                                                                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')], 'deleted !=' => true, 'student_id' => $student->id]]);
         
         if($student->course_id != 1){ //Ha nem mérnökinformatikus
             $ok = false;

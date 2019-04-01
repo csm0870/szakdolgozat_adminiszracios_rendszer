@@ -26,7 +26,7 @@
             'WatingForSendingToReview' => 23, //A dolgozat bírálója kijelölve, bírálatra küldésre vár
             'UnderReview' => 24, //A dolgozat bírálat alatt
             'Reviewed' => 25, //A dolgozat bírálva
-            'ThesisAccpeted' => 26 //A dolgozat elfogadva
+            'ThesisAccepted' => 26 //A dolgozat elfogadva
         ]
     ];
 ?>
