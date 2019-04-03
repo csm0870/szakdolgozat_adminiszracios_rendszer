@@ -33,8 +33,9 @@ class ThesisTopicsController extends AppController
                                                                                                                                      \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopic'),
                                                                                                                                      \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByInternalConsultant')] /* Már eljutott a tanszékvezetőig */],
                                                           'contain' => ['Students', 'InternalConsultants', 'ThesisTopicStatuses', 'Reviews'], 'order' => ['ThesisTopics.modified' => 'DESC']]);
-
-        $this->set(compact('thesisTopics'));
+        $this->loadModel('Information');
+        $information = $this->Information->find('all')->first();
+        $this->set(compact('thesisTopics', 'information'));
     }
     
     /**

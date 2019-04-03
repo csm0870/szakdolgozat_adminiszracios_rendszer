@@ -32,7 +32,9 @@ class ThesisTopicsController extends AppController
                                                                                                                                      \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingCanceledByStudent')] /* Még nincs leadva */],
                                                           'contain' => ['Students', 'ThesisTopicStatuses'], 'order' => ['ThesisTopics.modified' => 'DESC']]);
 
-        $this->set(compact('thesisTopics'));
+        $this->loadModel('Information');
+        $information = $this->Information->find('all')->first();
+        $this->set(compact('thesisTopics', 'information'));
     }
 
     /**

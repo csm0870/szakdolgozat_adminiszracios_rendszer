@@ -23,7 +23,9 @@ class OfferedTopicsController extends AppController
         
         $offeredTopics = $this->OfferedTopics->find('all', ['conditions' => ['OfferedTopics.internal_consultant_id' => ($user->has('internal_consultant') ? $user->internal_consultant->id : '-1')],
                                                             'contain' => ['ThesisTopics' => ['Students', 'ThesisTopicStatuses']]]);
-        $this->set(compact('offeredTopics'));
+        $this->loadModel('Information');
+        $information = $this->Information->find('all')->first();
+        $this->set(compact('offeredTopics', 'information'));
     }
 
     /**

@@ -1,7 +1,7 @@
 <div class="container">
     <div class="row">
         <div class="col-12 text-center">
-            <h4><?= __('Titoktartási kérelem szabályzatának szövegét állíthatja be.') ?></h4>
+            <h4><?= __('Titoktartási kérelem szabályzatának beállítása') ?></h4>
         </div>
         <div class="col-12">
             <?= $this->Flash->render() ?>
