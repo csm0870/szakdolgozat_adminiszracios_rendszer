@@ -304,6 +304,16 @@ class ThesisTopicsTable extends Table
             $entity->handed_in_date = date('Y-m-d');
         }
         
+        //Ha a belső konzulens visszautasította a témát, és a kiírt témája volt
+        if($entity->getOriginal('thesis_topic_status_id') == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopic') &&
+           $entity->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByInternalConsultant')){
+            $offered_topic = $this->OfferedTopics->find('all', ['conditions' => ['id' => $entity->offered_topic_id]])->first();
+            //Ha van hozzá témakiírás
+            if(!empty($offered_topic)){
+                $entity->offered_topic_id = null;
+            }
+        }
+        
         //A téma elfogadott állapotba kerül
         if(($entity->getOriginal('thesis_topic_status_id') == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForHeadOfDepartmentAcceptingOfThesisTopic') ||
             $entity->getOriginal('thesis_topic_status_id') == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingExternalConsultantSignatureOfThesisTopic')) &&
@@ -1385,6 +1395,31 @@ class ThesisTopicsTable extends Table
         
         //======================================================================
         // ÉRTESÍTÉSEK VÉGE
+        //======================================================================
+        
+        //======================================================================
+        // MEZŐK VAGY TÉMÁHOZ TARTOZÓ ADATOK RESETELÉSE/MÓDOSÍTÁSA ELEJE
+        //======================================================================
+        
+        //Tanszékvezető módosítási javaslatakor a hallgató módosít az adatokon, akkor ezeket a módosításokat átírjuk a kiírt témára is
+        if($entity->isNew() === false &&
+           $entity->getOriginal('thesis_topic_status_id') == \Cake\Core\Configure::read('ThesisTopicStatuses.ProposalForAmendmentOfThesisTopicAddedByHeadOfDepartment') &&
+           $entity->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ProposalForAmendmentOfThesisTopicAddedByHeadOfDepartment')){
+            $offered_topic = $this->OfferedTopics->find('all', ['conditions' => ['id' => $entity->offered_topic_id]])->first();
+            //Ha van hozzá témakiírás
+            if(!empty($offered_topic)){
+                $offered_topic->title = $entity->title;
+                $offered_topic->description = $entity->description;
+                $offered_topic->language_id = $entity->language_id;
+                $offered_topic->confidential = $entity->confidential;
+                $offered_topic->is_thesis = $entity->is_thesis;
+                
+                $this->OfferedTopics->save($offered_topic);
+            }
+        }
+        
+        //======================================================================
+        // MEZŐK VAGY TÉMÁHOZ TARTOZÓ ADATOK RESETELÉSE/MÓDOSÍTÁSA VÉGE
         //======================================================================
     }
 }

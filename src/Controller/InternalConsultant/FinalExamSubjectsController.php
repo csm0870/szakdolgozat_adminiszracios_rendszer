@@ -117,7 +117,7 @@ class FinalExamSubjectsController extends AppController
             }
         }
         
-        $years = $this->FinalExamSubjects->Years->find('list');
+        $years = $this->FinalExamSubjects->Years->find('list', ['order' => ['year' => 'ASC']]);
         $this->set(compact('student', 'years'));
     }
 }

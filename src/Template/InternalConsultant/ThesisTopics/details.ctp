@@ -10,6 +10,11 @@
                 <div class="col-12">
                     <fieldset class="border-1-grey p-3 mb-3">
                         <legend class="w-auto"><?= __('A téma adatai') ?></legend>
+                        <?php if($thesisTopic->has('offered_topic')){ ?>
+                            <p class="mb-4 lead">
+                                <strong><?= __('Információ') . ': ' ?></strong><?= __('A téma az Ön által kiírt téma.') ?>
+                            </p>
+                        <?php } ?>
                         <p class="mb-4">
                             <strong><?= __('Állapot') . ': ' ?></strong><?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : '' ?>
                             <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ProposalForAmendmentOfThesisTopicAddedByHeadOfDepartment')){ ?>
@@ -456,7 +461,7 @@
                 e.preventDefault();
 
                 $('#confirmationModal .header').text('<?= __('Biztosan elutasítod?') ?>');
-                $('#confirmationModal .msg').text('<?= __('Téma elutasítása.') ?>');
+                $('#confirmationModal .msg').text('<?= __('Téma elutasítása.') . ($thesisTopic->has('offered_topic') ? ' ' . __('Visszautasítás után a kiírt témák listájához visszakerül a téma, amire a hallgatók ismét jelentkezhetnek.') : '') ?>');
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Elutasítás') ?>').css('background-color', 'red');
                 //Save gomb eventjeinek resetelése cserével
                 $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());

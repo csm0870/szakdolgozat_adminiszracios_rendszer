@@ -83,7 +83,7 @@
             $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
             //Save gomb eventjeinek resetelése cserével
             $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-            $('#confirmationModal .msg').text('<?= __('Téma adatok mentése. Mentés után még módosíthatóak.') ?>');
+            $('#confirmationModal .msg').text('<?= __('Téma adatok mentése. Mentés után még módosíthatóak. Mentés után a hallgatók láthatják, és jelentkezhetnek rá, ha témaleadási időszak van.') ?>');
 
             $('#confirmationModal').modal('show');
 

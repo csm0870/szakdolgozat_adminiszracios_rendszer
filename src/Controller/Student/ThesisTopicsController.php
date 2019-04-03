@@ -166,26 +166,29 @@ class ThesisTopicsController extends AppController
             $request_data = $this->getRequest()->getData();
             $can_change_external_consultant = true;
             //Ha témaájánlatok közül választott témáról van szó, akkor a megfelelő mezőket, amiket nem módosíthat, "töröljük"
-            //Csak akkor ha a téma az első foglalásnál van, amikor tanszékvezető módosítási javaslat van, akkor nem
-            if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking') && $thesisTopic->has('offered_topic')){
-                unset($request_data['title']);
-                unset($request_data['description']);
-                unset($request_data['is_thesis']);
-                unset($request_data['language_id']);
-                unset($request_data['confidential']);
+            if($thesisTopic->has('offered_topic')){
                 unset($request_data['internal_consultant_id']);
                 
-                //Ha a témaajánlathoz tartozik külső konzulens
-                if($thesisTopic->offered_topic->has_external_consultant === true){
-                    unset($request_data['external_consultant_name']);
-                    unset($request_data['external_consultant_position']);
-                    unset($request_data['external_consultant_workplace']);
-                    unset($request_data['external_consultant_email']);
-                    unset($request_data['external_consultant_phone_number']);
-                    unset($request_data['external_consultant_address']);
-                    unset($request_data['cause_of_no_external_consultant']);
-                    $thesisTopic->cause_of_no_external_consultant = null;
-                    $can_change_external_consultant = false;
+                //Ha témalefoglalásról van szó
+                if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking')){
+                    unset($request_data['title']);
+                    unset($request_data['description']);
+                    unset($request_data['is_thesis']);
+                    unset($request_data['language_id']);
+                    unset($request_data['confidential']);
+
+                    //Ha a témaajánlathoz tartozik külső konzulens
+                    if($thesisTopic->offered_topic->has_external_consultant === true){
+                        unset($request_data['external_consultant_name']);
+                        unset($request_data['external_consultant_position']);
+                        unset($request_data['external_consultant_workplace']);
+                        unset($request_data['external_consultant_email']);
+                        unset($request_data['external_consultant_phone_number']);
+                        unset($request_data['external_consultant_address']);
+                        unset($request_data['cause_of_no_external_consultant']);
+                        $thesisTopic->cause_of_no_external_consultant = null;
+                        $can_change_external_consultant = false;
+                    }
                 }
             }
             

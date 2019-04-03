@@ -95,7 +95,7 @@ class ThesisTopicsController extends AppController
         
         $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id, 'ThesisTopics.deleted !=' => true],
                                                          'contain' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels'],
-                                                                                      'ThesisSupplements', 'ThesisTopicStatuses', 'StartingYears', 'ExpectedEndingYears', 'Languages',
+                                                                                      'ThesisSupplements', 'ThesisTopicStatuses', 'StartingYears', 'ExpectedEndingYears', 'Languages', 'OfferedTopics',
                                                                                       'Reviews' => ['Reviewers']]])->first();
     
         $ok = true;
@@ -121,7 +121,7 @@ class ThesisTopicsController extends AppController
     }
     
     /**
-     * Táma elfogadása vagy elutasítása
+     * Téma elfogadása vagy elutasítása
      * @return type
      */
     public function accept(){
@@ -158,9 +158,9 @@ class ThesisTopicsController extends AppController
             $thesisTopic->thesis_topic_status_id = $accepted == 0 ? \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByInternalConsultant') : \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForHeadOfDepartmentAcceptingOfThesisTopic');
 
             if($this->ThesisTopics->save($thesisTopic)){
-                $this->Flash->success(__($accepted == 0 ? 'Elutasítás sikeres.' : 'Elfogadás sikeres.'));
+                $this->Flash->success($accepted == 0 ? __('Elutasítás sikeres.') : __('Elfogadás sikeres.'));
             }else{
-                $this->Flash->error(__(($accepted == 0 ? 'Elutasítás sikeretlen.' : 'Elfogadás sikeretlen.') . 'Próbálja újra!'));
+                $this->Flash->error(($accepted == 0 ? __('Elutasítás sikertelen.') : __('Elfogadás sikeretlen.')) . __('Próbálja újra!'));
             }
         }
         

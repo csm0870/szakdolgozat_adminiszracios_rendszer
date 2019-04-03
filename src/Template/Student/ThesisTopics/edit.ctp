@@ -78,7 +78,7 @@
             ?>
             <?= $this->Form->control('is_thesis', ['class' => 'form-control', 'type' => 'select', 'empty' => false, 'disabled' => $thesisTopic->has('offered_topic') && $thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking'),
                                                    'options' => [__('Diplomamunka'), __('Szakdolgozat')], 'label' => ['text' => __('Típus')], 'value' => $thesisTopic->is_thesis === true ? 1 : 0]) ?>
-            <?= $this->Form->control('internal_consultant_id', ['class' => 'form-control', 'disabled' => $thesisTopic->has('offered_topic') && $thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking'),
+            <?= $this->Form->control('internal_consultant_id', ['class' => 'form-control', 'disabled' => $thesisTopic->has('offered_topic'),
                                                                 'label' => ['text' => __('Belső konzulens'), 'options' => $internalConsultants]]) ?>
             <?php
                 $value = $thesisTopic->cause_of_no_external_consultant === null ? 1 : 0;

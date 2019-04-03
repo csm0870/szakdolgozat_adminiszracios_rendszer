@@ -164,7 +164,7 @@ class FinalExamSubjectsController extends AppController
         
         //Hallgató lekérése újra, hogy, ha van mentett ZV-tárgy, akkor azok bekerüljenek a mezőkbe sikertelen mentés után is (olyan esetben, ha pl. 1-et el tudunk menteni, de egy másikat nem, így az elmentett adatok jó helyre kerülnek)
         $student = $this->FinalExamSubjects->Students->find('all', ['conditions' => ['Students.id' => $data['student_id']], 'contain' => ['FinalExamSubjects']])->first();
-        $years = $this->FinalExamSubjects->Years->find('list');
+        $years = $this->FinalExamSubjects->Years->find('list', ['order' => ['year' => 'ASC']]);
         $this->set(compact('student', 'ok', 'error_msg', 'years', 'internalConsultants'));
     }
     
