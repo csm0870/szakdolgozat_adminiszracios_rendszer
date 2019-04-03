@@ -287,8 +287,8 @@ class ThesisTopicsTable extends Table
             $ok = false;
         }
         
-        if(!empty($entity->internal_consultant_grade) && !in_array($entity->internal_consultant_grade, [1, 2, 3, 4, 5])){
-            $entity->setError('internal_consultant_grade', __('A jegy csak 1, 2, 3, 4, 5 értéket vehet fel.'));
+        if(!empty($entity->internal_consultant_grade) && !in_array($entity->internal_consultant_grade, [2, 3, 4, 5])){
+            $entity->setError('internal_consultant_grade', __('A jegy csak 2, 3, 4, 5 értéket vehet fel.'));
             $ok = false;
         }
         
@@ -340,30 +340,29 @@ class ThesisTopicsTable extends Table
             $thesisTopic = $this->find('all', ['conditions' => ['ThesisTopics.id' => $entity->id],
                                                'contain' => ['Reviews']])->first();
             
-            
             if($thesisTopic->has('review')){
                 $total_points = 0;
                 $grade = 1;
                 
                 //Összpontszám kiszámítása
                 $total_points = (empty($thesisTopic->review->structure_and_style_point) ? 0 : $thesisTopic->review->structure_and_style_point) +
-                            (empty($thesisTopic->review->processing_literature_point) ? 0 : $thesisTopic->review->processing_literature_point) +
-                            (empty($thesisTopic->review->writing_up_the_topic_point) ? 0 : $thesisTopic->review->writing_up_the_topic_point) +
-                            (empty($thesisTopic->review->practical_applicability_point) ? 0 : $thesisTopic->review->practical_applicability_point);
+                                (empty($thesisTopic->review->processing_literature_point) ? 0 : $thesisTopic->review->processing_literature_point) +
+                                (empty($thesisTopic->review->writing_up_the_topic_point) ? 0 : $thesisTopic->review->writing_up_the_topic_point) +
+                                (empty($thesisTopic->review->practical_applicability_point) ? 0 : $thesisTopic->review->practical_applicability_point);
         
                 //Jegy kiszámítása
                 if(!empty($thesisTopic->review->structure_and_style_point) && !empty($thesisTopic->review->processing_literature_point) &&
                    !empty($thesisTopic->review->writing_up_the_topic_point) && !empty($thesisTopic->review->practical_applicability_point)){
 
                     if($total_points >= 45) $grade = 5;
-                    else if($total_points < 45 && $total_points >= 38) $grade = 4;
-                    else if($total_points < 38 && $total_points >= 31) $grade = 3;
-                    else if($total_points < 31 && $total_points >= 26) $grade = 2;
+                    elseif($total_points < 45 && $total_points >= 38) $grade = 4;
+                    elseif($total_points < 38 && $total_points >= 31) $grade = 3;
+                    elseif($total_points < 31 && $total_points >= 26) $grade = 2;
                 }
                 
-                //Ha mindkét értékelés legalább elégséges, akkor a dolgozat elfogadva, ha nem akkor újra második diplomakurzus
-                if($grade > 1 && $entity->internal_consultant_grade > 1) $entity->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted');
-                else $entity->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.FirstThesisSubjectSucceeded');
+                //Ha a bírálat legalább elégséges, akkor a dolgozat elfogadva, ha nem akkor újra mellékletek feltöltése lesz
+                if($grade > 1) $entity->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted');
+                else $entity->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable');
             }
         }
         
@@ -1227,7 +1226,7 @@ class ThesisTopicsTable extends Table
         //A dolgozat értékelése alapján a dolgozat nem felelt meg (belső konzulens és a bíráló)
         if(in_array($entity->getOriginal('thesis_topic_status_id'), [\Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
                                                                      \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed')]) &&
-           $entity->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.FirstThesisSubjectSucceeded')){
+           $entity->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable')){
             $Notifications = \Cake\ORM\TableRegistry::get('Notifications');
             
             $student = $this->Students->find('all', ['conditions' => ['Students.id' => $entity->student_id],
@@ -1237,7 +1236,8 @@ class ThesisTopicsTable extends Table
                 $notification->user_id = $student->user_id;
                 $notification->unread = true;
                 $notification->subject = 'A leadott ' . ($entity->is_thesis === true ? 'szakdolgozata' : 'diplomamunkája') . ' értékelve lett. A dolgozat nem lett elfogadva.';
-                $notification->message = 'A ' . h($entity->title) . ' című ' . ($entity->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' értékelés alapján nem lett elfogadva.' . '<br/>' .
+                $notification->message = 'A ' . h($entity->title) . ' című ' . ($entity->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' a bíráló értékelése alapján nem lett elfogadva.' . '<br/>' .
+                                         'A dolgozat újra bírálásához javítson a dolgozaton, majd ismét feltöltheti a mellékleteket az újboli bírálathoz.' . '<br/>' .
                                          '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'student'], true) . '">' . 'Részletek megtekintése' . '</a>';
             
                 $Notifications->save($notification);
@@ -1252,6 +1252,7 @@ class ThesisTopicsTable extends Table
                 $notification->subject = 'Egy Önhöz tartozó ' . ($entity->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' értékelve lett. A dolgozat nem lett elfogadva.';
                 $notification->message = 'A téma címe: ' . h($entity->title) . '<br/>' .
                                          'Hallgató: ' . h($student->name) . ' (' . h($student->neptun) . ')' . '<br/>' .
+                                         'A bírálat alapján a dolgozat nem lett elfogadva. A hallgató a dolgozat módosítása után újra feltöltheti a mellékleteket, majd ismét bírálatra lehet bocsátani.' . '<br/>' .
                                          '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'internal_consultant'], true) . '">' . 'Részletek megtekintése' . '</a>';
             
                 $Notifications->save($notification);
@@ -1268,6 +1269,7 @@ class ThesisTopicsTable extends Table
                     $notification->message = 'A téma címe: ' . h($entity->title) . '<br/>' .
                                              'Hallgató: ' . h($student->name) . ' (' . h($student->neptun) . ')' . '<br/>' .
                                              'Belső konzulens: ' . h($internalConsultant->name) . '<br/>' .
+                                             'A bírálat alapján a dolgozat nem lett elfogadva. A hallgató a dolgozat módosítása után újra feltöltheti a mellékleteket, majd ismét bírálatra lehet bocsátani.' . '<br/>' .
                                              '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'head_of_department'], true) . '">' . 'Részletek megtekintése' . '</a>';
 
                     $Notifications->save($notification);

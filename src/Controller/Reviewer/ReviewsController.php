@@ -127,10 +127,12 @@ class ReviewsController extends AppController
             
             //Azon kérdések azonosítójai, amelyek a kérésben vannak
             $question_ids_in_request = [];
-            foreach($questions as $question){
-                if(!empty($question['question'])){
-                    if(isset($question['id'])){
-                        $question_ids_in_request[] = $question['id'];
+            if(!empty($questions)){
+                foreach($questions as $question){
+                    if(!empty($question['question'])){
+                        if(isset($question['id'])){
+                            $question_ids_in_request[] = $question['id'];
+                        }
                     }
                 }
             }

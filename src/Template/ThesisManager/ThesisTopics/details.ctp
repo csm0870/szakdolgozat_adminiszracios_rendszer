@@ -103,9 +103,20 @@
                         <p class="mb-2">
                             <strong><?= __('Belső konzulens értékelése') . ': ' ?></strong><?= $thesisTopic->internal_consultant_grade === null ? __('még nincs értékelve') : h($thesisTopic->internal_consultant_grade) ?>
                         </p>
-                        <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')]) && $thesisTopic->has('review'))
-                                    echo $this->Html->link(__('Bírálat megtekintése') . ' ->', ['controller' => 'Reviews', 'action' => 'checkReview', $thesisTopic->id], ['class' => 'mb-2', 'style' => 'display: inline-block']); ?>
+                        <?php 
+                            if($thesisTopic->has('review') && $thesisTopic->review->review_status == 6){
+                                if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                                   \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')]))
+                                    echo $this->Html->link(__('Bírálat megtekintése') . ' ->', ['controller' => 'Reviews', 'action' => 'checkReview', $thesisTopic->id], ['class' => 'mb-2', 'style' => 'display: inline-block']);
+                                elseif(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable'),
+                                                                                       \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),
+                                                                                       \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements'),
+                                                                                       \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected'),
+                                                                                       \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant')])){
+                                    echo $this->Html->link(__('A dolgozat előző verziójának bírálatának megtekintése') . ' ->', ['controller' => 'Reviews', 'action' => 'checkReview', $thesisTopic->id], ['class' => 'mb-2', 'style' => 'display: inline-block']);
+                                }
+                            }
+                        ?>
                         <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
                                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
                                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),

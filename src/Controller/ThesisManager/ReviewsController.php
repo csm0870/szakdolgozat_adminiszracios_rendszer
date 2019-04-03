@@ -25,11 +25,16 @@ class ReviewsController extends AppController
         if(empty($thesisTopic)){ //Nem létezik a téma
             $this->Flash->error(__('A bírálat nem elérhető.') . ' ' . __('Nem létező dolgozat.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])){ //Nem "A dolgozat bírálva", "A dolgozat elfogadva" státuszban van
             $this->Flash->error(__('A bírálat nem elérhető.') . ' ' . __('A dolgozat még nem lett bírálva.'));
             $ok = false;
-        }elseif($thesisTopic->has('review') == false){ //Nincs bírálat a dolgozathoz
+        }elseif($thesisTopic->has('review') == false && $thesisTopic->review->review_status != 6){ //Nincs bírálat a dolgozathoz
             $this->Flash->error(__('A bírálat nem elérhető.') . ' ' . __('A dolgozathoz nem tartozik bírálat.'));
             $ok = false;
         }
@@ -52,8 +57,14 @@ class ReviewsController extends AppController
         if(empty($thesisTopic)){ //Nem létezik a téma
             $this->Flash->error(__('A feltölött bírálati lap nem elérhető.') . ' ' . __('Nem létező dolgozat.'));
             $ok = false;
-        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])){ //Nem "A dolgozat bírálva", "A dolgozat elfogadva" státuszban van
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])){
             $this->Flash->error(__('A feltölött bírálati lap nem elérhető.') . ' ' . __('A dolgozat még nem lett bírálva.'));
             $ok = false;
         }elseif($thesisTopic->has('review') == false){ //Nincs bírálat a dolgozathoz

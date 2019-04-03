@@ -115,41 +115,54 @@
                             <p class="mb-2">
                                 <strong><?= __('Belső konzulens értékelése') . ': ' ?></strong><?= $thesisTopic->internal_consultant_grade === null ? __('még nincs értékelve') : h($thesisTopic->internal_consultant_grade) ?>
                             </p>
-                            <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
-                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
-                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                                     \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')]) && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer')){ ?>
-                                <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
-                                                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
-                                                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])  && in_array($thesisTopic->review->review_status, [4, 5, 6]))
-                                        echo $this->Html->link(__('Bírálat megtekintése') . ' ->', ['controller' => 'Reviews', 'action' => 'checkReview', $thesisTopic->id], ['class' => 'mb-2', 'style' => 'display: inline-block']); ?>
-                                <p class="mb-1">
-                                    <?= $this->Html->link(__('Dolgozat bírálója') . '&nbsp;' . '<i class="fas fa-angle-down fa-lg" id="reviewer_details_arrow_down"></i>' . '<i class="fas fa-angle-up fa-lg d-none" id="reviewer_details_arrow_up"></i>',
-                                                          '#', ['id' => 'reviewer_details_link', 'escape' => false]) ?>
-                                </p>
-                                <div id="reviewer_details_container" style="display: none">
-                                    <p class="mb-1">
-                                        <strong><?= __('Név') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->name) ?>
-                                    </p>
-                                    <p class="mb-1">
-                                        <strong><?= __('Email') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->email) ?>
-                                    </p>
-                                    <p class="mb-1">
-                                        <strong><?= __('Munkahely') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->workplace) ?>
-                                    </p>
-                                    <p class="mb-1">
-                                        <strong><?= __('Pozició') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->position) ?>
-                                    </p>
-                                    <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview') && $thesisTopic->has('review') && $thesisTopic->review->has('reviewer') && $thesisTopic->review->reviewer->has('user')){ ?>
-                                        <p class="mb-1 mt-4">
-                                            <strong><?= __('Belépési email') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->user->email) ?>
-                                        </p>
+                            <?php
+                                if($thesisTopic->has('review')){
+                                    if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable'),
+                                                                                       \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),
+                                                                                       \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements'),
+                                                                                       \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected'),
+                                                                                       \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant')]) &&
+                                           $thesisTopic->review->review_status == 6)
+                                        echo $this->Html->link(__('A dolgozat előző verziójának bírálatának megtekintése') . ' ->', ['controller' => 'Reviews', 'action' => 'checkReview', $thesisTopic->id], ['class' => 'mb-2', 'style' => 'display: inline-block']);
+                                    elseif(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                                                           \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                                           \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])  && in_array($thesisTopic->review->review_status, [4, 5, 6]))
+                                        echo $this->Html->link(__('Bírálat megtekintése') . ' ->', ['controller' => 'Reviews', 'action' => 'checkReview', $thesisTopic->id], ['class' => 'mb-2', 'style' => 'display: inline-block']);
+                                    
+                                    if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
+                                                                                       \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                                                       \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                                       \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')]) && $thesisTopic->review->has('reviewer')){ ?>
+                                    
                                         <p class="mb-1">
-                                            <strong><?= __('Belépési jelszó') . ': ' ?></strong><?= $thesisTopic->review->reviewer->user->has('raw_password') ? h($thesisTopic->review->reviewer->user->raw_password->password) : __('nincs jelszó, újra kell menteni') ?>
+                                        <?= $this->Html->link(__('Dolgozat bírálója') . '&nbsp;' . '<i class="fas fa-angle-down fa-lg" id="reviewer_details_arrow_down"></i>' . '<i class="fas fa-angle-up fa-lg d-none" id="reviewer_details_arrow_up"></i>',
+                                                          '#', ['id' => 'reviewer_details_link', 'escape' => false]) ?>
                                         </p>
-                                    <?php } ?>
-                                </div>
-                            <?php } ?>
+                                        <div id="reviewer_details_container" style="display: none">
+                                            <p class="mb-1">
+                                                <strong><?= __('Név') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->name) ?>
+                                            </p>
+                                            <p class="mb-1">
+                                                <strong><?= __('Email') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->email) ?>
+                                            </p>
+                                            <p class="mb-1">
+                                                <strong><?= __('Munkahely') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->workplace) ?>
+                                            </p>
+                                            <p class="mb-1">
+                                                <strong><?= __('Pozició') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->position) ?>
+                                            </p>
+                                            <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview') &&
+                                                     $thesisTopic->review->has('reviewer') &&
+                                                     $thesisTopic->review->reviewer->has('user')){ ?>
+                                                <p class="mb-1 mt-4">
+                                                    <strong><?= __('Belépési email') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->user->email) ?>
+                                                </p>
+                                                <p class="mb-1">
+                                                    <strong><?= __('Belépési jelszó') . ': ' ?></strong><?= $thesisTopic->review->reviewer->user->has('raw_password') ? h($thesisTopic->review->reviewer->user->raw_password->password) : __('nincs jelszó, újra kell menteni') ?>
+                                                </p>
+                                            <?php } ?>
+                                        </div>
+                             <?php }} ?>
                         </fieldset>
                     <?php } ?>
                     <fieldset class="border-1-grey p-3 mb-3">

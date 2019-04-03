@@ -13,7 +13,7 @@
                 <tr>
                     <td class="text-center">
                         <?= $this->Form->control('internal_consultant_grade', ['label' => __('Jegy') . ": ", 'error' => false,
-                                                                               'options' => [1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5],
+                                                                               'options' => [2 => 2, 3 => 3, 4 => 4, 5 => 5],
                                                                                'templates' => ['formGroup' => '{{label}}&nbsp;&nbsp;{{input}}']]) ?>
                     </td>
                 </tr>
