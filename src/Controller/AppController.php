@@ -78,7 +78,10 @@ class AppController extends Controller
     public function beforeFilter(Event $event) {
         parent::beforeFilter($event);
         
-        if ($this->Auth->user("id") == null && $this->request->action != "home" && $this->request->action != "login") {
+        if($this->Auth->user("id") == null &&
+           !(($this->getRequest()->getParam('controller') == 'Pages' && $this->getRequest()->getParam('action') == "home") ||
+             ($this->getRequest()->getParam('controller') == 'Users' && $this->getRequest()->getParam('action') == "login") ||
+             ($this->getRequest()->getParam('controller') == 'Install' && $this->getRequest()->getParam('action') == "install"))) {
             return $this->redirect(["controller" => "Pages", "action" => "home", 'prefix' => false]);
         }
         
@@ -115,8 +118,8 @@ class AppController extends Controller
     }
     
     /**
-     * Adott mappába(path) a fájlnév alapján nevet ad a fájlnak és kiszedi a spaceket a névből, ha már létezik a megadott név akkor számmal bővíti, ha még nem létezik
-     * akkor marad ugyanaz.
+     * Adott mappába(path) a fájlnév alapján nevet ad a fájlnak és kiszedi a spaceket a névből, illetve az ékezetes karaktereket cseréli a nem ékezetes megfelelőire.
+     * Ha már létezik a megadott név akkor számmal bővíti, ha még nem létezik, akkor marad ugyanaz.
      * 
      * @param string $file_name Fájl neve
      * @param string $path Fájl elérési útja
