@@ -42,19 +42,4 @@ class PagesController extends AppController
      */
     public function home(){
     }
-    
-    /**
-     * Dashboard
-     */
-    public function dashboard(){
-        //Hallgatói adatellenőrzés
-        if($this->Auth->user('group_id') == 6){
-            $this->loadModel('Students');
-            $data = $this->Students->checkStundentData($this->Auth->user('id'));
-            if($data['success'] === false){
-                $this->Flash->error(__('Adja meg az adatit a továbblépéshez!'));
-                return $this->redirect(['controller' => 'Students', 'action' => 'studentEdit', $data['student_id']]);
-            }
-        }
-    }
 }

@@ -199,20 +199,20 @@
                             //Belső konzulensi döntésre vár
                             if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopic')){
                                 echo $this->Form->create(null, ['id' => 'acceptThesisTopicForm', 'style' => 'display: inline-block', 'url' => ['action' => 'accept']]);
-                                echo $this->Form->button(__('Téma elfogadás'), ['type' => 'submit', 'class' => 'btn btn-success btn-accept border-radius-45px mb-2']);
+                                echo $this->Form->button(__('Téma elfogadása'), ['type' => 'submit', 'class' => 'btn btn-success btn-accept border-radius-45px mb-2']);
                                 echo $this->Form->input('thesis_topic_id', ['type' => 'hidden', 'value' => $thesisTopic->id]);
                                 echo $this->Form->input('accepted', ['type' => 'hidden', 'value' => 1]);
                                 echo $this->Form->end();
-                                echo "&nbsp;&nbsp;";
                                 echo $this->Form->create(null, ['id' => 'rejectThesisTopicForm', 'style' => 'display: inline-block', 'url' => ['action' => 'accept']]);
-                                echo $this->Form->button(__('Téma elutasítás'), ['type' => 'submit', 'class' => 'btn btn-danger btn-reject border-radius-45px mb-2']);
+                                echo $this->Form->button(__('Téma elutasítása'), ['type' => 'submit', 'class' => 'btn btn-danger btn-reject border-radius-45px mb-2']);
                                 echo $this->Form->input('thesis_topic_id', ['type' => 'hidden', 'value' => $thesisTopic->id]);
                                 echo $this->Form->input('accepted', ['type' => 'hidden', 'value' => 0]);
                                 echo $this->Form->end();
                                 echo '<br/>';
                             }
                             
-                            if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant')) echo $this->Html->link(__('Bíráló személyének kijelölése'), '#', ['class' => 'btn btn-secondary border-radius-45px setReviewerSuggestionBtn mb-2']). '<br/>';
+                            if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant'))
+                                echo $this->Html->link(__('Bíráló személyének kijelölése'), '#', ['class' => 'btn btn-secondary border-radius-45px setReviewerSuggestionBtn mb-2']). '<br/>';
                                      
                             if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable'),
                                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),
@@ -222,9 +222,11 @@
                                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByHeadOfDepartment'),
                                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
                                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
-                                                                               \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed')]) && $thesisTopic->internal_consultant_grade === null) echo $this->Html->link(__('Dolgozat értékelése'), '#', ['class' => 'btn btn-secondary border-radius-45px setThesisGradeBtn mb-2']). '<br/>';
+                                                                               \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed')]) && $thesisTopic->internal_consultant_grade === null)
+                                echo $this->Html->link(__('Dolgozat értékelése'), '#', ['class' => 'btn btn-secondary border-radius-45px setThesisGradeBtn mb-2']). '<br/>';
                             
-                            if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicAccepted')) echo $this->Html->link(__('Diplomakurzus első félévének teljesítésének rögzítése'), '#', ['class' => 'btn btn-secondary border-radius-45px setFirstThesisSubjectCompletedBtn mb-2']). '<br/>';
+                            if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicAccepted'))
+                                echo $this->Html->link(__('Diplomakurzus első félévének teljesítésének rögzítése'), '#', ['class' => 'btn btn-secondary border-radius-45px setFirstThesisSubjectCompletedBtn mb-2']). '<br/>';
                             
                             if(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalize'),
                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking'),
@@ -237,7 +239,8 @@
                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByHeadOfDepartment'),
                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ProposalForAmendmentOfThesisTopicAddedByHeadOfDepartment'),
                                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingExternalConsultantSignatureOfThesisTopic'),
-                                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByExternalConsultant')])) echo $this->Html->link(__('Konzultációk kezelése'), ['controller' => 'Consultations', 'action' => 'index', $thesisTopic->id], ['class' => 'btn btn-secondary border-radius-45px mb-2']) . '<br/>';
+                                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByExternalConsultant')]))
+                                echo $this->Html->link(__('Konzultációk kezelése'), ['controller' => 'Consultations', 'action' => 'index', $thesisTopic->id], ['class' => 'btn btn-secondary border-radius-45px mb-2']) . '<br/>';
                             
                             if(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalize'),
                                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking'),
@@ -285,18 +288,18 @@
     </div>
 <?php } ?>
 <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant')){ ?>
-<!-- Bíráló személyének belső konzulensi javaslata modal -->
-<div class="modal fade" id="setReviewerSuggestionModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-body">
-                <div id="set_reviewer_suggestion_container">
+    <!-- Bíráló személyének belső konzulensi javaslata modal -->
+    <div class="modal fade" id="setReviewerSuggestionModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div id="set_reviewer_suggestion_container">
 
+                    </div>
                 </div>
             </div>
-        </div>
-  </div>
-</div>
+      </div>
+    </div>
 <?php } ?>
 <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable'),
                                                          \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),

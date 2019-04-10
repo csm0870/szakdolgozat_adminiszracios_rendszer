@@ -39,7 +39,7 @@ class ThesisTopicsController extends AppController
     }
     
     /**
-     * Táma elfogadása vagy elutasítása
+     * Téma elfogadása vagy elutasítása
      * @return type
      */
     public function accept(){
@@ -68,11 +68,10 @@ class ThesisTopicsController extends AppController
             //Elutasítás vagy elfogadás esetén, ha van külső konzulens, akkor külső konzulensi ellenőrzésre vár státuszú lesz, ha nincs, akkor pedig elfogadva
             $thesisTopic->thesis_topic_status_id = $accepted == 0 ? \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByHeadOfDepartment') : ($thesisTopic->cause_of_no_external_consultant === null ? \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingExternalConsultantSignatureOfThesisTopic') :  \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicAccepted'));
 
-            if($this->ThesisTopics->save($thesisTopic)){
-                $this->Flash->success($accepted == 0 ? __('Elutasítás sikeres.') : __('Elfogadás sikeres.'));
-            }else{
-                $this->Flash->error(($accepted == 0 ? __('Elutasítás sikertelen.') : __('Elfogadás sikertelen.')) . ' ' . __('Próbálja újra!'));
-            }
+            if($this->ThesisTopics->save($thesisTopic))  $this->Flash->success($accepted == 0 ? __('Elutasítás sikeres.') : __('Elfogadás sikeres.'));
+            else $this->Flash->error(($accepted == 0 ? __('Elutasítás sikertelen.') : __('Elfogadás sikertelen.')) . ' ' . __('Próbálja újra!'));
+            
+            return $this->redirect(['action' => 'details', $thesisTopic->id]);
         }
         return $this->redirect(['action' => 'index']);
     }
@@ -146,7 +145,6 @@ class ThesisTopicsController extends AppController
                 $thesisTopic->setError('custom', __('A javaslatot kötelező kitölteni.'));
             }else{ //Ajánlott témánál pedig a belső konzulenshez kerüljön vissza sztem
                 $thesisTopic->proposal_for_amendment = $proposal_for_amendment;
-                
                 $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.ProposalForAmendmentOfThesisTopicAddedByHeadOfDepartment');
             }
             
@@ -176,6 +174,7 @@ class ThesisTopicsController extends AppController
     }
     
     /**
+     * Első diplimakurzus sikertelensége eseténi döntés, hogy folytathatja-e a hallgató a témát vagy újat válasszon
      * 
      * @param type $id Téma azonosítója
      */
@@ -192,7 +191,7 @@ class ThesisTopicsController extends AppController
             $error_msg = __('Nem dönthet.') . ' ' . __('Nem létező téma.');
             $ok = false;
         }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.FirstThesisSubjectFailedWaitingForHeadOfDepartmentDecision')){ //Nem "Első diplomakurzus sikertelen, tanszékvezető döntésére vár" státuszban van
-            $error_msg = __('Nem dönthet.') . ' ' . __('A téma nem "Első diplomakurzus sikertlen" állapotban van.');
+            $error_msg = __('Nem dönthet.') . ' ' . __('A téma nem "Első diplomakurzus sikertelen" állapotban van.');
             $ok = false;
         }
         

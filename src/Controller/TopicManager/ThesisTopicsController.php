@@ -66,11 +66,10 @@ class ThesisTopicsController extends AppController
             //Elfogadás vagy elutasítás
             $thesisTopic->thesis_topic_status_id = $accepted == 0 ? \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByExternalConsultant') : \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicAccepted');
 
-            if($this->ThesisTopics->save($thesisTopic)){
-                $this->Flash->success($accepted == 0 ? __('Elutasítás sikeres.') : __('Elfogadás sikeres.'));
-            }else{
-                $this->Flash->error(($accepted == 0 ? __('Elutasítás sikertelen.') : __('Elfogadás sikertelen.')) . ' ' . __('Próbálja újra!'));
-            }
+            if($this->ThesisTopics->save($thesisTopic)) $this->Flash->success($accepted == 0 ? __('Elutasítás sikeres.') : __('Elfogadás sikeres.'));
+            else $this->Flash->error(($accepted == 0 ? __('Elutasítás sikertelen.') : __('Elfogadás sikertelen.')) . ' ' . __('Próbálja újra!'));
+        
+            return $this->redirect(['action' => 'details', $thesisTopic->id]);
         }
             
         return $this->redirect(['action' => 'index']);

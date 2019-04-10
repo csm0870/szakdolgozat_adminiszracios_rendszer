@@ -150,7 +150,7 @@ class UsersController extends AppController
                 $this->Auth->setUser($user);
                 
                 if($user['group_id'] == 1) // Admin
-                    return $this->redirect(['controller' => 'Notifications', 'action' => 'index', 'prefix' => 'admin']);
+                    return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'admin']);
                 elseif($user['group_id'] == 2) // Belső konzulens
                     return $this->redirect(['controller' => 'Notifications', 'action' => 'index', 'prefix' => 'internal_consultant']);
                 elseif($user['group_id'] == 3) // Tanszékvezető

@@ -454,7 +454,7 @@ class ThesisTopicsTable extends Table
                 $notification->user_id = $student->user_id;
                 $notification->unread = true;
                 $notification->subject = 'Egy kiírt téma foglalását a belső konzulens elfogadta.';
-                $notification->message = 'A ' . h($entity->title) . ' című téma foglalását a ' . h($internalConsultant->name) . ' nevű belső konzulens elfogadta.' . '<br/>' .
+                $notification->message = 'A ' . h($entity->title) . ' című téma foglalását a ' . h($internalConsultant->name) . ' nevű belső konzulens elfogadta. Adja meg a hiányzó adatokat, majd véglegesítse a témát!' . '<br/>' .
                                          '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $entity->id, 'prefix' => 'student'], true) . '">' . 'Részletek megtekintése' . '</a>';
 
                 $Notifications->save($notification);

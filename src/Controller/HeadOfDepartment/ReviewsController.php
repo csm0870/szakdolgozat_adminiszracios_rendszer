@@ -51,7 +51,6 @@ class ReviewsController extends AppController
         $saved = true;
         $error_ajax = "";
         if($this->getRequest()->is('post')){
-            //Itt valamiért még létrehozza a usert
             if(!$thesisTopic->review->reviewer->has('user')){ //Ha még nincs hozzárendelve user
                 //Usergenerálás
                 //Névgenerálás
@@ -84,9 +83,8 @@ class ReviewsController extends AppController
                 $saved_ok = true;
                 if(!$thesisTopic->review->reviewer->has('user')){
                     $thesisTopic->review->reviewer->user_id = $reviewer_user->id;
-                    //Nem menti a jelszót :D
-                    $raw_password = $this->Reviews->Reviewers->Users->RawPasswords->newEntity();
                     
+                    $raw_password = $this->Reviews->Reviewers->Users->RawPasswords->newEntity();
                     $raw_password->password = $pw;
                     $raw_password->user_id = $reviewer_user->id;
                     if(!$this->Reviews->Reviewers->save($thesisTopic->review->reviewer) || !$this->Reviews->Reviewers->Users->RawPasswords->save($raw_password)){

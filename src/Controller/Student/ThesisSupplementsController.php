@@ -13,7 +13,7 @@ use App\Controller\AppController;
 class ThesisSupplementsController extends AppController
 {
     /**
-     * Szakdolgozat/Diplomamunka melléklet letöltése
+     * Melléklet letöltése
      * 
      * @param type $thesis_supplement_id
      */
@@ -46,7 +46,7 @@ class ThesisSupplementsController extends AppController
     }
     
     /**
-     * Szakdolgozat/Diplomamunka Mellékletek letöltése egy ZIP-bem
+     * Mellékletek letöltése egy ZIP-bem
      * 
      * @param type $thesis_topic_id
      * @return type
@@ -90,7 +90,7 @@ class ThesisSupplementsController extends AppController
     }
     
     /**
-     * Delete method
+     * Melléklet törlése
      *
      * @param string|null $id Thesis Supplement id.
      * @return \Cake\Http\Response|null Redirects to index.
@@ -109,8 +109,12 @@ class ThesisSupplementsController extends AppController
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['Students']]);
         
         $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['id' => $thesisSupplement->thesis_topic_id, 'ThesisTopics.deleted !=' => true]])->first();
+        
         $ok = true;
-        if($thesisTopic->student_id != ($user->has('student') ? $user->student->id : '-1')){
+        if(empty($thesisTopic)){
+            $ok = false;
+            $this->Flash->error(__('A dolgozat mellékletek nem elérhetőek.') . ' ' . __('A dolgozat nem létezik.'));
+        }elseif($thesisTopic->student_id != ($user->has('student') ? $user->student->id : '-1')){
             $ok = false;
             $this->Flash->error(__('A melléklet nem törölhető.') . ' ' . __('A dolgozat nem Önhöz tartozik.'));
         }elseif(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable'),
@@ -122,11 +126,8 @@ class ThesisSupplementsController extends AppController
         
         if($ok === false) return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index']);
         
-        if ($this->ThesisSupplements->delete($thesisSupplement)){
-            $this->Flash->success(__('Törlés sikeres.'));
-        } else {
-            $this->Flash->error(__('Törlés sikertelen. Próbálja újra!'));
-        }
+        if($this->ThesisSupplements->delete($thesisSupplement)) $this->Flash->success(__('Törlés sikeres.'));
+        else $this->Flash->error(__('Törlés sikertelen. Próbálja újra!'));
 
         return $this->redirect($this->referer(null, true));
     }

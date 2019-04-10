@@ -168,6 +168,11 @@ class OfferedTopicsController extends AppController
         $this->set(compact('offeredTopic'));
     }
     
+    /**
+     * Foglalás elfogadása/elutasítása
+     * 
+     * @return type
+     */
     public function acceptBooking(){
         if($this->getRequest()->is('post')){
             $offered_topic_id = $this->getRequest()->getData('offered_topic_id');

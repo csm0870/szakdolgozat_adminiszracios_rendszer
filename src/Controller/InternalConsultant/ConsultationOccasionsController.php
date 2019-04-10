@@ -19,7 +19,7 @@ class ConsultationOccasionsController extends AppController
     }
     
     /**
-     * Index method
+     * Konzultációs alkalmak listája
      *
      * @return \Cake\Http\Response|void
      */
@@ -38,7 +38,6 @@ class ConsultationOccasionsController extends AppController
         $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $consultation->thesis_topic_id, 'ThesisTopics.deleted !=' => true]])->first();
         
         $ok = true;
-        
         if(empty($thesisTopic)){ //Nem létezik a téma
             $this->Flash->error(__('A konzultációs csoportotokat nem láthatja.') . ' ' . __('A téma, amelyhez tartozik nem létezik.'));
             $ok = false;
@@ -64,12 +63,11 @@ class ConsultationOccasionsController extends AppController
         }
         
         $consultationOccasions = $this->ConsultationOccasions->find('all', ['conditions' => ['consultation_id' => $consultation->id], 'order' => ['date' => 'DESC']]);
-        
         $this->set(compact('consultationOccasions', 'consultation', 'thesisTopic'));
     }
     
     /**
-     * Konzultációs alkalmak hozzáadása
+     * Konzultációs alkalom hozzáadása
      *
      * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
      */
@@ -154,7 +152,7 @@ class ConsultationOccasionsController extends AppController
     }
 
     /**
-     * Edit method
+     * Konzultációs alkalom szerkesztése
      *
      * @param string|null $id Consultation Occasion id.
      * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
@@ -247,14 +245,13 @@ class ConsultationOccasionsController extends AppController
     }
 
     /**
-     * Delete method
+     * Konzultációs alkalom törlése
      *
      * @param string|null $id Consultation Occasion id.
      * @return \Cake\Http\Response|null Redirects to index.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function delete($id = null)
-    {
+    public function delete($id = null){
         $this->request->allowMethod(['post', 'delete']);
         
         $consultationOccasion = $this->ConsultationOccasions->find('all', ['conditions' => ['id' => $id]])->first();
@@ -263,17 +260,20 @@ class ConsultationOccasionsController extends AppController
             return $this->redirect($this->referer(null, true));
         }
         
+        $ok = true;
         $consultation = $this->ConsultationOccasions->Consultations->find('all', ['conditions' => ['id' => $consultationOccasion->consultation_id]])->first();
         if(empty($consultation)){ //Ha nem létezik a konzultációs csoport
             $this->Flash->error(__('A konzultációs alkalom nem törölhető.') . ' ' . __('A konzultációs csoport, amihez tartozik nem létezik.'));
-            return $this->redirect($this->referer(null, true));
+            $ok = false;
         }elseif($consultation->accepted !== null){ //Már véglegesített
             $this->Flash->error(__('A konzultációs alkalom nem törölhető.') . ' ' . __('A konzultációs csoport, amihez tartozik már véglegesített.'));
-            return $this->redirect($this->referer(null, true));
+            $ok = false;
         }elseif($consultation->current === false){ //Régi szakdolgozathoz tartozik
             $this->Flash->error(__('A konzultációs alkalom nem törölhető.') . ' ' . __('A konzultációs csoport, amihez tartozik régebbi dolgozathoz tartozik.'));
-            return $this->redirect($this->referer(null, true));
+            $ok = false;
         }
+        
+        if(!$ok) return $this->redirect($this->referer(null, true));
         
         $this->loadModel('Users');
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
@@ -296,11 +296,8 @@ class ConsultationOccasionsController extends AppController
 
         if(!$ok) return $this->redirect($this->referer(null, true));
         
-        if ($this->ConsultationOccasions->delete($consultationOccasion)) {
-            $this->Flash->success(__('Törlés sikeres.'));
-        } else {
-            $this->Flash->error(__('Törlés sikertelen. Próbálja újra!'));
-        }
+        if($this->ConsultationOccasions->delete($consultationOccasion)) $this->Flash->success(__('Törlés sikeres.'));
+        else $this->Flash->error(__('Törlés sikertelen. Próbálja újra!'));
 
         return $this->redirect(['action' => 'index', $consultationOccasion->consultation_id]);
     }

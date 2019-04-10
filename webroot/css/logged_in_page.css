@@ -254,17 +254,21 @@ html, body{
     padding-bottom: 10px;
 }
 
-/* Consultations (internal consultant) and ConsultationOccasions*/
+/* Internal consultant, admin Consultations and ConsultationOccasions */
 
+.admin-consultations-index .finalizeBtn,
 .internalConsultant-consultations-index .finalizeBtn{
     color: green;
 }
 
+.admin-consultations-index .finalizeBtn:hover,
 .internalConsultant-consultations-index .finalizeBtn:hover{
     border-bottom: 1px solid green;
     color: green;
 }
 
+.admin-consultations-index .add-new-consultation,
+.admin-consultationOccasions-index .add-new-consultationOccasion,
 .internalConsultant-consultations-index .add-new-consultation,
 .internalConsultant-consultationOccasions-index .add-new-consultationOccasion{
     text-decoration: none;
@@ -275,12 +279,16 @@ html, body{
     margin-top: 5px;
 }
 
+.admin-consultations-index .add-btn,
+.admin-consultationOccasions-index .add-btn,
 .internalConsultant-consultations-index .add-btn,
 .internalConsultant-consultationOccasions-index .add-btn{
     background-color: chartreuse;
     display: inline-block;
 }
 
+.admin-consultations-index .add-btn img,
+.admin-consultationOccasions-index .add-btn img,
 .internalConsultant-consultations-index .add-btn img,
 .internalConsultant-consultationOccasions-index .add-btn img{
     width: 20px;
@@ -323,8 +331,9 @@ html, body{
     border-top: 1px solid #28a745;
 }
 
-/*  HeadOfDepartment thesis topics details */
+/*  HeadOfDepartment and Admin thesis topics details */
 
+.admin-thesisTopics-details .decideToContinueAfterFailedFirstThesisSubjectBtn,
 .headOfDepartment-thesisTopics-details .decideToContinueAfterFailedFirstThesisSubjectBtn{
     color: red;
     text-decoration: none;
@@ -334,6 +343,7 @@ html, body{
     padding: 2px;
 }
 
+.admin-thesisTopics-details .decideToContinueAfterFailedFirstThesisSubjectBtn:hover,
 .headOfDepartment-thesisTopics-details .decideToContinueAfterFailedFirstThesisSubjectBtn:hover{
     text-decoration: underline;
 }

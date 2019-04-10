@@ -57,10 +57,10 @@ class FinalExamSubjectsController extends AppController
         }
         
         if($thesisTopics->count() == 0){ // Ha nincs olyan állapotban lévő témája, ami alapján leadhatna ZV-tárgyakat, de ha itt vagyunk, akkor már van leadva
-            $internalConsultants = $this->FinalExamSubjects->Students->FinalExamSubjectsInternalConsultants->find('list', ['conditions' => ['id' => $student->final_exam_subjects_status]]);
+            $internalConsultants = $this->FinalExamSubjects->Students->FinalExamSubjectsInternalConsultants->find('list', ['conditions' => ['id' => $student->final_exam_subjects_internal_consultant_id]]);
             if($internalConsultants->count() == 0){
                 $ok = false;
-                $error_msg = __('Nincs belső konzulens rendelve a závizsga tárgyaihoz.');
+                $error_msg = __('Nincs belső konzulens rendelve a záróvizsga-tárgyaihoz.');
                 $this->set(compact('ok', 'error_msg'));
                 return;
             }

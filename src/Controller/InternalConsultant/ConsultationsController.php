@@ -119,7 +119,6 @@ class ConsultationsController extends AppController
         $consultation = $this->Consultations->newEntity();
         $consultation->thesis_topic_id = $thesisTopic->id;
         $consultation->current = true;
-        
         if ($this->Consultations->save($consultation)){
             $this->Flash->success(__('Mentés sikeres.'));
             $consultations = $this->Consultations->find('all', ['conditions' => ['Consultations.thesis_topic_id' => $thesisTopic->id]]);

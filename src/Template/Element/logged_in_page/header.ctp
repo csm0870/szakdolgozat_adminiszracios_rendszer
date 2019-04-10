@@ -19,9 +19,16 @@
 </div>
 <script>
     $(function(){
-        $('.header .title').on('click', function(){
-            location.href = '<?= $this->Url->build('/', true) ?>';
-        });
+        <?php if($logged_in_user['group_id'] == 1){ ?>
+            $('.header .title').on('click', function(){
+                location.href = '<?= $this->Url->build(['controller' => 'Pages', 'action' => 'dashboard'], true) ?>';
+            });
+        <?php }else{ ?>
+            $('.header .title').on('click', function(){
+                location.href = '<?= $this->Url->build(['controller' => 'Notifications', 'action' => 'index'], true) ?>';
+            });
+        <?php } ?>
+        
 
        /**
         * Kijelentkezés popup

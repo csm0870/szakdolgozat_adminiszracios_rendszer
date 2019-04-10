@@ -147,7 +147,7 @@ class StudentsTable extends Table
         return $rules;
     }
     
-        /**
+    /**
      * Hallgató adatinak ellenőrzése. Ha még nincs hozzárendelve rekord, vagy ha valamely kötelező adata hiányzik, akkor false-t ad vissza.
      * Ha nincs hozzárendelve rekord, akkor létrehozza.
      * 
@@ -163,7 +163,7 @@ class StudentsTable extends Table
             $student->user_id = $user_id;
             if(!$this->save($student)){
                 throw new \Cake\Core\Exception\Exception(__('Hiba történt. Próbálja újra!'));
-}
+            }
             return ['success' => false, 'student_id' => $student->id];
         }
 
@@ -197,7 +197,7 @@ class StudentsTable extends Table
                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByHeadOfDepartment'),
                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByExternalConsultant'),
                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByHeadOfDepartmentCauseOfFirstThesisSubjectFailed')])){
-    $can_add_topic = false;
+                $can_add_topic = false;
                 break;
             }
         }

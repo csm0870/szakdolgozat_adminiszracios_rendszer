@@ -225,7 +225,7 @@
     </div>
 </div>
 <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements')){ ?>
-    <!-- Diplomakurzus első félévének teljesítésének rögzítése modal -->
+    <!-- Dolgozat mellékleteinek elfogadása modal -->
     <div class="modal fade" id="acceptThesisSupplementsModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -257,7 +257,7 @@
         $('#thesis_topics_index_menu_item').addClass('active');
         
         <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements')){ ?>
-            //Tartalom lekeérése a "diplomakurzus első félévének teljesítésének rögzítése" modalba
+            //Tartalom lekeérése a "dolgozat mellékleteinek elfogadása" modalba
             $.ajax({
                 url: '<?= $this->Url->build(['action' => 'acceptThesisSupplements', $thesisTopic->id], true) ?>',
                 cache: false

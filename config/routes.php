@@ -50,7 +50,7 @@ Router::extensions(['pdf', 'json']);
 //Az egyes user típusoknak különböző route prefix
 
 Router::prefix('admin',  function ($routes) {
-    $routes->connect('/', ['controller' => 'Notifications', 'action' => 'index']); 
+    $routes->connect('/', ['controller' => 'Pages', 'action' => 'dashboard']); 
     $routes->fallbacks(DashedRoute::class);
 });
 
@@ -96,7 +96,7 @@ Router::scope('/', function (RouteBuilder $routes) {
      * to use (in this case, src/Template/Pages/home.ctp)...
      */
     $routes->connect('/', ['controller' => 'Pages', 'action' => 'home']);
-
+    
     /**
      * Connect catchall routes for all controllers.
      *

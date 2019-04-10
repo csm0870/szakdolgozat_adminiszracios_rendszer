@@ -101,7 +101,7 @@
         $('#topics_menu_item').addClass('active');
         $('#offered_topics_index_menu_item').addClass('active');
         
-                //Confirmation modal elfogadás előtt
+        //Confirmation modal elfogadás előtt
         $('.btn-accept').on('click', function(e){
             e.preventDefault();
             

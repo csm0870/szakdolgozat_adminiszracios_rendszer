@@ -99,6 +99,12 @@
                                 <strong><?= __('Külső konzulenstól való eltekintés indoklása') . ': ' ?></strong><?= h($thesisTopic->cause_of_no_external_consultant) ?>
                             </p>
                         <?php } ?>
+                        <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.FirstThesisSubjectFailedWaitingForHeadOfDepartmentDecision')){ ?> <!-- Első diplomakurzus sikertelen, tanszékvezető döntése a folytatásról -->
+                            <p class="mb-1">
+                                <strong><?= __('A hallgató a diplomakurzus első félévét nem teljesítette') . ': ' ?></strong>
+                                <?= $this->Html->link(__('Döntés a folytatásról'), '#', ['class' => 'decideToContinueAfterFailedFirstThesisSubjectBtn']) ?>
+                            </p>
+                        <?php } ?>
                     </fieldset>
                     <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable'),
                                                                              \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),
@@ -183,12 +189,6 @@
                             <strong><?= __('Képzés típusa') . ': ' ?></strong><?= $thesisTopic->has('student') ? ($thesisTopic->student->has('course_type') ? h($thesisTopic->student->course_type->name) : '') : ''?>
                         </p>
                     </fieldset>
-                    <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.FirstThesisSubjectFailedWaitingForHeadOfDepartmentDecision')){ ?> <!-- Első diplomakurzus sikertelen, tanszékvezető döntése a folytatásról -->
-                        <p>
-                            <strong><?= __('Diplomakurzus első félévét nem teljesítette') . ': ' ?></strong>
-                            <?= $this->Html->link(__('Döntés a folytatásról'), '#', ['class' => 'decideToContinueAfterFailedFirstThesisSubjectBtn']) ?>
-                        </p>
-                    <?php } ?>
                 </div>
                 <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant'),
                                                                          \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByHeadOfDepartment'),
@@ -268,11 +268,11 @@
                                 echo $this->Html->link(__('Bírálatra küldés'), '#', ['class' => 'btn btn-info sendToReviewBtn border-radius-45px mb-2']) . '<br/>';
                             
                             if(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalize'),
-                                                                        \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking'),
-                                                                        \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingRejectedByInternalConsultant'),
-                                                                        \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking'),
-                                                                        \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingCanceledByStudent'),
-                                                                        \Cake\Core\Configure::read('ThesisTopicStatuses.ProposalForAmendmentOfThesisTopicAddedByHeadOfDepartment')]))
+                                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking'),
+                                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingRejectedByInternalConsultant'),
+                                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking'),
+                                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingCanceledByStudent'),
+                                                                                \Cake\Core\Configure::read('ThesisTopicStatuses.ProposalForAmendmentOfThesisTopicAddedByHeadOfDepartment')]))
                                 echo $this->Html->link(__('Témaengedélyező PDF letöltése'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px mb-2', 'target' => '_blank']);
                         ?>
                     </fieldset>
@@ -353,10 +353,11 @@
 <?php } ?>
 <script>
     $(function(){
+        $('#topics_menu_item').addClass('active');
         $('#thesis_topics_index_menu_item').addClass('active');
         
         <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.FirstThesisSubjectFailedWaitingForHeadOfDepartmentDecision')){ ?>
-            //Tartalom lekeérése a "diplomakurzus első félévének teljesítésének rögzítése" modalba
+            //Tartalom lekeérése a "döntés diplomakurzus első félévének sikertelenségének eseténi folytatásról" modalba
             $.ajax({
                 url: '<?= $this->Url->build(['action' => 'decideToContinueAfterFailedFirstThesisSubject', $thesisTopic->id], true) ?>',
                 cache: false

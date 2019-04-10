@@ -1,7 +1,7 @@
 <div class="container">
     <div class="row">
         <div class="col-12 text-center page-title">
-            <?= $this->Html->link('<i class="fas fa-arrow-alt-circle-left fa-lg"></i>' . '&nbsp;' . __('Vissza'), ['controller' => 'ThesisTopics', 'action' => 'index'], ['escape' => false, 'class' => 'backBtn float-left border-radius-45px', 'title' => __('Vissza')]) ?>
+            <?= $this->Html->link('<i class="fas fa-arrow-alt-circle-left fa-lg"></i>' . '&nbsp;' . __('Vissza'), ['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id], ['escape' => false, 'class' => 'backBtn float-left border-radius-45px', 'title' => __('Vissza')]) ?>
             <h4><?= __('Diplomamunka/szakdolgozat feltöltése') ?></h4>
         </div>
         <?= $this->Flash->render() ?>
@@ -9,31 +9,30 @@
             <?php  
                 $this->Form->templates(['inputContainer' => '<div class="form-group">{{content}}</div>',
                                         'inputContainerError' => '<div class="form-group">{{content}}{{error}}</div>']);
-                echo $this->Form->create($thesisTopic, ['id' => 'uploadThesisForm', 'type' => 'file', 'class' => 'row'])
+                echo $this->Form->create($thesisTopic, ['id' => 'uploadThesisSupplementsForm', 'type' => 'file', 'class' => 'row'])
             ?>
-            
-                <div class="col-12">
-                    <p class="mb-4">
-                        <strong><?= __('Állapot') . ': ' ?></strong><?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : ''?>
-                        <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected') ||
-                            ($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement') && $thesisTopic->cause_of_rejecting_thesis_supplements !== null)){ ?>
-                            <br/>
-                            <strong><?= __('Elutasítás oka') . ': ' ?></strong><?= h($thesisTopic->cause_of_rejecting_thesis_supplements) ?>
-                        <?php } ?>
-                    </p>
-                </div>
+            <div class="col-12">
+                <p class="mb-4">
+                    <strong><?= __('Állapot') . ': ' ?></strong><?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name) : ''?>
+                    <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected') ||
+                        ($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement') && $thesisTopic->cause_of_rejecting_thesis_supplements !== null)){ ?>
+                        <br/>
+                        <strong><?= __('Elutasítás oka') . ': ' ?></strong><?= h($thesisTopic->cause_of_rejecting_thesis_supplements) ?>
+                    <?php } ?>
+                </p>
+            </div>
             <div class="col-12">
                 <fieldset class="border-1-grey p-3 mb-2">
                     <legend class="w-auto"><?= __('Mellékletek feltöltése') ?></legend>
                     <?= $this->Form->control('thesis_supplements[]', ['type' => 'file', 'label' => ['text' => __('Fájl feltöltése (Szakdolgozat/Diplomamunka PDF-ben és a mellékletek)')],
                                                                       'class' => 'form-control', 'multiple' => true]) ?>
                     <?php if(count($thesisTopic->thesis_supplements) > 0){ ?>
-                        <p><?= __('Jelenlegi fájlok') . '' ?></p>
+                        <p class="mb-1"><?= __('Jelenlegi fájlok') . ':' ?></p>
                     <?php } ?>
                     <?php 
                         foreach($thesisTopic->thesis_supplements as $supplement){
                             if(!empty($supplement->file)){ 
-                                echo '<p>' .
+                                echo '<p class="mb-0">' .
                                         $this->Html->link($supplement->file, ['controller' => 'ThesisSupplements', 'action' => 'downloadFile', $supplement->id], ['target' => '_blank']) .
                                         '&nbsp;&nbsp;' . $this->Html->link(__('<i class="fas fa-trash"></i>'), '#', ['class' => 'deleteThesisSupplement', 'style' => 'color: red', 'escape' => false, 'data-id' => $supplement->id, 'title' => __('Törlés')]) .
                                      '</p>';
@@ -48,7 +47,7 @@
                         <?= $this->Form->button(__('Mentés'), ['type' => 'submit', 'class' => 'btn btn-primary border-radius-45px submitBtn']) ?>
                     </div>
                     <div class=" col-12 col-sm-6 text-center">
-                        <?= $thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement') ? $this->Html->link(__('Feltöltés véglegesítése'), '#', ['class' => 'btn btn-success finalizeUpoadedThesisBtn border-radius-45px']) : ''?>
+                        <?= $thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement') ? $this->Html->link(__('Feltöltés véglegesítése'), '#', ['class' => 'btn btn-success finalizeUpoadedThesisSupplementsBtn border-radius-45px']) : ''?>
                     </div>
                 </div>
             </div>
@@ -99,20 +98,20 @@
             e.preventDefault();
 
             //Formvalidáció manuális meghívása
-            if($('#uploadThesisForm')[0].reportValidity() === false) return;
+            if($('#uploadThesisSupplementsForm')[0].reportValidity() === false) return;
 
             $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan mented?') ?>');
             $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
             //Save gomb eventjeinek resetelése cserével
             $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-            $('#confirmationModal .msg').text('<?= __('Záróvizsga-tárgyak mentése.') ?>');
+            $('#confirmationModal .msg').text('<?= __('Mellékletek mentése.') ?>');
 
             $('#confirmationModal').modal('show');
 
             $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
                 e.preventDefault();
                 $('#confirmationModal').modal('hide');
-                $('#uploadThesisForm').trigger('submit');
+                $('#uploadThesisSupplementsForm').trigger('submit');
             });
         });
         
@@ -120,7 +119,7 @@
             /**
             * Confirmation modal megnyitása submit előtt
             */
-            $('.finalizeUpoadedThesisBtn').on('click', function(e){
+            $('.finalizeUpoadedThesisSupplementsBtn').on('click', function(e){
                 e.preventDefault();
 
                 $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan véglegesíted?') ?>');
@@ -134,7 +133,7 @@
                 $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
                     e.preventDefault();
                     $('#confirmationModal').modal('hide');
-                    location.href = '<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'finalizeUploadedThesis', $thesisTopic->id], true) ?>';
+                    location.href = '<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'finalizeUploadedThesisSupplements', $thesisTopic->id], true) ?>';
                 });
             });
         <?php } ?>

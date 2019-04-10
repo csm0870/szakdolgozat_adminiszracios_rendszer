@@ -162,7 +162,7 @@ class ThesisTopicsController extends AppController
         
         if(!$ok) return $this->redirect(['action' => 'index']);
 
-        if ($this->request->is(['patch', 'post', 'put'])){
+        if($this->request->is(['patch', 'post', 'put'])){
             $request_data = $this->getRequest()->getData();
             $can_change_external_consultant = true;
             //Ha témaájánlatok közül választott témáról van szó, akkor a megfelelő mezőket, amiket nem módosíthat, "töröljük"
@@ -291,7 +291,7 @@ class ThesisTopicsController extends AppController
             return $this->redirect(['controller' => 'Students', 'action' => 'edit', $data['student_id']]);
         }
 
-        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['id' => $id]])->first();
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['id' => $id, 'deleted !=' => true]])->first();
         
         $ok = true;
         if(empty($thesisTopic)){
@@ -359,16 +359,15 @@ class ThesisTopicsController extends AppController
             $this->Flash->error($error_msg);
         }
 
-        return $this->redirect(['action' => 'index']);
+        return $this->redirect(['action' => 'details', $thesisTopic->id]);
     }
     
     /**
      * Szakdolgozat/diplomamunka, mellékletek feltöltése.
-     * Záróvizsga tárgyak megadása
      * 
      * @param type $thesis_topic_id
      */
-    public function uploadThesis($thesis_topic_id = null){
+    public function uploadThesisSupplements($thesis_topic_id = null){
         //Hallgatói adatellenőrzés
         $this->loadModel('Students');
         $data = $this->Students->checkStundentData($this->Auth->user('id'));
@@ -419,7 +418,7 @@ class ThesisTopicsController extends AppController
                 $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement');
                 if($this->ThesisTopics->save($thesisTopic)){
                     $this->Flash->success(__('Mentés sikeres.'));
-                    return $this->redirect(['action' => 'uploadThesis', $thesisTopic->id]);
+                    return $this->redirect(['action' => 'uploadThesisSupplements', $thesisTopic->id]);
                 }
                 $this->Flash->error(__('Mentés sikertelen. Próbálja újra!!'));
             }
@@ -429,38 +428,12 @@ class ThesisTopicsController extends AppController
     }
     
     /**
-     * Diplomamunka/Szakdolgozat melléklet letöltése
-     * 
-     * @param type $thesis_topic_id Téma azonosítója
-     */
-    public function getThesisSupplements($thesis_topic_id = null){
-        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['id' => $thesis_topic_id, 'deleted !=' => true]])->first();
-        $student = $this->ThesisTopics->Students->find('all', ['conditions' => ['Students.user_id' => $this->Auth->user('id')]])->first();
-        
-        $ok = true;
-        if($thesisTopic->student_id != (empty($student) ? 'null' : $student->id)){
-            $this->Flash->error(__('A dolgozat nem Önhöz tartozik.'));
-            $ok = false;
-        }elseif(empty($thesisTopic->thesis_supplements)){
-            $this->Flash->error(__('A dolgozat nem tartozik melléklet.'));
-            $ok = false;
-        }
-        
-        if(!$ok) return;
-        
-        $response = $this->getResponse()->withFile(ROOT . DS . 'files' . DS . 'thesis_supplements' . DS . $thesisTopic->thesis_supplements,
-                                                   ['download' => true, 'name' => $thesisTopic->thesis_supplements]);
-
-        return $response;
-    }
-    
-    /**
-     * Téma véglegesítés
+     * Dolgozat melléklet feltöltésének véglegesítés
      * 
      * @param type $id Téma ID-ja
      * @return type
      */
-    public function finalizeUploadedThesis($id = null){
+    public function finalizeUploadedThesisSupplements($id = null){
         //Hallgatói adatellenőrzés
         $this->loadModel('Students');
         $data = $this->Students->checkStundentData($this->Auth->user('id'));
@@ -523,13 +496,13 @@ class ThesisTopicsController extends AppController
             $ok = false;
         }
         
-        if($ok === true){
-            $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingCanceledByStudent');
-            $thesisTopic->offered_topic_id = null;
+        if($ok === false) return $this->redirect(['action' => 'index']);
+        
+        $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingCanceledByStudent');
+        $thesisTopic->offered_topic_id = null;
 
-            if ($this->ThesisTopics->save($thesisTopic)) $this->Flash->success(__('Visszavonás sikeres.'));
-            else $this->Flash->error(__('Hiba történt. Próbálja újra!'));
-        }
+        if ($this->ThesisTopics->save($thesisTopic)) $this->Flash->success(__('Visszavonás sikeres.'));
+        else $this->Flash->error(__('Hiba történt. Próbálja újra!'));
         
         return $this->redirect(['action' => 'index']);
     }

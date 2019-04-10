@@ -77,9 +77,9 @@ class ThesisTopicsController extends AppController
         if(!$ok) return $this->redirect(['action' => 'index']);
 
         $thesisTopic->deleted = true;
-        if ($this->ThesisTopics->save($thesisTopic)) {
+        if($this->ThesisTopics->save($thesisTopic)){
             $this->Flash->success(__('Törlés sikeres.'));
-        } else {
+        }else{
             $this->Flash->error(__('Törlés sikertelen. Próbálja újra!'));
         }
         
@@ -137,13 +137,11 @@ class ThesisTopicsController extends AppController
             }
 
             $this->loadModel('Users');
-            
             $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
 
             $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesisTopic_id, 'ThesisTopics.deleted !=' => true]])->first();
 
             $ok = true;
-            
             if(empty($thesisTopic)){ //Nem létezik a téma
                 $ok = false;
                 $this->Flash->error(__('A témáról nem dönthet.') . ' ' . __('Nem létező téma.'));
@@ -159,11 +157,10 @@ class ThesisTopicsController extends AppController
             
             $thesisTopic->thesis_topic_status_id = $accepted == 0 ? \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByInternalConsultant') : \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForHeadOfDepartmentAcceptingOfThesisTopic');
 
-            if($this->ThesisTopics->save($thesisTopic)){
-                $this->Flash->success($accepted == 0 ? __('Elutasítás sikeres.') : __('Elfogadás sikeres.'));
-            }else{
-                $this->Flash->error(($accepted == 0 ? __('Elutasítás sikertelen.') : __('Elfogadás sikeretlen.')) . __('Próbálja újra!'));
-            }
+            if($this->ThesisTopics->save($thesisTopic)) $this->Flash->success($accepted == 0 ? __('Elutasítás sikeres.') : __('Elfogadás sikeres.'));
+            else $this->Flash->error(($accepted == 0 ? __('Elutasítás sikertelen.') : __('Elfogadás sikeretlen.')) . ' ' . __('Próbálja újra!'));
+
+            return $this->redirect(['action' => 'details', $thesisTopic->id]);
         }
         
         return $this->redirect(['action' => 'index']);
@@ -184,7 +181,6 @@ class ThesisTopicsController extends AppController
 
         $error_msg = '';
         $ok = true;
-        
         if(empty($thesisTopic)){ //Nem létezik a téma
             $error_msg = __('A diplomakurzus első félévének teljesítésének rögzítését nem teheti meg.') . ' ' . __('Nem létező téma.');
             $ok = false;

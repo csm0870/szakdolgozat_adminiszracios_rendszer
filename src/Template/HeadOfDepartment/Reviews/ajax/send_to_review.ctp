@@ -1,4 +1,4 @@
-<div class="form-modal headOfDepartment-decideToContinueAfterFailedFirstThesisSubject">
+<div class="form-modal headOfDepartment-sendToReview">
     <?= $ok === true ? $this->Form->create(null, ['id' => 'sendToReviewForm']) : '' ?>
     <div class="form-header text-center">
         <?= __('Bírálatra küldés') ?>

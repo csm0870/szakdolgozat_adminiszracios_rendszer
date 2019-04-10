@@ -174,20 +174,19 @@
                         //Ha kitöltési időszak van, csak akkor lehet véglegesíteni
                         if(!empty($can_fill_in_topic) && $can_fill_in_topic === true){
                             echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary border-radius-45px mb-2']) . '<br/>';
-                            echo $this->Html->link(__('Téma véglegesítése'), '#', ['class' => 'btn btn-success finalize-thesis-topic-btn border-radius-45px mb-2', 'data-id' => $thesisTopic->id]) . '<br/>';
-                        }else{
+                            echo $this->Html->link(__('Téma véglegesítése/leadása'), '#', ['class' => 'btn btn-success finalize-thesis-topic-btn border-radius-45px mb-2']) . '<br/>';
+                        }else
                             echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary border-radius-45px mb-2']) . '<br/>';
-                        }
 
-                        if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking')){
-                            echo $this->Html->link(__('Foglalás visszavonása'), '#', ['class' => 'btn btn-danger cancel-booking-btn border-radius-45px mb-2', 'data-id' => $thesisTopic->id]);
-                            echo "<br/>";
-                        }
+
+                        if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking'))
+                            echo $this->Html->link(__('Foglalás visszavonása'), '#', ['class' => 'btn btn-danger cancel-booking-btn border-radius-45px mb-2']) . '<br/>';
                     }
                     
                     if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable'),
                                                                        \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),
-                                                                       \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected')])) echo $this->Html->link(__('Dolgozat mellékleteinek feltöltése'), ['controller' => 'ThesisTopics', 'action' => 'uploadThesis', $thesisTopic->id], ['class' => 'btn btn-info border-radius-45px mb-2']) . '<br/>';
+                                                                       \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected')]))
+                        echo $this->Html->link(__('Dolgozat mellékleteinek feltöltése'), ['controller' => 'ThesisTopics', 'action' => 'uploadThesisSupplements', $thesisTopic->id], ['class' => 'btn btn-info border-radius-45px mb-2']) . '<br/>';
                     
                     if(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalize'),
                                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking'),
@@ -246,7 +245,7 @@
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
                 //Save gomb eventjeinek resetelése cserével
                 $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-                $('#confirmationModal .msg').html('<?= __('Téma véglegesítése. Véglegesítés után a téma adatai nem módosíthatóak.<br/>A véglegesítés után a hallgatói adatok sem módosíthatóak, csak ha elutasíják a témát.') ?>');
+                $('#confirmationModal .msg').html('<?= __('Téma véglegesítése/leadása. Véglegesítés után a téma adatai nem módosíthatóak.<br/>A véglegesítés után a hallgatói adatok sem módosíthatóak, csak ha elutasíják a témát.') ?>');
 
                 $('#confirmationModal').modal('show');
 
