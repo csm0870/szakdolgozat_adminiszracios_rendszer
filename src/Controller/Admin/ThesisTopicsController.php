@@ -15,7 +15,10 @@ class ThesisTopicsController extends AppController
     
     public function beforeFilter(\Cake\Event\Event $event){
         parent::beforeFilter($event);
-        if(in_array($this->getRequest()->getParam('action'), ['decideToContinueAfterFailedFirstThesisSubject', 'proposalForAmendment', 'setFirstThesisSubjectCompleted', 'acceptThesisSupplements'])) $this->viewBuilder()->setLayout(false);
+        if(in_array($this->getRequest()->getParam('action'), ['decideToContinueAfterFailedFirstThesisSubject', 'proposalForAmendment',
+                                                              'setFirstThesisSubjectCompleted', 'acceptThesisSupplements', 'setThesisGrade',
+                                                              'applyAcceptedThesisData']))
+            $this->viewBuilder()->setLayout(false);
     }
     
     /**
@@ -673,6 +676,142 @@ class ThesisTopicsController extends AppController
             }else{
                 $saved = false;
                 $error_ajax = ($accepted == 0 ? __('Elutasítás sikertelen.') : __('Elfogadás sikertelen.')) . ' ' . __('Próbálja újra!');
+                
+                $errors = $thesisTopic->getErrors();
+                if(!empty($errors)){
+                    foreach($errors as $error){
+                        if(is_array($error)){
+                            foreach($error as $err){
+                                $error_ajax.= '<br/>' . $err;
+                            }
+                        }else{
+                            $error_ajax.= '<br/>' . $error;
+                        }
+                    }
+                }
+            }
+        }
+        
+        $this->set(compact('thesisTopic' ,'ok', 'error_msg', 'saved', 'error_ajax'));
+        $this->set('_serialize', ['saved', 'error_ajax']);
+    }
+    
+     /**
+     * Dolgozat értékelése (belső konzulensi művelet)
+     * 
+     * @param type $id Téma azonosítója
+     */
+    public function setThesisGrade($id = null){
+        $this->getRequest()->allowMethod('ajax');
+        $this->viewBuilder()->setClassName('Ajax.Ajax');
+        
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id]])->first();
+
+        $error_msg = '';
+        $ok = true;
+        
+        if(empty($thesisTopic)){ //Nem létezik a téma
+            $error_msg = __('A dolgozat értékelését nem teheti meg.') . ' ' . __('Nem létező dolgozat.');
+            $ok = false;
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByHeadOfDepartment'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])){ //Nincs legalább "Formai követelményeknek megfelelt" státuszban
+            $error_msg = __('A dolgozat értékelését nem teheti meg.') . ' ' . __('A dolgozat még nincs abban az állapotban, hogy értékelhető legyen.');
+            $ok = false;
+        }
+        
+        //Ha a feltételeknek megfelelő téma nem található
+        if($ok === false){
+            $this->set(compact('ok', 'error_msg'));
+            return;
+        }
+                
+        $saved = true;
+        $error_ajax = "";
+        if($this->getRequest()->is(['post', 'patch', 'put'])){
+            
+            $internal_consultant_grade = $this->getRequest()->getData('internal_consultant_grade');
+            if(isset($internal_consultant_grade)){
+                $thesisTopic->internal_consultant_grade = $internal_consultant_grade;
+                if($this->ThesisTopics->save($thesisTopic)){
+                    $this->Flash->success(__('Mentés sikeres!'));
+                }else{
+                    $saved = false;
+                    $error_ajax = __('Mentés sikertelen. Próbálja újra!');
+
+                    $errors = $thesisTopic->getErrors();
+                    if(!empty($errors)){
+                        foreach($errors as $error){
+                            if(is_array($error)){
+                                foreach($error as $err){
+                                    $error_ajax.= '<br/>' . $err;
+                                }
+                            }else{
+                                $error_ajax.= '<br/>' . $error;
+                            }
+                        }
+                    }
+                }
+            }else{
+                $saved = false;
+                $error_ajax = __('Értékelés megadása kötelező.');
+            }
+        }
+        
+        $this->set(compact('thesisTopic' ,'ok', 'error_msg', 'saved', 'error_ajax'));
+        $this->set('_serialize', ['saved', 'error_ajax']);
+    }
+    
+    /**
+     * Elfogadott dolgozat adatainak felvitelének rögzítése a Neptun rendszerbe vagy pedig, ha már rögzítve vannak, akkor annak jelzése,
+     * hogy még sem viték őket fel
+     * 
+     * @param type $id Téma azonosítója
+     * @return type
+     */
+    public function applyAcceptedThesisData($id = null){
+        $this->getRequest()->allowMethod('ajax');
+        $this->viewBuilder()->setClassName('Ajax.Ajax');
+        
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id],
+                                                         'contain' => ['InternalConsultants', 'Reviews' => ['Reviewers']]])->first();
+        
+        $error_msg = '';
+        $ok = true;
+        if(empty($thesisTopic)){
+            $ok = false;
+            $error_msg = __('Az adatok felvitele nem rögzíthető.') . ' ' . __('Nem létezik a dolgozat.');
+        }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')){ //A dolgozat még nincs elfogadva
+            $ok = false;
+            $error_msg =  __('Az adatok felvitele nem rögzíthető.') . ' ' . __('A dolgozat még nincs elfogadott állapotban.');
+        }
+        
+        //Ha a feltételeknek megfelelő téma nem található
+        if($ok === false){
+            $this->set(compact('ok', 'error_msg'));
+            return;
+        }
+        
+        $saved = true;
+        $error_ajax = "";
+        if($this->getRequest()->is(['post', 'patch', 'put'])){
+            if($thesisTopic->accepted_thesis_data_applyed_to_neptun !== true)
+                $thesisTopic->accepted_thesis_data_applyed_to_neptun = true;
+            else
+                $thesisTopic->accepted_thesis_data_applyed_to_neptun = false;
+            
+            if($this->ThesisTopics->save($thesisTopic)){
+                $this->Flash->success(__('Mentés sikeres.'));
+            }else{
+                $saved = false;
+                $error_ajax = __('Mentés sikertelen. Próbálja újra!');
                 
                 $errors = $thesisTopic->getErrors();
                 if(!empty($errors)){

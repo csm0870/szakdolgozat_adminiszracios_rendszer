@@ -288,7 +288,6 @@ class ThesisTopicsController extends AppController
         if($this->getRequest()->is(['post', 'patch', 'put'])){
             
             $internal_consultant_grade = $this->getRequest()->getData('internal_consultant_grade');
-            
             if(isset($internal_consultant_grade)){
                 $thesisTopic->internal_consultant_grade = $internal_consultant_grade;
                 if($this->ThesisTopics->save($thesisTopic)){

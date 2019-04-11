@@ -1,4 +1,4 @@
-<div class="form-modal headOfDepartment-acceptReview">
+<div class="form-modal admin-acceptReview">
     <?= $ok ? $this->Form->create(null, ['id' => 'acceptReviewForm']) : '' ?>
     <div class="form-header text-center">
         <?= __('Bírálat elfogadása') ?>
@@ -19,7 +19,7 @@
                 <tr class="rejected_review_row">
                     <td>
                         <label>
-                            <?= __('Az elutasítás oka') . ": " ?>
+                            <?= __('Az elutasítás oka') . ":" ?>
                         </label>
                     </td>
                 </tr>

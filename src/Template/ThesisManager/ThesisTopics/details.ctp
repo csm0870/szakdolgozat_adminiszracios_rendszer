@@ -14,7 +14,7 @@
                             if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted') && $thesisTopic->accepted_thesis_data_applyed_to_neptun !== true){
                                 echo '(' . __('Az elfogadott dolgozat adatait fel kell vinni a Neptun rendszerbe.') . ')';
                                 echo '<br/>';
-                                echo $this->Html->link(__('Adatok felvitele') . ' ->', '#', ['class' => 'mt-2 applyAcceptedThesisDataBtn', 'style' => 'display: inline-block']);
+                                echo $this->Html->link(__('Adatok felvitele') . ' ->', '#', ['class' => 'applyAcceptedThesisDataBtn', 'style' => 'display: inline-block']);
                             }
                             
                             if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements') &&

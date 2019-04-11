@@ -405,7 +405,7 @@
         <?php } ?>
         
         <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview') && $thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status == 2){ ?>
-            //Tartalom lekeérése a "bírálatra küldés" modalba
+            //Tartalom lekeérése a "feltöltött titoktartási szerződés ellenőrzése" modalba
             $.ajax({
                 url: '<?= $this->Url->build(['controller' => 'Reviews', 'action' => 'checkConfidentialityContract', $thesisTopic->id], true) ?>',
                 cache: false

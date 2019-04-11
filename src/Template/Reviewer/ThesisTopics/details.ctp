@@ -99,22 +99,24 @@
                     <fieldset class="border-1-grey p-3 text-center">
                         <legend class="w-auto"><?= __('Műveletek') ?></legend>
                         <?php
-                            if(($thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status === 4) ||
-                                $thesisTopic->confidential === false){
-                                echo $this->Html->link(__('Dolgozat bírálata'), ['controller' => 'Reviews', 'action' => 'review', $thesisTopic->id], ['class' => 'btn btn-secondary border-radius-45px mb-2']). '<br/>';
-                            } 
-                            
-                            if($thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status == 1){
-                                echo $this->Form->button(__('Titoktartási szerződés feltöltésének véglegesítése'), ['type' => 'button', 'role' => 'button', 'class' => 'btn btn-info finalizeBtn border-radius-45px mb-2']) . '<br/>';
-                            }
-                            
+                            if($thesisTopic->has('review')){
+                                if(($thesisTopic->confidential === true && $thesisTopic->review->confidentiality_contract_status === 4) ||
+                                    $thesisTopic->confidential === false){
+                                    echo $this->Html->link(__('Dolgozat bírálata'), ['controller' => 'Reviews', 'action' => 'review', $thesisTopic->id], ['class' => 'btn btn-secondary border-radius-45px mb-2']). '<br/>';
+                                } 
+
+                                if($thesisTopic->confidential === true && $thesisTopic->review->confidentiality_contract_status == 1){
+                                    echo $this->Form->button(__('Titoktartási szerződés feltöltésének véglegesítése'), ['type' => 'button', 'role' => 'button', 'class' => 'btn btn-info finalizeBtn border-radius-45px mb-2']) . '<br/>';
+                                }
+
+                                if($thesisTopic->confidential === true && !in_array($thesisTopic->review->confidentiality_contract_status, [2, 4])){
+                                    echo $this->Html->link(__('Titoktartási nyilatkozat feltöltése'), '#', ['class' => 'btn btn-secondary border-radius-45px uploadConfidentialityContractBtn mb-2']). '<br/>';
+                                }
+
                             if($thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status != 4){
-                                echo $this->Html->link(__('Titoktartási nyilatkozat feltöltése'), '#', ['class' => 'btn btn-secondary border-radius-45px uploadConfidentialityContractBtn mb-2']). '<br/>';
+                                    echo $this->Html->link(__('Titoktartási nyilatkozat letöltése'), ['controller' => 'Reviews', 'action' => 'confidentialityContractDoc', $thesisTopic->id], ['class' => 'btn btn-secondary border-radius-45px mb-2', 'target' => '_blank']). '<br/>';
+                                }
                             }
-                        
-                            if($thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status != 4){
-                                echo $this->Html->link(__('Titoktartási nyilatkozat letöltése'), ['controller' => 'Reviews', 'action' => 'confidentialityContractDoc', $thesisTopic->id], ['class' => 'btn btn-secondary border-radius-45px mb-2', 'target' => '_blank']). '<br/>';
-                            }   
                         ?>
                     </fieldset>
                 </div>
@@ -122,7 +124,7 @@
         </div>
     </div>
 </div>
-<?php if($thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status != 4){ ?>
+<?php if($thesisTopic->confidential === true && $thesisTopic->has('review') && !in_array($thesisTopic->review->confidentiality_contract_status, [2, 4])){ ?>
     <!-- Titoktartási nyilatkozat feltöltése modal -->
     <div class="modal fade" id="uploadConfidentialityContractModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
@@ -140,7 +142,7 @@
     $(function(){
         $('#thesis_topics_index_menu_item').addClass('active');
         
-        <?php if($thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status != 4){ ?>
+        <?php if($thesisTopic->confidential === true && $thesisTopic->has('review') && !in_array($thesisTopic->review->confidentiality_contract_status, [2, 4])){ ?>
             //Tartalom lekeérése a "titoktartási szerződés feltöltése" modalba
             $.ajax({
                 url: '<?= $this->Url->build(['controller' => 'Reviews', 'action' => 'uploadConfidentialityContract', $thesisTopic->id], true) ?>',

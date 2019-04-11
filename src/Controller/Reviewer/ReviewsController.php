@@ -455,8 +455,8 @@ class ReviewsController extends AppController
             }
         }
         
-        if($ok === true && $thesisTopic->review->confidentiality_contract_status == 4){ //Ha már el van fogadva a titoktartási szerződés
-            $error_msg = __('A dolgozat részletei nem elérhetők.') . ' ' . __('A titoktartási szerződés már el van fogadva.');
+        if($ok === true && in_array($thesisTopic->review->confidentiality_contract_status, [2, 4])){ //Ha ellenőrzésre vár vagy már el van fogadva a titoktartási szerződés
+            $error_msg = __('A dolgozat részletei nem elérhetők.') . ' ' . __('A titoktartási szerződés ellenőrzésre vár vagy már el van fogadva.');
             $ok = false;
         }elseif($thesisTopic->review->review_status != null){ //Ha bírálat már folyamatban van
             $error_msg = __('A dolgozat részletei nem elérhetők.') . ' ' . __('A bírálat már folyamatban van.');

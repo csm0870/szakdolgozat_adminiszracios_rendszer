@@ -1,4 +1,4 @@
-<div class="form-modal headOfDepartment-checkConfidentialityContract">
+<div class="form-modal admin-checkConfidentialityContract">
     <?= $ok ? $this->Form->create(null, ['id' => 'checkConfidentialityContractForm']) : '' ?>
     <div class="form-header text-center">
         <?= __('Titoktartási szerződés elfogadása') ?>
@@ -26,7 +26,7 @@
                 <tr class="rejected_confidentiality_contract_row">
                     <td>
                         <label>
-                            <?= __('Az elutasítás oka') . ": " ?>
+                            <?= __('Az elutasítás oka') . ":" ?>
                         </label>
                     </td>
                 </tr>
@@ -76,7 +76,7 @@
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
                 //Save gomb eventjeinek resetelése cserével
                 $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-                $('#confirmationModal .msg').text('<?= __('Titoktartási szerződés elfogadása.') ?>');
+                $('#confirmationModal .msg').html('<?= __('Titoktartási szerződés elfogadása.') . '<br/><br/>' .__('Művelet végrehajtója') . ': ' . __('tanszékvezető') ?>');
 
                 $('#confirmationModal').modal('show');
 

@@ -67,6 +67,20 @@
                             <br/>
                             <strong><?= __('A mellékletek elutasításának oka') . ': ' ?></strong><?= h($thesisTopic->cause_of_rejecting_thesis_supplements) ?>
                         <?php } ?>
+                            
+                        <?php //Adatok felvitele a Neptun rendszerbe
+                            if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')){
+                                if($thesisTopic->accepted_thesis_data_applyed_to_neptun !== true){
+                                    echo '(' . __('Az elfogadott dolgozat adatait nincsenek rögzítve a Neptun rendszerbe.') . ')';
+                                    echo '<br/>';
+                                    echo $this->Html->link(__('Adatok felvitele') . ' ->', '#', ['id' => 'applyAcceptedThesisDataBtn', 'style' => 'display: inline-block']);
+                                }else{
+                                    echo '(' . __('Az elfogadott dolgozat adatai rögzítve vannak a Neptun rendszerbe.') . ')';
+                                    echo '<br/>';
+                                    echo $this->Html->link(__('Az adatokat mégsem vitték fel') . ' ->', '#', ['id' => 'applyAcceptedThesisDataBtn', 'style' => 'display: inline-block']);
+                                }
+                            }
+                        ?>
                         </p>
                         <p class="mb-1">
                             <strong><?= __('Belső konzulens') . ': ' ?></strong><?= $thesisTopic->has('internal_consultant') ? h($thesisTopic->internal_consultant->name) : '' ?>
@@ -322,6 +336,28 @@
                                 echo '<br/>';
                             }
                             
+                            //Dolgozat értékelése (belső konzulensi művelet)
+                            if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable'),
+                                                                               \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),
+                                                                               \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements'),
+                                                                               \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected'),
+                                                                               \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant'),
+                                                                               \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByHeadOfDepartment'),
+                                                                               \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
+                                                                               \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                                               \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                               \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')]))
+                                echo $this->Html->link(__('Dolgozat értékelése'), '#', ['class' => 'btn btn-secondary border-radius-45px mb-2', 'id' => 'setThesisGradeBtn']). '<br/>';
+                            
+                            //Bíráló titoktartási szerződésének ellenőrzése (tanszékvezetői művelet)
+                            if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview') && $thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status == 2)
+                                echo $this->Html->link(__('Bíráló titoktartási szerződésének ellenőrzése'), '#', ['class' => 'btn btn-info border-radius-45px mb-2', 'id' => 'checkConfidentialityContractBtn']) . '<br/>';
+                            
+                            if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                                               \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                               \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')]) && $thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status == 4)
+                                echo $this->Html->link(__('Bíráló titoktartási szerződésének letöltése'), ['controller' => 'Reviews', 'action' => 'getUploadedConfidentialityContract', $thesisTopic->id], ['class' => 'btn btn-info border-radius-45px mb-2', 'target' => '__blank']) . '<br/>';
+                            
                             //Újboli bírálatra küldés bíráló változtatási lehetőséggel
                             if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'))
                                 echo $this->Html->link(__('Újbóli bírálatra küldés'), '#', ['class' => 'btn btn-info border-radius-45px mb-2', 'id' => 'sendToReviewAgainBtn']) . '<br/>';
@@ -500,15 +536,67 @@
         </div>
     </div>
 <?php } ?>
+<?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview') && $thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status == 2){ ?>
+    <!-- Bíráló titoktartási szerződésének ellenőrzése (tanszékvezetői művelet) modal -->
+    <div class="modal fade" id="checkConfidentialityContractModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div id="check_confidentiality_contract_container">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php } ?>
+<?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable'),
+                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),
+                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements'),
+                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected'),
+                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant'),
+                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByHeadOfDepartment'),
+                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
+                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])){ ?>
+<!-- Dolgozat értékelése modal -->
+<div class="modal fade" id="setThesisGradeModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+              <div class="modal-body">
+                  <div id="set_thesis_grade_container">
+
+                  </div>
+              </div>
+          </div>
+    </div>
+</div>
+<?php } ?>
+<?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')){ ?>
+    <!-- Elfogadott dolgozat adatainak felvitele modal -->
+    <div class="modal fade" id="applyAcceptedThesisDataModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div id="apply_accepted_thesis_data_container">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php } ?>
 <script>
     $(function(){
         $('#topics_menu_item').addClass('active');
         $('#thesis_topics_index_menu_item').addClass('active');
         
-        //Téma véglegesításe (hallgatói művelet)
         <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalize'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.ProposalForAmendmentOfThesisTopicAddedByHeadOfDepartment')])){ ?>
+            //Téma véglegesításe (hallgatói művelet)
+            
             /**
             * Confirmation modal megnyitása submit előtt
             */
@@ -542,8 +630,9 @@
             });
         <?php } ?>
         
-        //Témafoglalás elfogadása (belső konzulensi művelet)
         <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking')){ ?>
+            //Témafoglalás elfogadása (belső konzulensi művelet)
+    
             //Confirmation modal elfogadás előtt
             $('#acceptBookingForm .btn-accept').on('click', function(e){
                 e.preventDefault();
@@ -583,8 +672,10 @@
             });
         <?php } ?>
         
-        //Témafoglalás visszanása (hallgatói művelet)
+        
         <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking')){ ?>
+            //Témafoglalás visszanása (hallgatói művelet)
+    
             /**
             * Confirmation modal megnyitása submit előtt
             */
@@ -607,10 +698,11 @@
             });
         <?php } ?>
         
-        //Téma elfogadása (belső konzulensi/tanszékvezető/témakezelői művelet)
+        
         <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopic'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForHeadOfDepartmentAcceptingOfThesisTopic'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingExternalConsultantSignatureOfThesisTopic')])){ ?>
+            //Téma elfogadása (belső konzulensi/tanszékvezető/témakezelői művelet)
             <?php
                 if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopic'))
                     $user_type = __('belső konzulens');
@@ -660,9 +752,8 @@
                 });
             });
             
-            //Téma módosítási javaslat adása (tanszékvezető)
             <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForHeadOfDepartmentAcceptingOfThesisTopic')){ ?>
-                //Tartalom lekeérése a "téma módosítási javaslat" modalba
+                //Tartalom lekeérése a "téma módosítási javaslat" (tanszékvezető) modalba
                 $.ajax({
                     url: '<?= $this->Url->build(['action' => 'proposalForAmendment', $thesisTopic->id], true) ?>',
                     cache: false
@@ -678,9 +769,8 @@
             <?php } ?>
         <?php } ?>
         
-        //Diplomakurzus első félévének teljesítésének rögzítése (belső konzulensi művelet)
         <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicAccepted')){?>
-            //Tartalom lekeérése a "diplomakurzus első félévének teljesítésének rögzítése" modalba
+            //Tartalom lekeérése a "diplomakurzus első félévének teljesítésének rögzítése" (belső konzulensi művelet) modalba
             $.ajax({
                 url: '<?= $this->Url->build(['action' => 'setFirstThesisSubjectCompleted', $thesisTopic->id], true) ?>',
                 cache: false
@@ -695,9 +785,8 @@
             });
         <?php } ?>
         
-        //Döntés a diplomakurzus első félévének sikertelenségének eseténi folytatásról (tanszékvezetői művelet)
         <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.FirstThesisSubjectFailedWaitingForHeadOfDepartmentDecision')){ ?>
-            //Tartalom lekeérése a "diplomakurzus első félévének sikertelenségének eseténi folytatásról" modalba
+            //Tartalom lekeérése a "diplomakurzus első félévének sikertelenségének eseténi folytatásról" (tanszékvezetői művelet) modalba
             $.ajax({
                 url: '<?= $this->Url->build(['action' => 'decideToContinueAfterFailedFirstThesisSubject', $thesisTopic->id], true) ?>',
                 cache: false
@@ -712,9 +801,8 @@
             });
         <?php } ?>
         
-        //Dolgozat mellékleteinek elfogadása (szakdolgozatkezelői művelet)
         <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements')){ ?>
-            //Tartalom lekeérése a "dolgozat mellékleteinek elfogadása" modalba
+            //Tartalom lekeérése a "dolgozat mellékleteinek elfogadása" (szakdolgozatkezelői művelet) modalba
             $.ajax({
                 url: '<?= $this->Url->build(['action' => 'acceptThesisSupplements', $thesisTopic->id], true) ?>',
                 cache: false
@@ -729,9 +817,8 @@
             });
         <?php } ?>
         
-        //Bíráló személyének javaslata (belső konzulensi művelet)
         <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant')){?>
-            //Tartalom lekeérése a "bíráló személyének javaslata" modalba
+            //Tartalom lekeérése a "bíráló személyének javaslata" (belső konzulensi művelet) modalba
             $.ajax({
                 url: '<?= $this->Url->build(['controller' => 'Reviewers', 'action' => 'setReviewerSuggestion', $thesisTopic->id], true) ?>',
                 cache: false
@@ -746,9 +833,8 @@
             });
         <?php } ?>
         
-        //Bíráló személyének kijelölése (tanszékvezetői művelet)
         <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByHeadOfDepartment')){ ?>
-            //Tartalom lekeérése a "bíráló személyének kijelölése" modalba
+            //Tartalom lekeérése a "bíráló személyének kijelölése" (tanszékvezetői művelet) modalba
             $.ajax({
                 url: '<?= $this->Url->build(['controller' => 'Reviewers', 'action' => 'setReviewerForThesisTopic', $thesisTopic->id], true) ?>',
                 cache: false
@@ -763,9 +849,8 @@
             });
         <?php } ?>
         
-        //Bírálatra küldés (tanszékvezetői művelet)
         <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview')){ ?>
-            //Tartalom lekeérése a "bírálatra küldés" modalba
+            //Tartalom lekeérése a "bírálatra küldés" (tanszékvezetői művelet) modalba
             $.ajax({
                 url: '<?= $this->Url->build(['controller' => 'Reviews', 'action' => 'sendToReview', $thesisTopic->id], true) ?>',
                 cache: false
@@ -780,7 +865,6 @@
             });
         <?php } ?>
         
-        //Újboli bírálatra küldés bíráló változtatási lehetőséggel
         <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview')){ ?>
             //Tartalom lekeérése a "újboli bírálatra küldés bíráló változtatási lehetőséggel" modalba
             $.ajax({
@@ -795,7 +879,63 @@
             $('#sendToReviewAgainBtn').on('click', function(e){
                 e.preventDefault();
                 $('#sendToReviewAgainModal').modal('show');
-                console.log('?');
+            });
+        <?php } ?>
+         
+        <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview') && $thesisTopic->confidential === true && $thesisTopic->has('review') && $thesisTopic->review->confidentiality_contract_status == 2){ ?>
+            //Tartalom lekeérése a "feltöltött titoktartási szerződés ellenőrzése" (tanszékvezetői művelet) modalba
+            $.ajax({
+                url: '<?= $this->Url->build(['controller' => 'Reviews', 'action' => 'checkConfidentialityContract', $thesisTopic->id], true) ?>',
+                cache: false
+            })
+            .done(function( response ) {
+                $('#check_confidentiality_contract_container').html(response.content);
+            });
+
+            $('#checkConfidentialityContractBtn').on('click', function(e){
+                e.preventDefault();
+                $('#checkConfidentialityContractModal').modal('show');
+            });
+        <?php } ?>
+        
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizeOfUploadOfThesisSupplement'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingOfThesisSupplements'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByHeadOfDepartment'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.WatingForSendingToReview'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])){ ?>
+            //Tartalom lekeérése a "dolgozat értékelése" (belső konzulensi művelet) modalba
+            $.ajax({
+                url: '<?= $this->Url->build(['action' => 'setThesisGrade', $thesisTopic->id], true) ?>',
+                cache: false
+            })
+            .done(function( response ) {
+                $('#set_thesis_grade_container').html(response.content);
+            });
+
+            $('#setThesisGradeBtn').on('click', function(e){
+                e.preventDefault();
+                $('#setThesisGradeModal').modal('show');
+            });
+        <?php } ?>
+        
+        <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')){ ?>
+            //Tartalom lekeérése a "adatok felvitele a Neptun rendszerbe" (szakdolgozatkezelői művelet) modalba
+            $.ajax({
+                url: '<?= $this->Url->build(['action' => 'applyAcceptedThesisData', $thesisTopic->id], true) ?>',
+                cache: false
+            })
+            .done(function(response){
+                $('#apply_accepted_thesis_data_container').html(response.content);
+            });
+
+            $('#applyAcceptedThesisDataBtn').on('click', function(e){
+                e.preventDefault();
+                $('#applyAcceptedThesisDataModal').modal('show');
             });
         <?php } ?>
         

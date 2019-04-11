@@ -1,4 +1,4 @@
-<div class="form-modal internalConsultant-setThesisGrade">
+<div class="form-modal admin-setThesisGrade">
     <?= $ok ? $this->Form->create($thesisTopic, ['id' => 'setThesisGradeForm']) : '' ?>
     <div class="form-header text-center">
         <?= __('Dolgozat értékelése') ?>
@@ -44,7 +44,7 @@
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
                 //Save gomb eventjeinek resetelése cserével
                 $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-                $('#confirmationModal .msg').text('<?= __('Dolgozat értékelésének mentése.') ?>');
+                $('#confirmationModal .msg').html('<?= __('Dolgozat értékelésének mentése.') . '<br/><br/>' .__('Művelet végrehajtója') . ': ' . __('belső konzulens') ?>');
 
                 $('#confirmationModal').modal('show');
 

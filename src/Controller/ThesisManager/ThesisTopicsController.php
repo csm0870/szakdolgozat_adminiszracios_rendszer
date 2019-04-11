@@ -160,7 +160,7 @@ class ThesisTopicsController extends AppController
             $error_msg = __('Az adatok felvitele nem rögzíthető.') . ' ' . __('Nem létezik a dolgozat.');
         }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')){ //A dolgozat még nincs elfogadva
             $ok = false;
-             __('Az adatok felvitele nem rögzíthető.') . ' ' . __('A dolgozat még nincs elfogadott állapotban.');
+             $error_msg = __('Az adatok felvitele nem rögzíthető.') . ' ' . __('A dolgozat még nincs elfogadott állapotban.');
         }elseif($thesisTopic->accepted_thesis_data_applyed_to_neptun === true){ //Az adatok már fel vannak vive
             $ok = false;
             $error_msg = __('Az adatok felvitele nem rögzíthető.') . ' ' . __('A dolgozat adatainak felvitele már megtörtént.');

@@ -146,7 +146,7 @@ class ReviewsController extends AppController
      * @param type $thesis_topic_id Téma azonosítója
      */
     public function checkReview($thesis_topic_id = null){
-        $thesisTopic = $this->Reviews->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id],
+        $thesisTopic = $this->Reviews->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id, 'ThesisTopics.deleted !=' => true],
                                                                   'contain' => ['Reviews' => ['Reviewers', 'Questions']]])->first();
         
         $ok = true;
@@ -188,7 +188,7 @@ class ReviewsController extends AppController
         $this->getRequest()->allowMethod('ajax');
         $this->viewBuilder()->setClassName('Ajax.Ajax');
         
-        $thesisTopic = $this->Reviews->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id],
+        $thesisTopic = $this->Reviews->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id, 'ThesisTopics.deleted !=' => true],
                                                                   'contain' => ['Reviews']])->first();
         
         $error_msg = '';
@@ -277,7 +277,7 @@ class ReviewsController extends AppController
      * @param type $thesis_topic_id Téma azonosítója
      */
     public function getReviewDoc($thesis_topic_id = null){
-        $thesisTopic = $this->Reviews->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id],
+        $thesisTopic = $this->Reviews->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id, 'ThesisTopics.deleted !=' => true],
                                                                   'contain' => ['Reviews']])->first();
     
         $ok = true;
@@ -325,7 +325,7 @@ class ReviewsController extends AppController
         $this->getRequest()->allowMethod('ajax');
         $this->viewBuilder()->setClassName('Ajax.Ajax');
         
-        $thesisTopic = $this->Reviews->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id],
+        $thesisTopic = $this->Reviews->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id, 'ThesisTopics.deleted !=' => true],
                                                                   'contain' => ['Reviews']])->first();
         
         $error_msg = '';
@@ -404,7 +404,7 @@ class ReviewsController extends AppController
      * @param type $thesis_topic_id Téma azonosítója
      */
     public function getUploadedConfidentialityContract($thesis_topic_id = null){
-        $thesisTopic = $this->Reviews->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id],
+        $thesisTopic = $this->Reviews->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id, 'ThesisTopics.deleted !=' => true],
                                                                   'contain' => ['Reviews']])->first();
     
         $ok = true;
