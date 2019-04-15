@@ -13,9 +13,9 @@ use App\Controller\AppController;
 class StudentsController extends AppController
 {
     /**
-     * Edit metódus hallgatónak
+     * Hallgatói adatok módosítása
      *
-     * @param string|null $id Student id.
+     * @param string|null $id Hallgató egyedi aznosítója
      * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
@@ -35,7 +35,7 @@ class StudentsController extends AppController
 
                 return $this->redirect(['action' => 'edit', $student->id]);
             }
-            $this->Flash->error(__('Mentés sikertelen.'));
+            $this->Flash->error(__('Mentés sikertelen. Próbálja újra!'));
         }
         $courses = $this->Students->Courses->find('list');
         $courseLevels = $this->Students->CourseLevels->find('list');

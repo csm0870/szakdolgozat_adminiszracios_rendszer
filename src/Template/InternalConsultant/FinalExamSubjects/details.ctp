@@ -43,7 +43,7 @@
                         <?php
                             $i = 1;
                             foreach($student->final_exam_subjects as $subject){  if($i >= 4) break; ?>
-                                <div class="card mb-4">
+                                <div class="card mb-1">
                                     <div class="card-header" id="heading_<?= $i ?>">
                                         <h5 class="mb-0">
                                             <button type="button" role="button" class="btn btn-link" data-toggle="collapse" data-target="#finalExamSubjectCollapse_<?= $i ?>" aria-expanded="true" aria-controls="collapse_<?= $i ?>">
@@ -91,7 +91,7 @@
                         <?php
                             if($student->final_exam_subjects_status == 2){
                                 for($i = $i; $i <= 3; $i++){ ?>
-                                    <div class="card mb-4">
+                                    <div class="card mb-1">
                                         <div class="card-header" id="heading_<?= $i ?>">
                                             <h5 class="mb-0">
                                                 <button type="button" role="button" class="btn btn-link" data-toggle="collapse" data-target="#finalExamSubjectCollapse_<?= $i ?>" aria-expanded="true" aria-controls="collapse_<?= $i ?>">

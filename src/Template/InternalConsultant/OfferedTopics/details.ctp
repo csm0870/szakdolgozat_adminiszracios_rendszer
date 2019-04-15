@@ -11,10 +11,10 @@
                     <fieldset class="border-1-grey p-3 mb-3">
                         <legend class="w-auto"><?= __('A téma adatai') ?></legend>
                         <p class="mb-1">
-                            <strong><?= __('Téma címe') . ': ' ?></strong><?= h($offeredTopic->title) ?>
+                            <strong><?= __('Cím') . ': ' ?></strong><?= h($offeredTopic->title) ?>
                         </p>
                         <div class="mb-1">
-                            <strong><?= __('Téma leírása') . ':' ?></strong><br/>
+                            <strong><?= __('Leírás') . ':' ?></strong><br/>
                             <?= $offeredTopic->description ?>
                         </div>
                         <p class="mb-1">
@@ -24,7 +24,7 @@
                             <strong><?= __('Titkos') . ': ' ?></strong><?= $offeredTopic->confidential === true ? __('Igen') : __('Nem') ?>
                         </p>
                         <p class="mb-1">
-                            <strong><?= __('Téma típusa') . ': ' ?></strong><?= $offeredTopic->is_thesis === true ? __('Szakdolgozat') : __('Diplomamunka')  ?>
+                            <strong><?= __('Típus') . ': ' ?></strong><?= $offeredTopic->is_thesis === true ? __('Szakdolgozat') : __('Diplomamunka')  ?>
                         </p>
                         <?php if($offeredTopic->has_external_consultant === true){ ?>
                             <p class="mb-1">
@@ -54,7 +54,7 @@
                     <fieldset class="border-1-grey p-3 mb-2">
                         <legend class="w-auto"><?= __('A jelentkezett hallgató adatai') ?></legend>
                         <p class="mb-1">
-                            <strong><?= __('Hallgató neve') . ': ' ?></strong><?= $offeredTopic->has('thesis_topic') ? ($offeredTopic->thesis_topic->has('student') ? h($offeredTopic->thesis_topic->student->name) : '') : ''?>
+                            <strong><?= __('Név') . ': ' ?></strong><?= $offeredTopic->has('thesis_topic') ? ($offeredTopic->thesis_topic->has('student') ? h($offeredTopic->thesis_topic->student->name) : '') : ''?>
                         </p>
                         <p class="mb-1">
                             <strong><?= __('Neptun kód') . ': ' ?></strong><?= $offeredTopic->has('thesis_topic') ? ($offeredTopic->thesis_topic->has('student') ? h($offeredTopic->thesis_topic->student->neptun) : '') : '' ?>

@@ -89,32 +89,32 @@ class StudentsTable extends Table
 
         $validator
             ->scalar('name')
-            ->maxLength('name', 50)
-            ->allowEmpty('name');
+            ->maxLength('name', 50, __('A név maximum 50 karakter lehet.'))
+            ->notEmpty('name', __('Név megadása kötelező.'));
 
         $validator
             ->scalar('address')
-            ->maxLength('address', 80)
-            ->allowEmpty('address');
+            ->maxLength('address', 80, __('A cím maximum 80 karakter lehet.'))
+            ->notEmpty('address', __('Cím megadása kötelező.'));
 
         $validator
             ->scalar('neptun')
-            ->maxLength('neptun', 6)
-            ->allowEmpty('neptun')
+            ->lengthBetween('neptun', [6, 6], __('A Neptun kódnak 6 karakternek kell lennie.'))
+            ->notEmpty('neptun', __('Neptun kód megadása kötelező.'))
             ->add('neptun', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
 
         $validator
-            ->email('email')
-            ->allowEmpty('email');
+            ->email('email', false, __('Nem megfelelő email formátum.'))
+            ->allowEmpty('email', __('Email megadása kötelező.'));
 
         $validator
             ->scalar('phone_number')
-            ->maxLength('phone_number', 15)
-            ->allowEmpty('phone_number');
+            ->maxLength('phone_number', 15, __('A telefonszám maximum 15 karakter lehet.'))
+            ->notEmpty('phone_number', __('Telefonszám megadása kötelező.'));
 
         $validator
             ->scalar('specialisation')
-            ->maxLength('specialisation', 40)
+            ->maxLength('specialisation', 40, __('A szakirány maximum 40 karakter lehet.'))
             ->allowEmpty('specialisation');
 
         $validator
@@ -123,6 +123,15 @@ class StudentsTable extends Table
         $validator
             ->boolean('passed_final_exam')
             ->allowEmpty('passed_final_exam');
+        
+        $validator
+            ->notEmpty('course_id', __('Szak megadása kötelező.'));
+        
+        $validator
+            ->notEmpty('course_level_id', __('Szak megadása kötelező.'));
+        
+        $validator
+            ->notEmpty('course_type_id', __('Tagozat megadása kötelező.'));
 
         return $validator;
     }

@@ -13,7 +13,7 @@ use App\Controller\AppController;
 class FinalExamSubjectsController extends AppController
 {
     /**
-     * Záróvizsga-tárgyak lista
+     * Záróvizsga-tárgyak lista mentés és véglegesítés
      * 
      * @return type
      */

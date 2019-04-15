@@ -14,7 +14,7 @@ class ReviewersController extends AppController
 {
     public function beforeFilter(\Cake\Event\Event $event) {
         parent::beforeFilter($event);
-        if($this->getRequest()->getParam('action') != 'index') $this->viewBuilder()->setLayout(false);
+        if(in_array($this->getRequest()->getParam('action'), ['add', 'edit', 'setReviewerSuggestion'])) $this->viewBuilder()->setLayout(false);
     }
     
     /**

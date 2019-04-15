@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-12 text-center page-title">
             <?= $this->Html->link('<i class="fas fa-arrow-alt-circle-left fa-lg"></i>' . '&nbsp;' . __('Vissza'), ['controller' => 'Students', 'action' => 'index'], ['escape' => false, 'class' => 'backBtn float-left border-radius-45px', 'title' => __('Vissza')]) ?>
-            <h4><?= __('Téma részletei') ?></h4>
+            <h4><?= __('Hallgató részletei') ?></h4>
         </div>
         <?= $this->Flash->render() ?>
         <div class="col-12">
@@ -11,7 +11,7 @@
                     <fieldset class="border-1-grey p-3 mb-3">
                         <legend class="w-auto"><?= __('Hallgató adatai') ?></legend>
                         <p class="mb-1">
-                            <strong><?= __('Hallgató neve') . ': ' ?></strong><?= h($student->name) ?>
+                            <strong><?= __('Név') . ': ' ?></strong><?= h($student->name) ?>
                         </p>
                         <p class="mb-1">
                             <strong><?= __('Neptun kód') . ': ' ?></strong><?= h($student->neptun)?>
@@ -35,7 +35,7 @@
                                 <?php 
                                     $i = 1;
                                     foreach($student->final_exam_subjects as $subject){  if($i >= 4) break; ?>
-                                        <div class="card mb-4">
+                                        <div class="card mb-1">
                                             <div class="card-header" id="heading_<?= $i ?>">
                                                 <h5 class="mb-0">
                                                     <button type="button" role="button" class="btn btn-link" data-toggle="collapse" data-target="#finalExamSubjectCollapse_<?= $i ?>" aria-expanded="true" aria-controls="collapse_<?= $i ?>">

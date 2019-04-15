@@ -27,10 +27,10 @@
                             <?php } ?>
                         </p>
                         <p class="mb-1">
-                            <strong><?= __('Téma címe') . ': ' ?></strong><?= h($thesisTopic->title) ?>
+                            <strong><?= __('Cím') . ': ' ?></strong><?= h($thesisTopic->title) ?>
                         </p>
                         <p class="mb-1">
-                            <strong><?= __('Téma leírása') . ':<br/>' ?></strong><?= $thesisTopic->description ?>
+                            <strong><?= __('Leírás') . ':<br/>' ?></strong><?= $thesisTopic->description ?>
                         </p>
                         <p class="mb-1">
                             <strong><?= __('Nyelv') . ': ' ?></strong><?= $thesisTopic->has('language') ? h($thesisTopic->language->name) : '' ?>
@@ -39,7 +39,7 @@
                             <strong><?= __('Titkos') . ': ' ?></strong><?= $thesisTopic->confidential === true ? __('Igen') : __('Nem') ?>
                         </p>
                         <p class="mb-1">
-                            <strong><?= __('Téma típusa') . ': ' ?></strong><?= $thesisTopic->is_thesis === true ? __('Szakdolgozat') : __('Diplomamunka')  ?>
+                            <strong><?= __('Típus') . ': ' ?></strong><?= $thesisTopic->is_thesis === true ? __('Szakdolgozat') : __('Diplomamunka')  ?>
                         </p>
                         <p class="mb-1">
                             <strong><?= __('Kezdési tanév') . ': ' ?></strong><?= $thesisTopic->has('starting_year') ? h($thesisTopic->starting_year->year) : '' ?>
@@ -135,7 +135,7 @@
                     <fieldset class="border-1-grey p-3 mb-3">
                         <legend class="w-auto"><?= __('Hallgató adatai') ?></legend>
                         <p class="mb-1">
-                            <strong><?= __('Hallgató neve') . ': ' ?></strong><?= $thesisTopic->has('student') ? h($thesisTopic->student->name) : '' ?>
+                            <strong><?= __('Név') . ': ' ?></strong><?= $thesisTopic->has('student') ? h($thesisTopic->student->name) : '' ?>
                         </p>
                         <p class="mb-1">
                             <strong><?= __('Neptun kód') . ': ' ?></strong><?= $thesisTopic->has('student') ? h($thesisTopic->student->neptun) : '' ?>

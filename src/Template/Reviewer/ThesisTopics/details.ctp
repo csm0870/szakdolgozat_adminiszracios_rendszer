@@ -41,10 +41,10 @@
                             <?php } ?>
                         </p>
                         <p class="mb-1">
-                            <strong><?= __('Téma címe') . ': ' ?></strong><?= h($thesisTopic->title) ?>
+                            <strong><?= __('Cím') . ': ' ?></strong><?= h($thesisTopic->title) ?>
                         </p>
                         <p class="mb-1">
-                            <strong><?= __('Téma leírása') . ':<br/>' ?></strong><?= $thesisTopic->description ?>
+                            <strong><?= __('Leírás') . ':<br/>' ?></strong><?= $thesisTopic->description ?>
                         </p>
                         <p class="mb-1">
                             <strong><?= __('Nyelv') . ': ' ?></strong><?= $thesisTopic->has('language') ? h($thesisTopic->language->name) : '' ?>

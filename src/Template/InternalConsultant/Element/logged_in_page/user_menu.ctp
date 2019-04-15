@@ -18,7 +18,7 @@
                     </div>
                 </li>
                 <li class="nav-item" id="reviewers_index_menu_item">
-                    <a class="nav-link" href="<?= $this->Url->build(['controller' => 'Reviewers', 'action' => 'index']) ?>"><?= __('Bírálók') ?></a>
+                    <a class="nav-link" href="<?= $this->Url->build(['controller' => 'Reviewers', 'action' => 'index']) ?>"><?= __('Bírálók kezelése') ?></a>
                 </li>
                 <li class="nav-item" id="final_exam_subjects_index_menu_item">
                     <a class="nav-link" href="<?= $this->Url->build(['controller' => 'FinalExamSubjects', 'action' => 'index']) ?>"><?= __('Záróvizsga-tárgyak') ?></a>

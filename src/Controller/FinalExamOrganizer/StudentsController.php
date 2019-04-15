@@ -44,7 +44,7 @@ class StudentsController extends AppController
             $this->Flash->error(__('A hallgató részletei nem elérhetőek.') . ' ' . __('A hallgató már teljesítette a záróvizsgát.'));
             $ok = false;
         }elseif($student->course_id == 1 && $student->final_exam_subjects_status != 3){ //Még nincsenek kiválasztva a ZV tárgyak
-            $this->Flash->error(__('A hallgató részletei nem elérhetőek.') . ' ' . __('A hallgatónak még nincsenek kiválasztva a záróvizsga-tárgyai.'));
+            $this->Flash->error(__('A hallgató részletei nem elérhetőek.') . ' ' . __('A hallgatónak még nincsenek kiválasztva a záróvizsga-tárgyai, így záróvizsgára nem is mehet.'));
             $ok = false;
         }
         
@@ -62,7 +62,7 @@ class StudentsController extends AppController
             
             if(!$has_appropriate_thesis){
                 $ok = false;
-                $this->Flash->error(__('A hallgató részletei nem elérhetőek.') . ' ' . __('A hallgatónak nincs elfogadott szakdolgozata/diplomamunkája.'));
+                $this->Flash->error(__('A hallgató részletei nem elérhetőek.') . ' ' . __('A hallgatónak nincs elfogadott szakdolgozata/diplomamunkája, így záróvizsgára nem is mehet.'));
             }
         }
         

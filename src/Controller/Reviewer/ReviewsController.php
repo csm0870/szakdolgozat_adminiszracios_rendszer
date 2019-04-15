@@ -61,7 +61,7 @@ class ReviewsController extends AppController
             $is_finalize = $this->getRequest()->getData('is_finalize');
             //Véglegesítésről van-e szó
             if(!empty($is_finalize) && $is_finalize == 1){
-                if($thesisTopic->review->review_status != 1){ //Ha még nincs mentvebírálat
+                if($thesisTopic->review->review_status != 1){ //Ha még nincs mentve bírálat
                     $this->Flash->error(__('A bírálat nem véglegesíthető.') . ' ' . __('Először meg kell tenni a bírálatot.'));
                     $ok = false;
                 }

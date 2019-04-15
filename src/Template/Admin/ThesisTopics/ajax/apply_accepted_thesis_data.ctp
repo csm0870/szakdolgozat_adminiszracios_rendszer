@@ -86,7 +86,7 @@
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Igen') ?>').css('background-color', '#71D0BD');
                 //Save gomb eventjeinek resetelése cserével
                 $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-                $('#confirmationModal .msg').html('<?= __('Adatok felvitele a Neptun rendszerbe.') . '<br/><br/>' .__('Művelet végrehajtója') . ': ' . __('szakdolgozatkezelő') ?>');
+                $('#confirmationModal .msg').html('<?= __('Adatok felvitele a Neptun rendszerbe. Rögzítés után visszavonható.') . '<br/><br/>' .__('Művelet végrehajtója') . ': ' . __('szakdolgozatkezelő') ?>');
 
                 $('#confirmationModal').modal('show');
 

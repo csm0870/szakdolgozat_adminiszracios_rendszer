@@ -19,7 +19,7 @@
                             <strong><?= __('Törölve (belső konzulens által)') . ': ' ?></strong><?= $thesisTopic->deleted === true ? __('Igen') : __('Nem') ?>
                         </p>
                         <p class="mb-2">
-                            <strong><?= __('Téma állapota') . ': ' ?></strong>
+                            <strong><?= __('Állapot') . ': ' ?></strong>
                             <?= $thesisTopic->has('thesis_topic_status') ? h($thesisTopic->thesis_topic_status->name): '' ?>
                             <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ProposalForAmendmentOfThesisTopicAddedByHeadOfDepartment')){ ?>
                                 <br/><strong><?= __('Módosítási javaslat') . ': ' ?></strong><br/>
@@ -86,10 +86,10 @@
                             <strong><?= __('Belső konzulens') . ': ' ?></strong><?= $thesisTopic->has('internal_consultant') ? h($thesisTopic->internal_consultant->name) : '' ?>
                         </p>
                         <p class="mb-1">
-                            <strong><?= __('Téma címe') . ': ' ?></strong><?= h($thesisTopic->title) ?>
+                            <strong><?= __('Cím') . ': ' ?></strong><?= h($thesisTopic->title) ?>
                         </p>
                         <div class="mb-1">
-                            <strong><?= __('Téma leírása') . ':' ?></strong><br/>
+                            <strong><?= __('Leírás') . ':' ?></strong><br/>
                             <?= $thesisTopic->description ?>
                         </div>
                         <p class="mb-1">
@@ -99,7 +99,7 @@
                             <strong><?= __('Titkos') . ': ' ?></strong><?= $thesisTopic->confidential === true ? __('Igen') : __('Nem') ?>
                         </p>
                         <p class="mb-1">
-                            <strong><?= __('Téma típusa') . ': ' ?></strong><?= $thesisTopic->is_thesis === true ? __('Szakdolgozat') : __('Diplomamunka')  ?>
+                            <strong><?= __('Típus') . ': ' ?></strong><?= $thesisTopic->is_thesis === true ? __('Szakdolgozat') : __('Diplomamunka')  ?>
                         </p>
                         <p class="mb-1">
                             <strong><?= __('Kezdési tanév') . ': ' ?></strong><?= $thesisTopic->has('starting_year') ? h($thesisTopic->starting_year->year) : '' ?>
@@ -212,7 +212,7 @@
                     <fieldset class="border-1-grey p-3 mb-3">
                         <legend class="w-auto"><?= __('Hallgató adatai') ?></legend>
                         <p class="mb-1">
-                            <strong><?= __('Hallgató neve') . ': ' ?></strong><?= $thesisTopic->has('student') ? $this->Html->link($thesisTopic->student->name, ['controller' => 'Students', 'action' => 'edit', $thesisTopic->student->id]) : ''?>
+                            <strong><?= __('Név') . ': ' ?></strong><?= $thesisTopic->has('student') ? $this->Html->link($thesisTopic->student->name, ['controller' => 'Students', 'action' => 'details', $thesisTopic->student->id]) : ''?>
                         </p>
                         <p class="mb-1">
                             <strong><?= __('Neptun kód') . ': ' ?></strong><?= $thesisTopic->has('student') ? h($thesisTopic->student->neptun) : ''?>

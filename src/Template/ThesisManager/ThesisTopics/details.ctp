@@ -36,10 +36,10 @@
                         <strong><?= __('Belső konzulens') . ': ' ?></strong><?= $thesisTopic->has('internal_consultant') ? h($thesisTopic->internal_consultant->name) : '' ?>
                     </p>
                     <p class="mb-1">
-                        <strong><?= __('Téma címe') . ': ' ?></strong><?= h($thesisTopic->title) ?>
+                        <strong><?= __('Cím') . ': ' ?></strong><?= h($thesisTopic->title) ?>
                     </p>
                     <div class="mb-1">
-                    <strong><?= __('Téma leírása') . ':' ?></strong><br/>
+                    <strong><?= __('Leírás') . ':' ?></strong><br/>
                         <?= $thesisTopic->description ?>
                     </div>
                     <p class="mb-1">
@@ -145,7 +145,7 @@
                 <fieldset class="border-1-grey p-3 mb-3">
                     <legend class="w-auto"><?= __('Hallgató adatai') ?></legend>
                     <p class="mb-1">
-                        <strong><?= __('Hallgató neve') . ': ' ?></strong><?= $thesisTopic->has('student') ? h($thesisTopic->student->name) : ''?>
+                        <strong><?= __('Név') . ': ' ?></strong><?= $thesisTopic->has('student') ? h($thesisTopic->student->name) : ''?>
                     </p>
                     <p class="mb-1">
                         <strong><?= __('Neptun kód') . ': ' ?></strong><?= $thesisTopic->has('student') ? h($thesisTopic->student->neptun) : ''?>
