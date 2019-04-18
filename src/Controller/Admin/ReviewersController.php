@@ -14,7 +14,7 @@ class ReviewersController extends AppController
 {
     public function beforeFilter(\Cake\Event\Event $event) {
         parent::beforeFilter($event);
-        if(in_array($this->getRequest()->getParam('action'), ['add', 'edit', 'setReviewerForThesisTopic', 'setReviewerSuggestion'])) $this->viewBuilder()->setLayout(false);
+        if(in_array($this->getRequest()->getParam('action'), ['setReviewerForThesisTopic', 'setReviewerSuggestion'])) $this->viewBuilder()->setLayout(false);
     }
     
     /**
@@ -27,105 +27,70 @@ class ReviewersController extends AppController
 
     /**
      * Bíráló hozzáadása
-     *
-     * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
      */
     public function add(){
-        $this->getRequest()->allowMethod('ajax');
-        $this->viewBuilder()->setClassName('Ajax.Ajax');
-        
-        $saved = true;
-        $error_ajax = "";
         $reviewer = $this->Reviewers->newEntity();
-        if ($this->getRequest()->is('post')) {
+        if($this->getRequest()->is(['patch', 'post', 'put'])){
             $reviewer = $this->Reviewers->patchEntity($reviewer, $this->request->getData());
-            if ($this->Reviewers->save($reviewer)){
+            if ($this->Reviewers->save($reviewer)) {
                 $this->Flash->success(__('Mentés sikeres.'));
-            }else{
-                $saved = false;
-                $error_ajax = __('Mentés sikertelen. Próbálja újra!');
-                
-                $errors = $reviewer->getErrors();
-                if(!empty($errors)){
-                    foreach($errors as $error){
-                        if(is_array($error)){
-                            foreach($error as $err){
-                                $error_ajax.= '<br/>' . $err;
-                            }
-                        }else{
-                            $error_ajax.= '<br/>' . $error;
-                        }
-                    }
-                }
+                return $this->redirect(['action' => 'edit', $reviewer->id]);
             }
+            $this->Flash->error(__('Mentés sikertelen. Próbálja újra!'));
         }
         
-        $this->set(compact('reviewer', 'saved', 'error_ajax'));
-        $this->set('_serialize', ['saved', 'error_ajax']);
+        $this->set(compact('reviewer'));
     }
 
     /**
-     * Edit method
+     * Bíráló adatainak szerkesztése
      *
-     * @param string|null $id Reviewer id.
-     * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @param string|null $id Bíráló egyedi azonosítója
      */
     public function edit($id = null){
-        $this->getRequest()->allowMethod('ajax');
-        $this->viewBuilder()->setClassName('Ajax.Ajax');
+        $reviewer = $this->Reviewers->find('all', ['conditions' => ['Reviewers.id' => $id]])->first();
         
-        $ok = true;
-        $error_msg = '';
-        
-        $reviewer = $this->Reviewers->find('all', ['conditions' => ['id' => $id]])->first();
-        
-        if(empty($reviewer)){
-            $ok = false;
-            $error_msg = __('Helytelen aznosító.') . __('A bíráló nem létezik.');
-            $this->set(compact('ok', 'error_msg'));
-            return;
+        if(empty($reviewer)){ //Nem létezik a bíráló
+            $this->Flash->error(__('A bíráló adatai nem szerkeszthetőek.') . ' ' . __('Nem létező bíráló.'));
+            return $this->redirect (['action' => 'index']);
         }
         
-        $saved = true;
-        $error_ajax = "";
-        if ($this->getRequest()->is(['patch', 'post', 'put'])) {
+        if($this->getRequest()->is(['patch', 'post', 'put'])){
             $reviewer = $this->Reviewers->patchEntity($reviewer, $this->request->getData());
-            if ($this->Reviewers->save($reviewer)){
+            if ($this->Reviewers->save($reviewer)) {
                 $this->Flash->success(__('Mentés sikeres.'));
-            }else{
-                $saved = false;
-                $error_ajax = __('Mentés sikertelen. Próbálja újra!');
-                
-                $errors = $reviewer->getErrors();
-                if(!empty($errors)){
-                    foreach($errors as $error){
-                        if(is_array($error)){
-                            foreach($error as $err){
-                                $error_ajax.= '<br/>' . $err;
-                            }
-                        }else{
-                            $error_ajax.= '<br/>' . $error;
-                        }
-                    }
-                }
+                return $this->redirect(['action' => 'edit', $reviewer->id]);
             }
+            $this->Flash->error(__('Mentés sikertelen. Próbálja újra!'));
         }
         
-        $this->set(compact('reviewer', 'saved', 'error_ajax', 'ok', 'error_msg'));
-        $this->set('_serialize', ['saved', 'error_ajax']);
+        $this->set(compact('reviewer'));
+    }
+    
+    /**
+     * Bíráló részletek
+     * 
+     * @param type $id Bíráló egyedi azonosítója
+     */
+    public function details($id = null){
+        $reviewer = $this->Reviewers->find('all', ['conditions' => ['Reviewers.id' => $id],
+                                                   'contain' => ['Users' => ['RawPasswords']]])->first();
+        
+        if(empty($reviewer)){ //Nem létezik a bíráló
+            $this->Flash->error(__('A bíráló részletei nem elérhetők.') . ' ' . __('Nem létező bíráló.'));
+            return $this->redirect (['action' => 'index']);
+        }
+        
+        $this->set(compact('reviewer'));
     }
     
     /**
      * Bíráló törlése
      *
-     * @param string|null $id Bíráló aznosítója
-     * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @param string|null $id Bíráló egyedi azonosítója
      */
-    public function delete($id = null)
-    {
-        $this->request->allowMethod(['post', 'delete']);
+    public function delete($id = null){
+        $this->getRequest()->allowMethod(['post', 'delete']);
         $reviewer = $this->Reviewers->find('all', ['conditions' => ['Reviewers.id' => $id],
                                                    'contain' => ['Reviews']])->first();
         
@@ -140,11 +105,8 @@ class ReviewersController extends AppController
         }
         
         if($can_be_deleted === true){ //Ha nincs folyamatban lévő bírálata
-            if($this->Reviewers->delete($reviewer)){
-                $this->Flash->success(__('Törlés sikeres.'));
-            }else{
-                $this->Flash->error(__('Törlés sikertelen.'));
-            }
+            if($this->Reviewers->delete($reviewer)) $this->Flash->success(__('Törlés sikeres.'));
+            else $this->Flash->error(__('Törlés sikertelen.'));
         }else $this->Flash->error(__('A bírálónak még van folyamatban lévő bíráláta. Nem törölheti.'));
 
         return $this->redirect(['action' => 'index']);

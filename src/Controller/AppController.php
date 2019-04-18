@@ -78,6 +78,7 @@ class AppController extends Controller
     public function beforeFilter(Event $event) {
         parent::beforeFilter($event);
         
+        //Ha nincs belépett user és olyan oldalra történne a kérés, amihez autentikáció kell, akkor a főoldalra dobjuk
         if($this->Auth->user("id") == null &&
            !(($this->getRequest()->getParam('controller') == 'Pages' && $this->getRequest()->getParam('action') == "home") ||
              ($this->getRequest()->getParam('controller') == 'Users' && $this->getRequest()->getParam('action') == "login") ||
@@ -85,8 +86,10 @@ class AppController extends Controller
             return $this->redirect(["controller" => "Pages", "action" => "home", 'prefix' => false]);
         }
         
-        //Layout beállítása, ha a listában lévő controllerek hívják meg
-        if(in_array($this->getRequest()->getParam('controller'), ['Information', 'ThesisTopics', 'Students', 'Consultations', 'ConsultationOccasions', 'FinalExamSubjects', 'Reviewers', 'OfferedTopics', 'Reviews', 'Notifications']) || ($this->getRequest()->getParam('controller') == 'Pages' && $this->getRequest()->getParam('action') == 'dashboard')){
+        //Layout beállítása, ha a listában lévő controllerek hívják meg vagy az admin a Users controllert
+        if(in_array($this->getRequest()->getParam('controller'), ['Information', 'ThesisTopics', 'Students', 'Consultations', 'ConsultationOccasions', 'FinalExamSubjects', 'Reviewers',
+                                                                  'OfferedTopics', 'Reviews', 'Notifications', 'InternalConsultants']) ||
+           ($this->getRequest()->getParam('controller') == 'Users' && $this->getRequest()->getParam('prefix') == 'admin')){
             $this->viewBuilder()->setLayout('logged_in_page');
         }
         

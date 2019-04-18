@@ -1,6 +1,6 @@
 <div class="container">
     <div class="row">
-        <div class="col-12 text-center">
+        <div class="col-12 text-center page-title">
             <h4><?= __('Adatok megadása') ?></h4>
         </div>
         <div class="col-12">

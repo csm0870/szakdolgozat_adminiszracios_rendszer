@@ -150,7 +150,7 @@ class UsersController extends AppController
                 $this->Auth->setUser($user);
                 
                 if($user['group_id'] == 1) // Admin
-                    return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => 'admin']);
+                    return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index', 'prefix' => 'admin']);
                 elseif($user['group_id'] == 2) // Belső konzulens
                     return $this->redirect(['controller' => 'Notifications', 'action' => 'index', 'prefix' => 'internal_consultant']);
                 elseif($user['group_id'] == 3) // Tanszékvezető
@@ -169,7 +169,7 @@ class UsersController extends AppController
                 return $this->redirect($this->Auth->redirectUrl());
             }
             
-            $this->Flash->error(__('Helytelen email vagy jelszó!'));
+            $this->Flash->error(__('Helytelen email vagy jelszó. Próbálja újra!'));
             $this->Auth->logout();
         }
     }

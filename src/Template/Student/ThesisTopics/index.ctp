@@ -38,7 +38,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-12 mt-2 text-center">
+                <div class="col-12 mt-2 mb-2 text-center">
                     <?php
                         if(!empty($can_fill_in_topic) && $can_fill_in_topic === true){
                             if(!empty($can_add_topic) && $can_add_topic === true)

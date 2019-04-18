@@ -50,7 +50,7 @@ Router::extensions(['pdf', 'json']);
 //Az egyes user típusoknak különböző route prefix
 
 Router::prefix('admin',  function ($routes) {
-    $routes->connect('/', ['controller' => 'Pages', 'action' => 'dashboard']); 
+    $routes->connect('/', ['controller' => 'ThesisTopics', 'action' => 'index']); 
     $routes->fallbacks(DashedRoute::class);
 });
 

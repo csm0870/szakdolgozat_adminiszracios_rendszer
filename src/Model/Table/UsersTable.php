@@ -79,13 +79,19 @@ class UsersTable extends Table
             ->allowEmpty('id', 'create');
 
         $validator
-            ->email('email')
-            ->allowEmpty('email');
+            ->email('email', false, __('Nem megfelelő email formátum.'))
+            ->notEmpty('email', __('Felhasználónév megadása kötelező.'))
+            ->requirePresence('email', 'create', __('Felhasználónév megadása kötelező.'));
 
         $validator
             ->scalar('password')
-            ->maxLength('password', 255)
-            ->allowEmpty('password');
+            ->maxLength('password', 255, __('A jelszó maximum 255 karakter lehet.'))
+            ->notEmpty('password', __('Jelszó megadása kötelező.'))
+            ->requirePresence('password', 'create', __('Jelszó megadása kötelező.'));
+        
+        $validator
+            ->notEmpty('group_id', __('Felhasználói csoport megadása kötelező.'))
+            ->requirePresence('group_id', 'create', __('Felhasználói csoport megadása kötelező.'));
 
         return $validator;
     }
@@ -99,7 +105,7 @@ class UsersTable extends Table
      */
     public function buildRules(RulesChecker $rules)
     {
-        $rules->add($rules->isUnique(['email']));
+        $rules->add($rules->isUnique(['email'], __('Ez az érték már létezik.')));
         $rules->add($rules->existsIn(['group_id'], 'Groups'));
 
         return $rules;

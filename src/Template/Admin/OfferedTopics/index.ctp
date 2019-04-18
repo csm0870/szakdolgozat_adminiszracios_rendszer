@@ -1,4 +1,4 @@
-<div class="container ">
+<div class="container">
     <div class="row">
         <div class="col-12 text-center page-title">
             <h4>
@@ -71,9 +71,9 @@
                     </div>
                 </div>
             </div>
-            <div class="row mt-2">
+            <div class="row mt-2 mb-2">
                 <div class="col-12">
-                    <?= $this->Html->link(__('Új téma hozzáadása'), ['controller' => 'OfferedTopics', 'action' => 'add'], ['class' => 'btn btn-outline-secondary btn-block border-radius-45px']) ?>
+                    <?= $this->Html->link(__('Új téma hozzáadása'), ['action' => 'add'], ['class' => 'btn btn-outline-secondary btn-block border-radius-45px']) ?>
                 </div>
             </div>
         </div>

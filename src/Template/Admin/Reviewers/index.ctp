@@ -13,28 +13,19 @@
                                     <tr>
                                         <th><?= __('Név') ?></th>
                                         <th><?= __('Email') ?></th>
-                                        <th><?= __('Műveletek') ?></th>
                                     </tr>
                                 </thead>
                                 <thead>
                                     <tr>
                                         <th><?= $this->Form->control('name_search_text', ['id' => 'name_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
                                         <th><?= $this->Form->control('email_search_text', ['id' => 'email_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
-                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php foreach($reviewers as $reviewer){ ?>
-                                        <tr>
+                                        <tr class="reviewers" data-id="<?= $reviewer->id ?>" style="cursor: pointer">
                                             <td><?= '<searchable-text>' . h($reviewer->name) . '</searchable-text>' ?></td>
                                             <td><?= '<searchable-text>' . h($reviewer->email) . '</searchable-text>'?></td>
-                                            <td class="text-center">
-                                                <?php
-                                                    echo $this->Html->link('<i class="fas fa-edit fa-lg"></i>', '#', ['class' => 'iconBtn editBtn', 'data-id' => $reviewer->id, 'escape' => false, 'title' => __('Szerkesztés')]);
-                                                    echo $this->Html->link('<i class="fas fa-trash fa-lg"></i>', '#', ['escape' => false, 'title' => __('Törlés'), 'class' => 'iconBtn deleteBtn', 'data-id' => $reviewer->id]);
-                                                    echo $this->Form->postLink('', ['action' => 'delete', $reviewer->id], ['style' => 'display: none', 'id' => 'deleteReviewerForm_' . $reviewer->id]);
-                                                ?>
-                                            </td>
                                         </tr>
                                     <?php } ?>
                                 <tbody>
@@ -42,90 +33,21 @@
                         </div>
                     </div>
                 <div class="col-12 mt-2">
-                    <?= $this->Html->link(__('Új bíráló hozzáadása'), '#', ['class' => 'btn btn-outline-secondary btn-block border-radius-45px', 'id' => 'add_new_reviewer']); ?>
+                    <?= $this->Html->link(__('Új bíráló hozzáadása'), ['action' => 'add'], ['class' => 'btn btn-outline-secondary btn-block border-radius-45px']); ?>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!-- Bíráló hozzáadása modal -->
-<div class="modal fade" id="reviewerAddModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-body">
-                <div id="reviewer-add">
-
-                </div>
-            </div>
-        </div>
-  </div>
-</div>
-<!-- Bíráló szerkesztése modal -->
-<div class="modal fade" id="reviewerEditModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-body">
-            <div id="reviewer-edit">
-
-                </div>
-            </div>
-        </div>
-  </div>
-</div>
 <script>
     $(function(){
+        $('#users_menu_item').addClass('active');
         $('#reviewers_index_menu_item').addClass('active');
         
-        //Tartalom lekeérése a hozzáadáshoz
-        $.ajax({
-                url: '<?= $this->Url->build(['controller' => 'Reviewers', 'action' => 'add']) ?>',
-                cache: false
-        })
-        .done(function(response) {
-            $('#reviewer-add').html(response.content);
-        });
-        
-        //Bíráló hozzáadása popup megnyitása
-        $('#add_new_reviewer').on('click', function(e){
-            e.preventDefault();
-            $('#reviewerAddModal').modal('show');
-        });
-        
-        //Bíráló szerkesztése
-        $('.editBtn').on('click', function(e){
-            e.preventDefault();
-            
+        //Táblázat sorára kattintáskor az adott bíráló részleteire ugrás
+        $('.reviewers').on('click', function(){
             var id = $(this).data('id');
-            
-            //Szerkesztési oldal lekérése
-            $.ajax({
-                    url: '<?= $this->Url->build(['action' => 'edit'], true) ?>' + '/' + id,
-                    cache: false
-            })
-            .done(function(response){
-                    $('#reviewer-edit').html(response.content);
-                    $('#reviewerEditModal').modal('show');
-            });
-        });
-        
-        //Törléskor confirmation modal a megerősítésre
-        $('.deleteBtn').on('click', function(e){
-            e.preventDefault();
-            
-            $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan törlöd?') ?>');
-            $('#confirmationModal .msg').text('<?= __('Bíráló törlése.') ?>');
-            $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Törlés') ?>').css('background-color', 'red');
-            //Save gomb eventjeinek resetelése cserével
-            $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-                        
-            $('#confirmationModal').modal('show');
-            
-            var id = $(this).data('id');
-            $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
-                e.preventDefault();
-                $('#confirmationModal').modal('hide');
-                $('#deleteReviewerForm_' + id).trigger('click');
-            });
+            location.href = '<?= $this->Url->build(['action' => 'details'], true) ?>' + '/' + id;
         });
         
         // DataTable

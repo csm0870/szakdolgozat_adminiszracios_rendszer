@@ -71,7 +71,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row mt-2">
+            <div class="row mt-2 mb-2">
                 <div class="col-12">
                     <?= $this->Html->link(__('Új téma hozzáadása'), ['controller' => 'OfferedTopics', 'action' => 'add'], ['class' => 'btn btn-outline-secondary btn-block border-radius-45px']) ?>
                 </div>

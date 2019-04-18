@@ -76,8 +76,17 @@ class InternalConsultantsTable extends Table
 
         $validator
             ->scalar('name')
-            ->maxLength('name', 50)
-            ->allowEmpty('name');
+            ->maxLength('name', 50, __('A név maximum 50 karakter lehet.'))
+            ->notEmpty('name', __('Név megadása kötelező.'))
+            ->requirePresence('name', 'create',__('Név megadása kötelező.'));
+        
+        $validator
+            ->notEmpty('department_id', __('Tanszék megadása kötelező.'))
+            ->requirePresence('department_id', 'create',__('Tanszék megadása kötelező.'));
+        
+        $validator
+            ->notEmpty('internal_consultant_position_id', __('Pozíció megadása kötelező.'))
+            ->requirePresence('internal_consultant_position_id', 'create',__('Pozíció megadása kötelező.'));
 
         return $validator;
     }
