@@ -359,7 +359,9 @@
                                 echo $this->Html->link(__('Bíráló titoktartási szerződésének letöltése'), ['controller' => 'Reviews', 'action' => 'getUploadedConfidentialityContract', $thesisTopic->id], ['class' => 'btn btn-info border-radius-45px mb-2', 'target' => '__blank']) . '<br/>';
                             
                             //Újboli bírálatra küldés bíráló változtatási lehetőséggel
-                            if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'))
+                            if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                                               \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                               \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')]))
                                 echo $this->Html->link(__('Újbóli bírálatra küldés'), '#', ['class' => 'btn btn-info border-radius-45px mb-2', 'id' => 'sendToReviewAgainBtn']) . '<br/>';
                             
                             //Bíráló kijelölése (tanszékvezetői művelet)
@@ -522,7 +524,9 @@
         </div>
     </div>
 <?php } ?>
-<?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview')){ ?>
+<?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])){ ?>
     <!-- Újboli bírálatra küldés bíráló változtatási lehetőséggel modal -->
     <div class="modal fade" id="sendToReviewAgainModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -865,7 +869,9 @@
             });
         <?php } ?>
         
-        <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview')){ ?>
+        <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])){ ?>
             //Tartalom lekeérése a "újboli bírálatra küldés bíráló változtatási lehetőséggel" modalba
             $.ajax({
                 url: '<?= $this->Url->build(['controller' => 'Reviews', 'action' => 'sendToReviewAgain', $thesisTopic->id], true) ?>',

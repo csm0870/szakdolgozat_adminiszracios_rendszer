@@ -158,8 +158,10 @@ class ReviewsController extends AppController
         if(empty($thesisTopic)){ //Nem létezik a téma
             $error_msg = __('Bírálatra küldés nem lehetséges.') . ' ' . __('Nem létező dolgozat.');
             $ok = false;
-        }elseif($thesisTopic->thesis_topic_status_id != \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview')){ //Nem "Bírálat alatt" státuszban van
-            $error_msg = __('Bírálatra küldés nem lehetséges.') . ' ' . __('A dolgozat nem bírálat alatt van.');
+        }elseif(!in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'),
+                                                                 \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')])){ //Nem "Bírálat alatt", "Bírálva", vagy "Dolgozat elfogadva" státuszban van
+            $error_msg = __('Bírálatra küldés nem lehetséges.') . ' ' . __('A dolgozat nincs abban az állapotban.');
             $ok = false;
         }
         
@@ -233,57 +235,92 @@ class ReviewsController extends AppController
                                     $saved_ok = false;
                                 }
                             }
-
+                            
                             if($saved_ok === true){
-                                $this->Flash->success(__('Bírálatra küldve.'));
-                                
-                                //Értesítés a megfelelő usereknek
-                                $this->loadModel('Notifications');
-                                
-                                $this->loadModel('Students');
-                                $student = $this->Students->find('all', ['conditions' => ['Students.id' => $thesisTopic->student_id],
-                                                                         'contain' => ['Users']])->first();
-                                if(!empty($student) && $student->has('user')){
+                                $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.UnderReview'); //Bírálat alatt
+                                if($this->Reviews->ThesisTopics->save($thesisTopic)){
+                                    $this->Flash->success(__('Bírálatra küldve.'));
+                                    //Értesítés a megfelelő usereknek
+                                    $this->loadModel('Notifications');
+
+                                    $this->loadModel('Students');
+                                    $student = $this->Students->find('all', ['conditions' => ['Students.id' => $thesisTopic->student_id],
+                                                                             'contain' => ['Users']])->first();
+                                    if(!empty($student) && $student->has('user')){
+                                        $notification = $this->Notifications->newEntity();
+                                        $notification->user_id = $student->user_id;
+                                        $notification->unread = true;
+                                        $notification->subject = 'A leadott ' . ($thesisTopic->is_thesis === true ? 'szakdolgozata' : 'diplomamunkája') . ' újra bírálatra lett küldve.';
+                                        $notification->message = 'A ' . h($thesisTopic->title) . ' című ' . ($thesisTopic->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' bírálatra lett küldve. A bírálat után megtekintheti a bírálatot.' . '<br/>' .
+                                                                 '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id, 'prefix' => 'student'], true) . '">' . 'Részletek megtekintése' . '</a>';
+
+                                        $this->Notifications->save($notification);
+                                    }
+
+                                    $this->loadModel('InternalConsultants');
+                                    $internalConsultant = $this->InternalConsultants->find('all', ['conditions' => ['InternalConsultants.id' => $thesisTopic->internal_consultant_id],
+                                                                                                   'contain' => ['Users']])->first();
+                                    if(!empty($internalConsultant) && $internalConsultant->has('user')){
+                                        $notification = $this->Notifications->newEntity();
+                                        $notification->user_id = $internalConsultant->user_id;
+                                        $notification->unread = true;
+                                        $notification->subject = 'Egy Önhöz tartozó ' . ($thesisTopic->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' újra bírálatra lett küldve.';
+                                        $notification->message = 'A téma címe: ' . h($thesisTopic->title) . '<br/>' .
+                                                                 'Hallgató: ' . (empty($student) ? '' : (h($student->name) . ' (' . h($student->neptun) . ')')) . '<br/>' .
+                                                                 'A bírálat után a bírálatot megtekintheti.' . '<br/>' .
+                                                                 '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id, 'prefix' => 'internal_consultant'], true) . '">' . 'Részletek megtekintése' . '</a>';
+
+                                        $this->Notifications->save($notification);
+                                    }
+                                    
+                                    if(!empty($student) && !empty($internalConsultant)){
+                                        //Tanszékvezetők, itt ha a belső konzulens egy tanszékhez tartozna, akkor annak a tanszékvezetője kapná csak az értesítést
+                                        $head_of_departments = $this->Reviews->ThesisTopics->Students->Users->find('all', ['conditions' => ['group_id' => 3]]);
+
+                                        foreach($head_of_departments as $head_of_department){
+                                            $notification = $this->Notifications->newEntity();
+                                            $notification->user_id = $head_of_department->id;
+                                            $notification->unread = true;
+                                            $notification->subject = 'Egy leadott ' . ($thesisTopic->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' újra bírálatra lett küldve.';
+                                            $notification->message = 'Hallgató: ' . h($student->name) . ' (' . h($student->neptun) . ')<br/>' .
+                                                                     'Téma címe: ' . h($thesisTopic->title) . '<br/>' .
+                                                                     'Belső konzulens: ' . h($internalConsultant->name) . '<br/>' .
+                                                                     '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id, 'prefix' => 'head_of_department'], true) . '">' . 'Részletek megtekintése' . '</a>';
+
+                                            $this->Notifications->save($notification);
+                                        }
+                                    }
+
+                                    $this->loadModel('Languages');
+                                    $language = $this->Languages->find('all', ['conditions' => ['Languages.id' => $thesisTopic->language_id]])->first();
+
                                     $notification = $this->Notifications->newEntity();
-                                    $notification->user_id = $student->user_id;
+                                    $notification->user_id = $reviewer->has('user') ? $reviewer->user->id : $reviewer_user->id;
                                     $notification->unread = true;
-                                    $notification->subject = 'A leadott ' . ($thesisTopic->is_thesis === true ? 'szakdolgozata' : 'diplomamunkája') . ' újra bírálatra lett küldve.';
-                                    $notification->message = 'A ' . h($thesisTopic->title) . ' című ' . ($thesisTopic->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . ' bírálatra lett küldve. A bírálat után megtekintheti a bírálatot.' . '<br/>' .
-                                                             '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id, 'prefix' => 'student'], true) . '">' . 'Részletek megtekintése' . '</a>';
+                                    $notification->subject = 'Egy ' . ($thesisTopic->is_thesis === true ? 'szakdolgozathoz' : 'diplomamunkáhpz') . ' Önt jelölték ki bírálónak.';
+                                    $notification->message = 'Dolgozat címe: ' . h($thesisTopic->title) . '<br/>' .
+                                                             'Titkos: ' . ($thesisTopic->confidential === true ? 'igen' : 'nem') . '<br/>' .
+                                                             (!empty($language) ? 'Nyelv: ' . h($language->name) . '<br/>' : '') .
+                                                             '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id, 'prefix' => 'reviewer'], true) . '">' . 'Részletek megtekintése' . '</a>';
 
                                     $this->Notifications->save($notification);
+                                }else{
+                                    $saved = false;
+                                    $error_ajax = __('Dolgozat állapotának megváltoztása sikertelen. Próbálja újra!');
+
+                                    $errors = $reviewer_user->getErrors();
+                                    if(!empty($errors)){
+                                        foreach($errors as $error){
+                                            if(is_array($error)){
+                                                foreach($error as $err){
+                                                    $error_ajax.= '<br/>' . $err;
+                                                }
+                                            }else{
+                                                $error_ajax.= '<br/>' . $error;
+                                            }
+                                        }
+                                    }
                                 }
-                                
-                                $this->loadModel('InternalConsultants');
-                                $internalConsultant = $this->InternalConsultants->find('all', ['conditions' => ['InternalConsultants.id' => $thesisTopic->internal_consultant_id],
-                                                                                               'contain' => ['Users']])->first();
-                                if(!empty($internalConsultant) && $internalConsultant->has('user')){
-                                    $notification = $this->Notifications->newEntity();
-                                    $notification->user_id = $internalConsultant->user_id;
-                                    $notification->unread = true;
-                                    $notification->subject = 'Egy Önhöz tartozó ' . ($thesisTopic->is_thesis === true ? 'szakdolgozat' : 'diplomamunka') . 'újra bírálatra lett küldve.';
-                                    $notification->message = 'A téma címe: ' . h($thesisTopic->title) . '<br/>' .
-                                                             'Hallgató: ' . (empty($student) ? '' : (h($student->name) . ' (' . h($student->neptun) . ')')) . '<br/>' .
-                                                             'A bírálat után a bírálatot megtekintheti.' . '<br/>' .
-                                                             '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id, 'prefix' => 'internal_consultant'], true) . '">' . 'Részletek megtekintése' . '</a>';
-
-                                    $this->Notifications->save($notification);
-                                }
-
-                                $this->loadModel('Languages');
-                                $language = $this->Languages->find('all', ['conditions' => ['Languages.id' => $thesisTopic->language_id]])->first();
-
-                                $notification = $this->Notifications->newEntity();
-                                $notification->user_id = $reviewer->has('user') ? $reviewer->user->id : $reviewer_user->id;
-                                $notification->unread = true;
-                                $notification->subject = 'Egy ' . ($thesisTopic->is_thesis === true ? 'szakdolgozathoz' : 'diplomamunkáhpz') . ' Önt jelölték ki bírálónak.';
-                                $notification->message = 'Dolgozat címe: ' . h($thesisTopic->title) . '<br/>' .
-                                                         'Titkos: ' . ($thesisTopic->confidential === true ? 'igen' : 'nem') . '<br/>' .
-                                                         (!empty($language) ? 'Nyelv: ' . h($language->name) . '<br/>' : '') .
-                                                         '<a href="' . \Cake\Routing\Router::url(['controller' => 'ThesisTopics', 'action' => 'details', $thesisTopic->id, 'prefix' => 'reviewer'], true) . '">' . 'Részletek megtekintése' . '</a>';
-
-                                $this->Notifications->save($notification);
-                                
                             }else{
                                 $saved = false;
                                 $error_ajax = __('Bírálói felhasználó mentése sikertelen. Próbálja újra!');
