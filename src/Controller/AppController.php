@@ -88,7 +88,7 @@ class AppController extends Controller
         
         //Layout beállítása, ha a listában lévő controllerek hívják meg vagy az admin a Users controllert
         if(in_array($this->getRequest()->getParam('controller'), ['Information', 'ThesisTopics', 'Students', 'Consultations', 'ConsultationOccasions', 'FinalExamSubjects', 'Reviewers',
-                                                                  'OfferedTopics', 'Reviews', 'Notifications', 'InternalConsultants']) ||
+                                                                  'OfferedTopics', 'Reviews', 'Notifications', 'InternalConsultants', 'Documents', 'Departments', 'CourseLevels', 'CourseTypes']) ||
            ($this->getRequest()->getParam('controller') == 'Users' && $this->getRequest()->getParam('prefix') == 'admin')){
             $this->viewBuilder()->setLayout('logged_in_page');
         }

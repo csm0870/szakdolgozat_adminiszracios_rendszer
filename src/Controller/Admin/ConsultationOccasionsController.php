@@ -15,7 +15,7 @@ class ConsultationOccasionsController extends AppController
 
     public function beforeFilter(\Cake\Event\Event $event) {
         parent::beforeFilter($event);
-        if($this->getRequest()->getParam('action') != 'index') $this->viewBuilder()->setLayout(false);
+        if(in_array($this->getRequest()->getParam('action'), ['add', 'edit'])) $this->viewBuilder()->setLayout(false);
     }
     
     /**
@@ -62,8 +62,6 @@ class ConsultationOccasionsController extends AppController
     
     /**
      * Konzultációs alkalom hozzáadása
-     *
-     * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
      */
     public function add($consultation_id = null){
         $this->getRequest()->allowMethod('ajax');
@@ -121,8 +119,8 @@ class ConsultationOccasionsController extends AppController
         
         $consultationOccasion = $this->ConsultationOccasions->newEntity();
         $consultationOccasion->consultation_id = $consultation->id;
-        if($this->request->is('post')){
-            $consultationOccasion = $this->ConsultationOccasions->patchEntity($consultationOccasion, $this->request->getData());
+        if($this->getRequest()->is('post')){
+            $consultationOccasion = $this->ConsultationOccasions->patchEntity($consultationOccasion, $this->getRequest()->getData());
             if($this->ConsultationOccasions->save($consultationOccasion)){
                 $this->Flash->success(__('Mentés sikeres!'));
             }else{
@@ -151,9 +149,7 @@ class ConsultationOccasionsController extends AppController
     /**
      * Konzultációs alkalom szerkesztése
      *
-     * @param string|null $id Consultation Occasion id.
-     * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @param string|null $id Konzultációs alkalom egyedi aznosítója
      */
     public function edit($id = null){
         $this->getRequest()->allowMethod('ajax');
@@ -208,8 +204,8 @@ class ConsultationOccasionsController extends AppController
         
         $saved = true;
         $error_ajax = "";
-        if($this->request->is(['patch', 'post', 'put'])){
-            $consultationOccasion = $this->ConsultationOccasions->patchEntity($consultationOccasion, $this->request->getData());
+        if($this->getRequest()->is(['patch', 'post', 'put'])){
+            $consultationOccasion = $this->ConsultationOccasions->patchEntity($consultationOccasion, $this->getRequest()->getData());
             if($this->ConsultationOccasions->save($consultationOccasion)) {
                 $this->Flash->success(__('Mentés sikeres!'));
             }else{
@@ -238,9 +234,7 @@ class ConsultationOccasionsController extends AppController
     /**
      * Konzultációs alkalom törlése
      *
-     * @param string|null $id Consultation Occasion id.
-     * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @param string|null $id Konzultációs alkalom egyedi aznosítója
      */
     public function delete($id = null){
         $this->request->allowMethod(['post', 'delete']);

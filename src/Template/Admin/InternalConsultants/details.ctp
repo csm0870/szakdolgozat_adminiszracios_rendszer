@@ -17,7 +17,7 @@
                             <strong><?= __('Pozició') . ': ' ?></strong><?= $internalConsultant->has('internal_consultant_position') ? h($internalConsultant->internal_consultant_position->name) : '' ?>
                         </p>
                         <p class="mb-1">
-                            <strong><?= __('Tanszék') . ': ' ?></strong><?= $internalConsultant->has('department') ? h($internalConsultant->department->name) : '' ?>
+                            <strong><?= __('Tanszék') . ': ' ?></strong><?= $internalConsultant->has('department') ? h($internalConsultant->department->name) : __('nincs tanszékhez rendelve') ?>
                         </p>
                     </fieldset>
                     <fieldset class="border-1-grey p-3 mb-3">

@@ -38,7 +38,7 @@ class DocumentsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
-        $this->addBehavior('Josegonzalez/Upload.Upload', ['confidentiality_contract' => ['path' =>'files{DS}documents{DS}']]);
+        $this->addBehavior('Josegonzalez/Upload.Upload', ['file' => ['path' =>'files{DS}documents{DS}']]);
     }
 
     /**

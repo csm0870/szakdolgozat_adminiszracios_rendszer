@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-12 text-center page-title">
             <h4>
-                <?= __('Kiírt témák kezelése') ?><br/>
+                <?= __('Kiírt témák') ?><br/>
                 <?php if(!empty($information) && !empty($information->filling_in_topic_form_begin_date) && !empty($information->filling_in_topic_form_end_date)){ ?>
                     <small class="text-muted">
                         <?= __('Témaleadási időszak') . ': ' .
@@ -49,7 +49,7 @@
                                                         if($offeredTopic->thesis_topic->has('thesis_topic_status')) echo h($offeredTopic->thesis_topic->thesis_topic_status->name);
                                                         echo '<br/>' . $this->Html->link(__('Részletek') . '&nbsp;->', ['controller' => 'OfferedTopics', 'action' => 'details', $offeredTopic->id], ['escape' => false]);
                                                     }else{
-                                                        echo __('A témafoglalás lezárult.') . ' ' . __('A részleteket a leadott témák menüpont alatt találja meg.');
+                                                        echo __('A témafoglalás lezárult.') . ' ' . __('A részleteket a Témák kezelése->Témaengedélyezők menüpont alatt találja meg.');
                                                     }
                                                 }else echo __('Nincs jelentkezett hallgató');
                                                 echo '</searchable-text>';

@@ -2,7 +2,7 @@
     <div class="container">
         <div class="row">
             <div class="col-12 text-center group-name">
-                <?= $group_name . '&nbsp;' . __('belépés') ?>
+                <?= $login_text ?>
             </div>
 
             <div class="col-12 col-sm-6 offset-sm-3 col-xl-4 offset-xl-4">

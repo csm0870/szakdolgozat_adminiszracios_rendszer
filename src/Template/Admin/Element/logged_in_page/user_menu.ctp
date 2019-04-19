@@ -8,8 +8,8 @@
                         <?= __('Témák kezelése') ?>
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" id="thesis_topics_index_menu_item" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'index']) ?>"><?= __('Témaengedélyezők listája') ?></a>
-                        <a class="dropdown-item" id="offered_topics_index_menu_item" href="<?= $this->Url->build(['controller' => 'OfferedTopics', 'action' => 'index']) ?>"><?= __('Kiírt témák listája') ?></a>
+                        <a class="dropdown-item" id="thesis_topics_index_menu_item" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'index']) ?>"><?= __('Témaengedélyezők') ?></a>
+                        <a class="dropdown-item" id="offered_topics_index_menu_item" href="<?= $this->Url->build(['controller' => 'OfferedTopics', 'action' => 'index']) ?>"><?= __('Kiírt témák') ?></a>
                         <a class="dropdown-item" id="thesis_topics_statistics" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'statistics']) ?>"><?= __('Téma kimutatások') ?></a>
                         <a class="dropdown-item" id="thesis_topics_exports" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'exports']) ?>"><?= __('Téma adatok exportálása') ?></a>
                     </div>
@@ -31,6 +31,17 @@
                         <a class="dropdown-item" id="internal_consultants_index_menu_item" href="<?= $this->Url->build(['controller' => 'InternalConsultants', 'action' => 'index']) ?>"><?= __('Belső konzulensek') ?></a>
                         <a class="dropdown-item" id="reviewers_index_menu_item" href="<?= $this->Url->build(['controller' => 'Reviewers', 'action' => 'index']) ?>"><?= __('Bírálók') ?></a>
                         <a class="dropdown-item" id="user_accounts_index_menu_item" href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'index']) ?>"><?= __('Felhasználói fiókok') ?></a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown" id="others_menu_item">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <?= __('Egyéb adatok kezelése') ?>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" id="documents_index_menu_item" href="<?= $this->Url->build(['controller' => 'Documents', 'action' => 'index']) ?>"><?= __('Dokumentumok') ?></a>
+                        <a class="dropdown-item" id="departments_index_menu_item" href="<?= $this->Url->build(['controller' => 'Departments', 'action' => 'index']) ?>"><?= __('Tanszékek') ?></a>
+                        <a class="dropdown-item" id="course_types_index_menu_item" href="<?= $this->Url->build(['controller' => 'CourseTypes', 'action' => 'index']) ?>"><?= __('Képzéstípusok') ?></a>
+                        <a class="dropdown-item" id="course_levels_index_menu_item" href="<?= $this->Url->build(['controller' => 'CourseLevels', 'action' => 'index']) ?>"><?= __('Képzésszintek') ?></a>
                     </div>
                 </li>
             </ul>

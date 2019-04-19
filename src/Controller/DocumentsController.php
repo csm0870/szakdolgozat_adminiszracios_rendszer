@@ -16,7 +16,7 @@ class DocumentsController extends AppController
     /**
      * Fájl letöltése
      * 
-     * @param type $document_id Dokument aznosója
+     * @param type $document_id Dokumentum azonosója
      */
     public function downloadFile($document_id = null){
         $document = $this->Documents->find('all', ['conditions' => ['id' => $document_id]])->first();
@@ -44,7 +44,7 @@ class DocumentsController extends AppController
         
         if(empty($document) || empty($document->file)){
             $this->Flash->error(__('Fájl nem létezik.'));
-            return $this->redirect(['controller' => 'Pages', 'action' => 'dashboard', 'prefix' => $prefix]);
+            return $this->redirect($this->referer(null, true));
         }
         
         $response = $this->getResponse()->withFile(ROOT . DS . 'files' . DS . 'documents' . DS . $document->file,

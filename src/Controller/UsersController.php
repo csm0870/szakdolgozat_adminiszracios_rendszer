@@ -124,11 +124,11 @@ class UsersController extends AppController
             return $this->redirect(['controller' => 'Pages', 'action' => 'home']);
         }
         
-        $group_name = "";
-        if($group_type == 1) $group_name = __('Hallgatói');
-        elseif($group_type == 2) $group_name = __('Oktatói');
+        $login_text = "";
+        if($group_type == 1) $login_text = __('Hallgatói belépés');
+        elseif($group_type == 2) $login_text = 'Belépés';
         
-        $this->set(compact('group_name'));
+        $this->set(compact('login_text'));
         
         $this->_doLogin($group_type);
     }

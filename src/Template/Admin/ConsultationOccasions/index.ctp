@@ -1,4 +1,4 @@
-<div class="container internalConsultant-consultationOccasions-index">
+<div class="container admin-consultationOccasions-index">
     <div class="row">
         <div class="col-12 text-center page-title">
             <?= $this->Html->link('<i class="fas fa-arrow-alt-circle-left fa-lg"></i>' . '&nbsp;' . __('Vissza'), ['controller' => 'Consultations', 'action' => 'index', $thesisTopic->id], ['escape' => false, 'class' => 'backBtn float-left border-radius-45px', 'title' => __('Vissza')]) ?>
@@ -37,7 +37,7 @@
                                                 }
                                             ?>
                                         </td>
-                                        <td><?= empty($consultationOccasion->created) ? '' : ('<searchable-text>' . $this->Time->format($consultationOccasion->created, 'yyyy-MM-dd HH:mm:ss') . '</searchable-text>')?></td>
+                                        <td><?= empty($consultationOccasion->created) ? '' : ('<searchable-text>' . $this->Time->format($consultationOccasion->created, 'yyyy-MM-dd HH:mm:ss') . '</searchable-text>') ?></td>
                                     </tr>
                                 <?php } ?>
                             <tbody>
@@ -84,58 +84,58 @@
         $('#topics_menu_item').addClass('active');
         $('#thesis_topics_index_menu_item').addClass('active');
         <?php if($consultation->accepted === null && $consultation->current === true){ //Még nincs véglegesítve a konzultációs csoport és a jelenlegi szakdolgozathoz tartozik ?>
-        //Tartalom lekeérése a hozzáadáshoz
-        $.ajax({
+            //Tartalom lekeérése a hozzáadáshoz
+            $.ajax({
                 url: '<?= $this->Url->build(['controller' => 'ConsultationOccasions', 'action' => 'add', $consultation->id]) ?>',
                 cache: false
-        })
-        .done(function(response) {
-            $('#consultationOccasion-add').html(response.content);
-        });
-        
-        //Konzultációs alkalom hozzáadása popup megnyitása
-        $('.add-new-consultationOccasion').on('click', function(e){
-            e.preventDefault();
-            $('#consultationOccasionAddModal').modal('show');
-        });
-        
-        //Konzultációs alkalom szerkesztése
-        $('.editBtn').on('click', function(e){
-            e.preventDefault();
-            
-            var id = $(this).data('id');
-            
-            //Szerkesztési oldal lekérése
-            $.ajax({
-                    url: '<?= $this->Url->build(['action' => 'edit'], true) ?>' + '/' + id,
-                    cache: false
             })
-            .done(function( response ) {
-                    $('#consultationOccasion-edit').html(response.content);
-                    $('#consultationOccasionEditModal').modal('show');
+            .done(function(response) {
+                $('#consultationOccasion-add').html(response.content);
             });
-        });
-        
-        
-        //Törléskor confirmation modal a megerősítésre
-        $('.internalConsultant-consultationOccasions-index .deleteBtn').on('click', function(e){
-            e.preventDefault();
-            
-            $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan törlöd?') ?>');
-            $('#confirmationModal .msg').text('<?= __('Konzultációs alkalom törlése.') ?>');
-            $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Törlés') ?>').css('background-color', 'red');
-            //Save gomb eventjeinek resetelése cserével
-            $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-                        
-            $('#confirmationModal').modal('show');
-            
-            var id = $(this).data('id');
-            $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
+
+            //Konzultációs alkalom hozzáadása popup megnyitása
+            $('.add-new-consultationOccasion').on('click', function(e){
                 e.preventDefault();
-                $('#confirmationModal').modal('hide');
-                $('#deleteConsultationOccasion_' + id).trigger('click');
+                $('#consultationOccasionAddModal').modal('show');
             });
-        });
+
+            //Konzultációs alkalom szerkesztése
+            $('.editBtn').on('click', function(e){
+                e.preventDefault();
+
+                var id = $(this).data('id');
+
+                //Szerkesztési oldal lekérése
+                $.ajax({
+                        url: '<?= $this->Url->build(['action' => 'edit'], true) ?>' + '/' + id,
+                        cache: false
+                })
+                .done(function( response ) {
+                        $('#consultationOccasion-edit').html(response.content);
+                        $('#consultationOccasionEditModal').modal('show');
+                });
+            });
+
+
+            //Törléskor confirmation modal a megerősítésre
+            $('.admin-consultationOccasions-index .deleteBtn').on('click', function(e){
+                e.preventDefault();
+
+                $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan törlöd?') ?>');
+                $('#confirmationModal .msg').text('<?= __('Konzultációs alkalom törlése.') ?>');
+                $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Törlés') ?>').css('background-color', 'red');
+                //Save gomb eventjeinek resetelése cserével
+                $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
+
+                $('#confirmationModal').modal('show');
+
+                var id = $(this).data('id');
+                $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
+                    e.preventDefault();
+                    $('#confirmationModal').modal('hide');
+                    $('#deleteConsultationOccasion_' + id).trigger('click');
+                });
+            });
         <?php } ?>
         
         // DataTable
