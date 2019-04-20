@@ -32,6 +32,8 @@ class GroupsTable extends Table
     public function initialize(array $config)
     {
         parent::initialize($config);
+        
+        $this->addBehavior('Acl.Acl', ['type' => 'requester']);
 
         $this->setTable('groups');
         $this->setDisplayField('name');

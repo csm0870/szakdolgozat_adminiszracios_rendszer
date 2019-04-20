@@ -2,6 +2,7 @@
 $baseDir = dirname(dirname(__FILE__));
 return [
     'plugins' => [
+        'Acl' => $baseDir . '/vendor/cakephp/acl/',
         'Ajax' => $baseDir . '/vendor/dereuromark/cakephp-ajax/',
         'Bake' => $baseDir . '/vendor/cakephp/bake/',
         'CakePdf' => $baseDir . '/vendor/friendsofcake/cakepdf/',

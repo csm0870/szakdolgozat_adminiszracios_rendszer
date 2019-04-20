@@ -119,6 +119,7 @@ class ComposerStaticInit4267271a2c1965b05732744859498c97
             'App\\' => 4,
             'Ajgl\\Twig\\Extension\\' => 20,
             'Ajax\\' => 5,
+            'Acl\\' => 4,
         ),
     );
 
@@ -338,6 +339,10 @@ class ComposerStaticInit4267271a2c1965b05732744859498c97
         'Ajax\\' => 
         array (
             0 => __DIR__ . '/..' . '/dereuromark/cakephp-ajax/src',
+        ),
+        'Acl\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/cakephp/acl/src',
         ),
     );
 

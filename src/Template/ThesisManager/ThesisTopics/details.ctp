@@ -197,7 +197,7 @@
                                     ?>
                                 </ul>
                                 <div>
-                                    <?= $this->Html->link(__('Mellékletek letöltése ZIP-ben'), ['controller' => 'ThesisSupplements', 'action' => 'downloadSupplementInZip', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px' ,'target' => '_blank']) ?>
+                                    <?= $this->Html->link(__('Mellékletek letöltése ZIP-ben'), ['controller' => 'ThesisSupplements', 'action' => 'downloadSupplementsInZip', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px' ,'target' => '_blank']) ?>
                                 </div>
                             </div>
                         </div>

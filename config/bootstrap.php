@@ -201,5 +201,6 @@ Type::build('timestamp')
 Plugin::load('CakePdf', ['bootstrap' => true]);
 Plugin::load('CsvView', ['routes' => true]);
 Plugin::load('Josegonzalez/Upload');
+Plugin::load('Acl', ['bootstrap' => true]);
 
 Configure::load('ThesisTopicStatuses');

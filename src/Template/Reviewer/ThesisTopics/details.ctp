@@ -83,7 +83,7 @@
                                         ?>
                                     </ul>
                                     <div>
-                                        <?= $this->Html->link(__('Mellékletek letöltése ZIP-ben'), ['controller' => 'ThesisSupplements', 'action' => 'downloadSupplementInZip', $thesisTopic->id], ['class' => 'btn btn-info border-radius-45px' ,'target' => '_blank']) ?>
+                                        <?= $this->Html->link(__('Mellékletek letöltése ZIP-ben'), ['controller' => 'ThesisSupplements', 'action' => 'downloadSupplementsInZip', $thesisTopic->id], ['class' => 'btn btn-info border-radius-45px' ,'target' => '_blank']) ?>
                                     </div>
                                     <?php }else{ ?>
                                         <p>

@@ -51,7 +51,7 @@ class ThesisSupplementsController extends AppController
      * @param type $thesis_topic_id
      * @return type
      */
-    public function downloadSupplementInZip($thesis_topic_id = null){
+    public function downloadSupplementsInZip($thesis_topic_id = null){
         $this->loadModel('Users');
         $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         

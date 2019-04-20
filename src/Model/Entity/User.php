@@ -56,10 +56,26 @@ class User extends Entity
         'password'
     ];
     
-    protected function _setPassword($password)
-    {
-        if (strlen($password) > 0) {
-          return (new DefaultPasswordHasher)->hash($password);
+    protected function _setPassword($password){
+        if(strlen($password) > 0){
+            return (new DefaultPasswordHasher)->hash($password);
         }
+    }
+    
+    public function parentNode(){
+        if(!$this->id){
+            return null;
+        }
+        if(isset($this->group_id)){
+            $groupId = $this->group_id;
+        }else{
+            $Users = \Cake\ORM\TableRegistry::get('Users');
+            $user = $Users->find('all', ['fields' => ['group_id']])->where(['id' => $this->id])->first();
+            $groupId = $user->group_id;
+        }
+        if(!$groupId){
+            return null;
+        }
+        return ['Groups' => ['id' => $groupId]];
     }
 }

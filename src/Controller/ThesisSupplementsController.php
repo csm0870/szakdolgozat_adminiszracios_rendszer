@@ -64,7 +64,7 @@ class ThesisSupplementsController extends AppController
      * @param type $thesis_topic_id
      * @return type
      */
-    public function downloadSupplementInZip($thesis_topic_id = null){
+    public function downloadSupplementsInZip($thesis_topic_id = null){
         $thesisTopic = $this->ThesisSupplements->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $thesis_topic_id, 'ThesisTopics.deleted !=' => true],
                                                                             'contain' => ['ThesisSupplements', 'Students']])->first();
         
@@ -92,7 +92,7 @@ class ThesisSupplementsController extends AppController
         $ok = true;
         if(empty($thesisTopic)){
             $ok = false;
-            $this->Flash->error(__('A dolgozat mellékletek nem elérhetőek.') . ' ' . __('A dolgozat nem létezik.'));
+            $this->Flash->error(__('A dolgozat mellékletei nem elérhetőek.') . ' ' . __('A dolgozat nem létezik.'));
         }
         
         if($ok === false) return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index', 'prefix' => $prefix]);
@@ -109,7 +109,7 @@ class ThesisSupplementsController extends AppController
         }
         
         if($i < 1){//Ha nem volt melléklet
-            $this->Flash->error(__('A dolgozat mellékletek nem elérhezőek.') . ' ' . __('A dolgozathoz nem tartoznak mellékletek.'));
+            $this->Flash->error(__('A dolgozat mellékletei nem elérhezőek.') . ' ' . __('A dolgozathoz nem tartoznak mellékletek.'));
             return $this->redirect(['controller' => 'ThesisTopics', 'action' => 'index', 'prefix' => $prefix]);            
         }
 

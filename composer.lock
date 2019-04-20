@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a0cda96527405264a374761288910617",
+    "content-hash": "b9ec1003e01edb03a0e053d7fc1391c3",
     "packages": [
         {
             "name": "aura/intl",
@@ -51,6 +51,52 @@
                 "localization"
             ],
             "time": "2017-01-20T05:00:11+00:00"
+        },
+        {
+            "name": "cakephp/acl",
+            "version": "0.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cakephp/acl.git",
+                "reference": "1a18f78de7200364559a5eb0f9c0ffc613c44d45"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cakephp/acl/zipball/1a18f78de7200364559a5eb0f9c0ffc613c44d45",
+                "reference": "1a18f78de7200364559a5eb0f9c0ffc613c44d45",
+                "shasum": ""
+            },
+            "require": {
+                "cakephp/cakephp": "^3.6.0",
+                "cakephp/plugin-installer": "*"
+            },
+            "require-dev": {
+                "cakephp/cakephp-codesniffer": "^3.0",
+                "phpunit/phpunit": "^5.7.14|^6.0"
+            },
+            "type": "cakephp-plugin",
+            "autoload": {
+                "psr-4": {
+                    "Acl\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "CakePHP Community",
+                    "homepage": "https://github.com/cakephp/acl/graphs/contributors"
+                }
+            ],
+            "description": "Acl Plugin for CakePHP 3.x framework",
+            "homepage": "http://cakephp.org",
+            "keywords": [
+                "acl",
+                "cakephp"
+            ],
+            "time": "2019-04-03T17:58:06+00:00"
         },
         {
             "name": "cakephp/cakephp",

@@ -27,4 +27,8 @@ class Group extends Entity
         'name' => true,
         'users' => true
     ];
+    
+    public function parentNode(){
+        return null;
+    }
 }

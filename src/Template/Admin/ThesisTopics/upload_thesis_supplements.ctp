@@ -33,7 +33,7 @@
                         foreach($thesisTopic->thesis_supplements as $supplement){
                             if(!empty($supplement->file)){ 
                                 echo '<p class="mb-0">' .
-                                        $this->Html->link($supplement->file, ['controller' => 'ThesisSupplements', 'action' => 'downloadFile', $supplement->id], ['target' => '_blank']) .
+                                        $this->Html->link($supplement->file, ['controller' => 'ThesisSupplements', 'action' => 'downloadFile', $supplement->id, 'prefix' => false], ['target' => '_blank']) .
                                         '&nbsp;&nbsp;' . $this->Html->link(__('<i class="fas fa-trash"></i>'), '#', ['class' => 'deleteThesisSupplement', 'style' => 'color: red', 'escape' => false, 'data-id' => $supplement->id, 'title' => __('Törlés')]) .
                                      '</p>';
                             }

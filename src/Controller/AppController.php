@@ -27,6 +27,11 @@ use Cake\Event\Event;
  */
 class AppController extends Controller
 {
+    public $components = [
+        'Acl' => [
+            'className' => 'Acl.Acl'
+        ]
+    ];
 
     /**
      * Initialization hook method.
@@ -46,8 +51,9 @@ class AppController extends Controller
         ]);
         $this->loadComponent('Flash');
         
-        $this->loadComponent('Auth',
-                    ['loginAction' => [
+        $this->loadComponent('Auth',[
+                    'authorize' => ['Acl.Actions' => ['actionPath' => 'controllers/']],
+                    'loginAction' => [
                                         'controller' => 'Users',
                                         'action' => 'login',
                                         'prefix' => false
@@ -67,7 +73,7 @@ class AppController extends Controller
                                         'action' => 'home',
                                         'prefix' => false],
                     'storage' => 'Session']);
-
+        
         /*
          * Enable the following component for recommended CakePHP security settings.
          * see https://book.cakephp.org/3.0/en/controllers/components/security.html
@@ -75,7 +81,7 @@ class AppController extends Controller
         //$this->loadComponent('Security');
     }
     
-    public function beforeFilter(Event $event) {
+    public function beforeFilter(Event $event){
         parent::beforeFilter($event);
         
         //Ha nincs belépett user és olyan oldalra történne a kérés, amihez autentikáció kell, akkor a főoldalra dobjuk
@@ -84,6 +90,11 @@ class AppController extends Controller
              ($this->getRequest()->getParam('controller') == 'Users' && $this->getRequest()->getParam('action') == "login") ||
              ($this->getRequest()->getParam('controller') == 'Install' && $this->getRequest()->getParam('action') == "install"))) {
             return $this->redirect(["controller" => "Pages", "action" => "home", 'prefix' => false]);
+        }
+        
+        //Ha van belépett felhasználó és admin, akkor átállítjuk a redirect URL-t
+        if($this->Auth->user("id") !== null && $this->Auth->user("group_id") == 1){
+            $this->Auth->setConfig('loginRedirect', ['controller' => 'ThesisTopics', 'action' => 'index', 'prefix' => 'admin']);
         }
         
         //Layout beállítása, ha a listában lévő controllerek hívják meg vagy az admin a Users controllert

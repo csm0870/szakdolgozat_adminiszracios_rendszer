@@ -133,7 +133,8 @@
                             if($student->final_exam_subjects_status == 2) //Elfogadásra várnak
                                 echo '<br/>' . $this->Html->link(__('Tárgyak elfogadása'), '#', ['class' => 'btn btn-primary finalizeFinalExamSubjectsBtn border-radius-45px mt-2']);
                             
-                            
+                            if($student->final_exam_subjects_status == 3) //El vannak fogadva
+                                echo '<br/>' . $this->Html->link(__('Záróvizsga-tárgy kérelem letöltése'), ['controller' => 'FinalExamSubjects', 'action' => 'exportDoc', $student->id, 'prefix' => false], ['target' => '_blank', 'class' => 'btn btn-primary border-radius-45px mt-2']);
                         ?>
                     </div>
                     <?= $this->Form->end() ?>

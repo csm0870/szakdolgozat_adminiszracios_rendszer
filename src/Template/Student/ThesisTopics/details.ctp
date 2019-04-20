@@ -156,7 +156,7 @@
                                     ?>
                                 </ul>
                                 <div>
-                                    <?= $this->Html->link(__('Mellékletek letöltése ZIP-ben'), ['controller' => 'ThesisSupplements', 'action' => 'downloadSupplementInZip', $thesisTopic->id], ['class' => 'btn btn-info border-radius-45px' ,'target' => '_blank']) ?>
+                                    <?= $this->Html->link(__('Mellékletek letöltése ZIP-ben'), ['controller' => 'ThesisSupplements', 'action' => 'downloadSupplementsInZip', $thesisTopic->id], ['class' => 'btn btn-info border-radius-45px' ,'target' => '_blank']) ?>
                                 </div>
                             </div>
                         </div>
@@ -196,7 +196,7 @@
                                                                         \Cake\Core\Configure::read('ThesisTopicStatuses.ProposalForAmendmentOfThesisTopicAddedByHeadOfDepartment')]))
                         echo $this->Html->link(__('Témaengedélyező PDF letöltése'), ['controller' => 'ThesisTopics', 'action' => 'exportPdf', $thesisTopic->id], ['class' => 'btn btn-info border-radius-45px mb-2', 'target' => '_blank']) . '<br/>';
 
-                    if($thesisTopic->confidential) echo $this->Html->link(__('Titkosítási kérelem letöltése'), ['controller' => 'ThesisTopics', 'action' => 'encyptionRegulationDoc', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px mb-2', 'target' => '_blank']) . '<br/>';
+                    if($thesisTopic->confidential === true) echo $this->Html->link(__('Titkosítási kérelem letöltése'), ['controller' => 'ThesisTopics', 'action' => 'encyptionRegulationDoc', $thesisTopic->id, 'prefix' => false], ['class' => 'btn btn-info border-radius-45px mb-2', 'target' => '_blank']) . '<br/>';
                 ?>
             </fieldset>
         </div>

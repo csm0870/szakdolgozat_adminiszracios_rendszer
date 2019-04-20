@@ -60,5 +60,6 @@ return array(
     'App\\' => array($baseDir . '/src'),
     'Ajgl\\Twig\\Extension\\' => array($vendorDir . '/ajgl/breakpoint-twig-extension/src'),
     'Ajax\\' => array($vendorDir . '/dereuromark/cakephp-ajax/src'),
+    'Acl\\' => array($vendorDir . '/cakephp/acl/src'),
     '' => array($vendorDir . '/asm89/twig-cache-extension/lib'),
 );
