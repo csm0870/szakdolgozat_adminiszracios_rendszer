@@ -92,14 +92,37 @@ class AppController extends Controller
             return $this->redirect(["controller" => "Pages", "action" => "home", 'prefix' => false]);
         }
         
-        //Ha van belépett felhasználó és admin, akkor átállítjuk a redirect URL-t
-        if($this->Auth->user("id") !== null && $this->Auth->user("group_id") == 1){
-            $this->Auth->setConfig('loginRedirect', ['controller' => 'ThesisTopics', 'action' => 'index', 'prefix' => 'admin']);
+        //Ha van belépett felhasználó, akkor átállítjuk a redirect URL-t
+        if($this->Auth->user("id") !== null){
+            $group_id = $this->Auth->user('group_id');
+            $prefix = '';
+            if($group_id == 1){
+                $prefix = 'admin';
+            }elseif($group_id == 2){
+                $prefix = 'internal_consultant';
+            }elseif($group_id == 3){
+                $prefix = 'head_of_department';
+            }elseif($group_id == 4){
+                $prefix = 'topic_manager';
+            }elseif($group_id == 5){
+                $prefix = 'thesis_manager';
+            }elseif($group_id == 6){
+                $prefix = 'student';
+            }elseif($group_id == 7){
+                $prefix = 'reviewer';
+            }elseif($group_id == 8){
+                $prefix = 'final_exam_organizer';
+            }
+            
+            if($group_id == 1)
+                $this->Auth->setConfig('loginRedirect', ['controller' => 'ThesisTopics', 'action' => 'index', 'prefix' => 'admin']);
+            else
+                $this->Auth->setConfig('loginRedirect', ['controller' => 'Notifications', 'action' => 'index', 'prefix' => $prefix]);
         }
         
         //Layout beállítása, ha a listában lévő controllerek hívják meg vagy az admin a Users controllert
         if(in_array($this->getRequest()->getParam('controller'), ['Information', 'ThesisTopics', 'Students', 'Consultations', 'ConsultationOccasions', 'FinalExamSubjects', 'Reviewers',
-                                                                  'OfferedTopics', 'Reviews', 'Notifications', 'InternalConsultants', 'Documents', 'Departments', 'CourseLevels', 'CourseTypes']) ||
+                                                                  'OfferedTopics', 'Reviews', 'Notifications', 'InternalConsultants', 'Documents', 'Departments', 'CourseLevels', 'CourseTypes', 'Years']) ||
            ($this->getRequest()->getParam('controller') == 'Users' && $this->getRequest()->getParam('prefix') == 'admin')){
             $this->viewBuilder()->setLayout('logged_in_page');
         }

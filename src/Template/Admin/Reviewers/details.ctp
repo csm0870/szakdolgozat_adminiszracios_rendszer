@@ -62,7 +62,7 @@
         $('#reviewers_index_menu_item').addClass('active');
         
         //Törléskor confirmation modal a megerősítésre
-        $('.admin-reviewer-details .delete-btn').on('click', function(e){
+        $('.admin-reviewers-details .delete-btn').on('click', function(e){
             e.preventDefault();
 
             $('#confirmationModal .header').text('<?= __('Biztosan törlöd?') ?>');

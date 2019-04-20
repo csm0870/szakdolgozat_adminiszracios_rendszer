@@ -56,8 +56,9 @@ class CourseTypesTable extends Table
 
         $validator
             ->scalar('name')
-            ->maxLength('name', 40)
-            ->allowEmpty('name');
+            ->maxLength('name', 40, __('A név maximum 40 karakter lehet.'))
+            ->requirePresence('name', 'create', __('Név megadása kötelező.'))
+            ->notEmpty('name', __('Név megadása kötelező.'));
 
         return $validator;
     }

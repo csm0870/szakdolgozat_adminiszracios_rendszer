@@ -42,6 +42,7 @@
                         <a class="dropdown-item" id="departments_index_menu_item" href="<?= $this->Url->build(['controller' => 'Departments', 'action' => 'index']) ?>"><?= __('Tanszékek') ?></a>
                         <a class="dropdown-item" id="course_types_index_menu_item" href="<?= $this->Url->build(['controller' => 'CourseTypes', 'action' => 'index']) ?>"><?= __('Képzéstípusok') ?></a>
                         <a class="dropdown-item" id="course_levels_index_menu_item" href="<?= $this->Url->build(['controller' => 'CourseLevels', 'action' => 'index']) ?>"><?= __('Képzésszintek') ?></a>
+                        <a class="dropdown-item" id="years_index_menu_item" href="<?= $this->Url->build(['controller' => 'Years', 'action' => 'index']) ?>"><?= __('Tanévek') ?></a>
                     </div>
                 </li>
             </ul>

@@ -56,13 +56,15 @@ class DepartmentsTable extends Table
 
         $validator
             ->scalar('name')
-            ->maxLength('name', 255)
-            ->allowEmpty('name');
+            ->maxLength('name', 255, __('A név maximum 255 karakter lehet.'))
+            ->requirePresence('name', 'create', __('Név megadása kötelező.'))
+            ->notEmpty('name', __('Név megadása kötelező.'));
 
         $validator
             ->scalar('head_of_department')
-            ->maxLength('head_of_department', 255)
-            ->allowEmpty('head_of_department');
+            ->maxLength('head_of_department', 255, __('A tanszékvezető neve maximum 255 karakter lehet.'))
+            ->requirePresence('head_of_department', 'create', __('Tanszékvezető megadása kötelező.'))
+            ->notEmpty('head_of_department', __('Tanszékvezető megadása kötelező.'));
 
         return $validator;
     }

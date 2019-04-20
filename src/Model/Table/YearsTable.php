@@ -67,8 +67,10 @@ class YearsTable extends Table
 
         $validator
             ->scalar('year')
-            ->maxLength('year', 8)
-            ->allowEmpty('year');
+            ->add('year', 'custom',['rule' => array('custom', '/[1-9][0-9]{3}\/[0-9]{1,2}/'),
+                                    'message' => __('Nem megfelelő a tanév formátuma.')])
+            ->requirePresence('year', 'create', __('Tanév megadása kötelező.'))
+            ->notEmpty('year', __('Tanév megadása kötelező.'));
 
         return $validator;
     }
