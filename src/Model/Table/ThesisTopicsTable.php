@@ -304,9 +304,11 @@ class ThesisTopicsTable extends Table
             $entity->handed_in_date = date('Y-m-d');
         }
         
-        //Ha a belső konzulens visszautasította a témát, és a kiírt témája volt
-        if($entity->getOriginal('thesis_topic_status_id') == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopic') &&
-           $entity->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByInternalConsultant')){
+        //Ha a belső konzulens vagy a témakezelő (külső konzulensi aláírás nem felelt meg) visszautasította a témát, és a kiírt témája volt
+        if(($entity->getOriginal('thesis_topic_status_id') == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopic') &&
+            $entity->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByInternalConsultant')) ||
+           ($entity->getOriginal('thesis_topic_status_id') == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingExternalConsultantSignatureOfThesisTopic') &&
+            $entity->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicRejectedByExternalConsultant'))){
             $offered_topic = $this->OfferedTopics->find('all', ['conditions' => ['id' => $entity->offered_topic_id]])->first();
             //Ha van hozzá témakiírás
             if(!empty($offered_topic)){
@@ -384,8 +386,6 @@ class ThesisTopicsTable extends Table
     
     /**
      * Mentés után callback
-     * 
-     * Itt majd az egyes állapotokból a másikba történő modosuláskor a különböző értékek resetelése kell, vagy akár emailek küldése iss
      * 
      * @param type $event
      * @param type $entity

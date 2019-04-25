@@ -62,7 +62,7 @@
             <?= $this->Form->control('confidential', ['label' => ['text' => __('Titkos')], 'templates' => ['nestingLabel' => '{{hidden}}<label{{attrs}}>{{text}}</label>&nbsp;{{input}}']]) ?>
             <?= $this->Form->control('is_thesis', ['class' => 'form-control', 'type' => 'select', 'empty' => false,
                                                    'options' => [__('Diplomamunka'), __('Szakdolgozat')], 'label' => ['text' => __('Típus')], 'value' => $thesisTopic->is_thesis === true ? 1 : 0]) ?>
-            <?= $this->Form->control('internal_consultant_id', ['class' => 'form-control', 'label' => ['text' => __('Belső konzulens'), 'options' => $internalConsultants]]) ?>
+            <?= $this->Form->control('internal_consultant_id', ['class' => 'form-control', 'label' => ['text' => __('Belső konzulens'), 'options' => $internalConsultants], 'disabled' => true]) ?>
             <?php
                 $value = $thesisTopic->cause_of_no_external_consultant === null ? 1 : 0;
             ?>

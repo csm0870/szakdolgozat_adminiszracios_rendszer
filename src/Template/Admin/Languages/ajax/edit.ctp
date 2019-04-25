@@ -1,7 +1,7 @@
-<div class="form-modal admin-courseTypes-add">
-    <?= $this->Form->create($courseType, ['id' => 'courseTypeAddForm']) ?>
+<div class="form-modal admin-language-edit">
+    <?= $this->Form->create($language, ['id' => 'languageEditForm']) ?>
     <div class="form-header text-center">
-        <?= __('Képzéstípus hozzáadása') ?>
+        <?= __('Nyelv szerkesztése') ?>
     </div>
     <div class="form-body">
         <table>
@@ -21,7 +21,7 @@
         <?= $this->Form->button(__('Mentés'), ['type' => 'button', 'role' => 'button', 'class' => 'btn btn-success submitBtn border-radius-45px']) ?>
     </div>
     <?= $this->Form->end() ?>
-    <div class="overlay overlay-courseType-add" style="display:none">
+    <div class="overlay overlay-language-edit" style="display:none">
         <div class="spinner fa-3x">
             <i class="fas fa-spinner fa-pulse"></i>
         </div>
@@ -33,49 +33,49 @@
         /**
          * Confirmation modal megnyitása submit előtt
          */
-        $('#courseTypeAddForm .submitBtn').on('click', function(e){
+        $('#languageEditForm .submitBtn').on('click', function(e){
             e.preventDefault();
 
             //Formvalidáció manuális meghívása
-            if($('#courseTypeAddForm')[0].reportValidity() === false) return;
+            if($('#languageEditForm')[0].reportValidity() === false) return;
 
             $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan mented?') ?>');
             $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
             //Save gomb eventjeinek resetelése cserével
             $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-            $('#confirmationModal .msg').text('<?= __('Képzéstípus mentése.') ?>');
+            $('#confirmationModal .msg').text('<?= __('Nyelv mentése.') ?>');
 
             $('#confirmationModal').modal('show');
 
             $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
                 e.preventDefault();
                 $('#confirmationModal').modal('hide');
-                $('#courseTypeAddForm').trigger('submit');
+                $('#languageEditForm').trigger('submit');
             });
         });
 
-        //courseTypeAddForm ajaxform
-        $('#courseTypeAddForm').ajaxForm({
+        //languageEditForm ajaxform
+        $('#languageEditForm').ajaxForm({
             replaceTarget: false,
             target: null,
             beforeSubmit: function(arr, $form, options) {
-                $('.overlay-courseType-add').show();
+                $('.overlay-language-edit').show();
             },
             success: function (response, textStatus, jqXHR, $form) {
-                    if(response.saved == false){
-                        $('.overlay-courseType-add').hide();
-                        $('#courseType_add_container').html(response.content);
-                        $('#error_modal_ajax .error-msg').html(response.error_ajax);
-                        $('#error_modal_ajax').modal('show');
-                    }else{
-                        location.href = '<?= $this->Url->build(['action' => 'index'], true)?>';
-                    }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                    $('.overlay-courseType-add').hide();
-                    $('#error_modal_ajax .error-msg').html('<?= __('Hiba történt mentés közben. Próbálja újra!') . '<br/>' . __('Hiba') . ': ' ?>' + errorThrown);
-                    $('#error_modal_ajax .error-code').text('-1000');
+                if(response.saved == false){
+                    $('.overlay-language-edit').hide();
+                    $('#language_edit_container').html(response.content);
+                    $('#error_modal_ajax .error-msg').html(response.error_ajax);
                     $('#error_modal_ajax').modal('show');
+                }else{
+                    location.href = '<?= $this->Url->build(['action' => 'index'], true)?>';
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown){
+                $('.overlay-language-edit').hide();
+                $('#error_modal_ajax .error-msg').html('<?= __('Hiba történt mentés közben. Próbálja újra!') . '<br/>' . __('Hiba') . ': ' ?>' + errorThrown);
+                $('#error_modal_ajax .error-code').text('-1000');
+                $('#error_modal_ajax').modal('show');
             }
         });
     });

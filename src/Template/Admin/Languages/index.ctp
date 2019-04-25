@@ -1,7 +1,7 @@
-<div class="container admin-courseTypes-index">
+<div class="container admin-languages-index">
     <div class="row">
         <div class="col-12 text-center page-title">
-            <h4><?= __('Képzéstípusok') ?></h4>
+            <h4><?= __('Nyelvek') ?></h4>
         </div>
         <?= $this->Flash->render() ?>
         <div class="col-12">
@@ -22,14 +22,14 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach($courseTypes as $courseType){ ?>
+                                <?php foreach($languages as $language){ ?>
                                     <tr>
-                                        <td><?= '<searchable-text>' . h($courseType->name) . '</searchable-text>' ?></td>
+                                        <td><?= '<searchable-text>' . h($language->name) . '</searchable-text>' ?></td>
                                         <td class="text-center">
                                             <?php
-                                                echo $this->Html->link('<i class="fas fa-edit fa-lg"></i>', '#', ['class' => 'iconBtn editBtn', 'data-id' => $courseType->id, 'escape' => false, 'title' => __('Szerkesztés')]);
-                                                echo $this->Html->link('<i class="fas fa-trash fa-lg"></i>', '#', ['escape' => false, 'title' => __('Törlés'), 'class' => 'iconBtn deleteBtn', 'data-id' => $courseType->id]);
-                                                echo $this->Form->postLink('', ['action' => 'delete', $courseType->id], ['style' => 'display: none', 'id' => 'deleteCourseType_' . $courseType->id]);
+                                                echo $this->Html->link('<i class="fas fa-edit fa-lg"></i>', '#', ['class' => 'iconBtn editBtn', 'data-id' => $language->id, 'escape' => false, 'title' => __('Szerkesztés')]);
+                                                echo $this->Html->link('<i class="fas fa-trash fa-lg"></i>', '#', ['escape' => false, 'title' => __('Törlés'), 'class' => 'iconBtn deleteBtn', 'data-id' => $language->id]);
+                                                echo $this->Form->postLink('', ['action' => 'delete', $language->id], ['style' => 'display: none', 'id' => 'deleteLanguage_' . $language->id]);
                                             ?>
                                         </td>
                                     </tr>
@@ -41,30 +41,30 @@
             </div>
             <div class="row mt-2 mb-2">
                 <div class="col-12">
-                    <?= $this->Html->link(__('Új képzéstípus hozzáadása'), ['action' => 'add'], ['class' => 'btn btn-outline-secondary btn-block border-radius-45px add-new-courseType']) ?>
+                    <?= $this->Html->link(__('Új nyelv hozzáadása'), ['action' => 'add'], ['class' => 'btn btn-outline-secondary btn-block border-radius-45px add-new-language']) ?>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!-- Képzéstípus hozzáadása modal -->
-<div class="modal fade" id="courseTypeAddModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<!-- Nyelv hozzáadása modal -->
+<div class="modal fade" id="languageAddModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
           <div class="modal-content">
               <div class="modal-body">
-                  <div id="courseType_add_container">
+                  <div id="language_add_container">
 
                   </div>
               </div>
           </div>
     </div>
 </div>
-<!-- Képzéstípus szerkesztése modal -->
-<div class="modal fade" id="courseTypeEditModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<!-- Nyelv szerkesztése modal -->
+<div class="modal fade" id="languageEditModal" data-focus="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
           <div class="modal-content">
               <div class="modal-body">
-                  <div id="courseType_edit_container">
+                  <div id="language_edit_container">
 
                   </div>
               </div>
@@ -74,7 +74,7 @@
 <script>
     $(function(){
         $('#others_menu_item').addClass('active');
-        $('#course_types_index_menu_item').addClass('active');
+        $('#languages_index_menu_item').addClass('active');
         
         //Tartalom lekeérése a hozzáadáshoz
         $.ajax({
@@ -82,16 +82,16 @@
             cache: false
         })
         .done(function(response){
-            $('#courseType_add_container').html(response.content);
+            $('#language_add_container').html(response.content);
         });
 
-        //Képzéstípus hozzáadása popup megnyitása
-        $('.add-new-courseType').on('click', function(e){
+        //Nyelv hozzáadása popup megnyitása
+        $('.add-new-language').on('click', function(e){
             e.preventDefault();
-            $('#courseTypeAddModal').modal('show');
+            $('#languageAddModal').modal('show');
         });
 
-        //Képzéstípus szerkesztése
+        //Nyelv szerkesztése
         $('.editBtn').on('click', function(e){
             e.preventDefault();
 
@@ -103,18 +103,18 @@
                 cache: false
             })
             .done(function(response){
-                $('#courseType_edit_container').html(response.content);
-                $('#courseTypeEditModal').modal('show');
+                $('#language_edit_container').html(response.content);
+                $('#languageEditModal').modal('show');
             });
         });
 
 
         //Törléskor confirmation modal a megerősítésre
-        $('.admin-courseTypes-index .deleteBtn').on('click', function(e){
+        $('.admin-languages-index .deleteBtn').on('click', function(e){
             e.preventDefault();
 
             $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan törlöd?') ?>');
-            $('#confirmationModal .msg').text('<?= __('Kézpéstípus törlése.') ?>');
+            $('#confirmationModal .msg').text('<?= __('Nyelv törlése.') ?>');
             $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Törlés') ?>').css('background-color', 'red');
             //Save gomb eventjeinek resetelése cserével
             $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
@@ -125,7 +125,7 @@
             $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
                 e.preventDefault();
                 $('#confirmationModal').modal('hide');
-                $('#deleteCourseType_' + id).trigger('click');
+                $('#deleteLanguage_' + id).trigger('click');
             });
         });
         

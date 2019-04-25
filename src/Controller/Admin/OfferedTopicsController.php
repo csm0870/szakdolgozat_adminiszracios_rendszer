@@ -24,6 +24,28 @@ class OfferedTopicsController extends AppController
         $this->set(compact('offeredTopics', 'information'));
     }
 
+     /**
+     * Hozzáadás
+     *
+     * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
+     */
+    public function add(){
+        $offeredTopic = $this->OfferedTopics->newEntity();
+        if ($this->request->is('post')) {
+            $offeredTopic = $this->OfferedTopics->patchEntity($offeredTopic, $this->request->getData());
+            
+            if($this->OfferedTopics->save($offeredTopic)){
+                $this->Flash->success(__('Mentés sikeres.'));
+                return $this->redirect(['action' => 'index']);
+            }
+            $this->Flash->error(__('Mentés sikertelen.'));
+        }
+        
+        $languages = $this->OfferedTopics->Languages->find('list');
+        $internalConsultants = $this->OfferedTopics->InternalConsultants->find('list');
+        $this->set(compact('offeredTopic', 'languages', 'internalConsultants'));
+    }
+    
     /**
      * Szerkesztés
      *
@@ -35,25 +57,28 @@ class OfferedTopicsController extends AppController
         $offeredTopic = $this->OfferedTopics->find('all', ['conditions' => ['OfferedTopics.id' => $id],
                                                            'contain' => ['ThesisTopics']])->first();
         
-        $this->loadModel('Users');
-        $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
         
         $ok = true;
         if(empty($offeredTopic)){ //Ha nem létezik a téma
             $ok = false;
             $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A téma nem létezik.'));
-        }elseif($user->internal_consultant->id != $offeredTopic->internal_consultant_id){ //Ha nem az adott belső konzulenshez tartozik
-            $ok = false;
-            $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A téma nem Önhöz tartozik.'));
         }elseif($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking')){ //Ha téma foglalva van és a hallgató véglegesítésére vár
             $ok = false;
             $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A téma foglalásának véglegesítését még nem tette meg a hallgató.'));
+        }elseif($offeredTopic->has('thesis_topic') && !in_array($offeredTopic->thesis_topic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking'),
+                                                                                                                      \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingRejectedByInternalConsultant'),
+                                                                                                                      \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisTopicBookingCanceledByStudent')])){
+            $ok = false;
+            $this->Flash->error(__('A téma nem módosítható.') . ' ' . __('A téma le van foglalva.'));
         }
         
         if($ok === false) return $this->redirect(['action' => 'index']);
         
         if($this->request->is(['patch', 'post', 'put'])){
             $offeredTopic = $this->OfferedTopics->patchEntity($offeredTopic, $this->request->getData());
+            
+            //Belső konzulenst nem módosíthat
+            unset($offeredTopic->internal_consultant_id);
             
             if($this->OfferedTopics->save($offeredTopic)){
                 $this->Flash->success(__('Mentés sikeres.'));
@@ -62,8 +87,9 @@ class OfferedTopicsController extends AppController
             $this->Flash->error(__('Mentés sikertelen.'));
         }
         
+        $internalConsultants = $this->OfferedTopics->InternalConsultants->find('list');
         $languages = $this->OfferedTopics->Languages->find('list');
-        $this->set(compact('offeredTopic', 'languages'));
+        $this->set(compact('offeredTopic', 'languages', 'internalConsultants'));
     }
 
     /**
@@ -79,15 +105,9 @@ class OfferedTopicsController extends AppController
         $offeredTopic = $this->OfferedTopics->find('all', ['conditions' => ['OfferedTopics.id' => $id],
                                                            'contain' => ['ThesisTopics']])->first();
         
-        $this->loadModel('Users');
-        $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
-        
         if(empty($offeredTopic)){ //Ha nem létezik a téma
             $ok = false;
             $this->Flash->error(__('A téma nem törölhető.') . ' ' . __('A téma nem létezik.'));
-        }elseif($user->internal_consultant->id != $offeredTopic->internal_consultant_id){
-            $this->Flash->error(__('A téma nem törölhető.') . ' ' . __('A téma nem Önhöz tartozik.'));
-            return $this->redirect(['action' => 'index']);
         }elseif($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking')){ //Ha téma foglalva van és a hallgató véglegesítésére vár
             $ok = false;
             $this->Flash->error(__('A téma nem törölhető.') . ' ' . __('A téma foglalásának véglegesítését még nem tette meg a hallgató.'));
@@ -115,20 +135,21 @@ class OfferedTopicsController extends AppController
         return $this->redirect(['action' => 'index']);
     }
     
+    /**
+     * Kiírt téma részletek
+     * 
+     * @param type $id
+     * @return type
+     */
     public function details($id = null){
         $offeredTopic = $this->OfferedTopics->find('all', ['conditions' => ['OfferedTopics.id' => $id],
-                                                           'contain' => ['Languages', 'ThesisTopics' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels']]]])->first();
-        
-        $this->loadModel('Users');
-        $user = $this->Users->get($this->Auth->user('id'), ['contain' => ['InternalConsultants']]);
+                                                           'contain' => ['Languages', 'ThesisTopics' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels']],
+                                                                         'InternalConsultants']])->first();
         
         $ok = true;
         if(empty($offeredTopic)){ //Ha nem létezik a téma
             $ok = false;
             $this->Flash->error(__('A téma részletei nem elérhetőek.') . ' ' . __('A téma nem létezik.'));
-        }elseif($user->internal_consultant->id != $offeredTopic->internal_consultant_id){ //Ha nem az adott belső konzulenshez tartozik
-            $ok = false;
-            $this->Flash->error(__('A téma részletei nem elérhetőek.') . ' ' . __('A téma nem Önhöz tartozik.'));
         }
         
         if($ok === false) return $this->redirect(['action' => 'index']);

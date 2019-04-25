@@ -8,10 +8,10 @@
                         <?= __('Témák kezelése') ?>
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" id="thesis_topics_index_menu_item" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'index']) ?>"><?= __('Témaengedélyezők') ?></a>
+                        <a class="dropdown-item" id="thesis_topics_index_menu_item" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'index']) ?>"><?= __('Leadott témák') ?></a>
                         <a class="dropdown-item" id="offered_topics_index_menu_item" href="<?= $this->Url->build(['controller' => 'OfferedTopics', 'action' => 'index']) ?>"><?= __('Kiírt témák') ?></a>
-                        <a class="dropdown-item" id="thesis_topics_statistics" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'statistics']) ?>"><?= __('Téma kimutatások') ?></a>
-                        <a class="dropdown-item" id="thesis_topics_exports" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'exports']) ?>"><?= __('Téma adatok exportálása') ?></a>
+                        <a class="dropdown-item" id="thesis_topics_statistics" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'statistics']) ?>"><?= __('Elfogadott téma kimutatások') ?></a>
+                        <a class="dropdown-item" id="thesis_topics_exports" href="<?= $this->Url->build(['controller' => 'ThesisTopics', 'action' => 'exports']) ?>"><?= __('Elfogadott téma adatok exportálása') ?></a>
                     </div>
                 </li>
                 <li class="nav-item" id="students_index_menu_item">
@@ -43,6 +43,7 @@
                         <a class="dropdown-item" id="course_types_index_menu_item" href="<?= $this->Url->build(['controller' => 'CourseTypes', 'action' => 'index']) ?>"><?= __('Képzéstípusok') ?></a>
                         <a class="dropdown-item" id="course_levels_index_menu_item" href="<?= $this->Url->build(['controller' => 'CourseLevels', 'action' => 'index']) ?>"><?= __('Képzésszintek') ?></a>
                         <a class="dropdown-item" id="years_index_menu_item" href="<?= $this->Url->build(['controller' => 'Years', 'action' => 'index']) ?>"><?= __('Tanévek') ?></a>
+                        <a class="dropdown-item" id="languages_index_menu_item" href="<?= $this->Url->build(['controller' => 'Languages', 'action' => 'index']) ?>"><?= __('Nyelvek') ?></a>
                     </div>
                 </li>
             </ul>

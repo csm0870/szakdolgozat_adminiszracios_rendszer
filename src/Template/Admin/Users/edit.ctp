@@ -64,7 +64,7 @@
             $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
             //Save gomb eventjeinek resetelése cserével
             $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-            $('#confirmationModal .msg').text('<?= __('Belső konzulens mentése.') ?>');
+            $('#confirmationModal .msg').text('<?= __('Felhasználói fiók mentése.') ?>');
 
             $('#confirmationModal').modal('show');
 

@@ -1,6 +1,6 @@
 <div class="container">
     <div class="row">
-        <div class="col-12 text-center">
+        <div class="col-12 text-center page-title">
             <?= $this->Html->link('<i class="fas fa-arrow-alt-circle-left fa-lg"></i>' . '&nbsp;' . __('Vissza'), ['controller' => 'OfferedTopics', 'action' => 'index'], ['escape' => false, 'class' => 'backBtn float-left border-radius-45px', 'title' => __('Vissza')]) ?>
             <h4><?= __('Új téma hozzáadása') ?></h4>
         </div>
@@ -13,6 +13,7 @@
                                            'inputContainerError' => '<div class="form-group">{{content}}{{error}}</div>']);
                 
                 echo $this->Form->create($offeredTopic, ['id' => 'offeredTopicAddForm']);
+                echo $this->Form->control('internal_consultant_id', ['class' => 'form-control', 'options' => $internalConsultants, 'label' => ['text' => __('Belső konzulens')]]);
                 echo $this->Form->control('title', ['class' => 'form-control', 'label' => ['text' => __('Cím')]]);
                 echo $this->Form->control('description', ['class' => 'form-control tinymce-input', 'label' => ['text' => __('Leírás')],
                                                           'templates' => ['inputContainer' => '<div class="form-group tinymce-container">{{content}}</div>']]);

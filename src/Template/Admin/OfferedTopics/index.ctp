@@ -21,47 +21,29 @@
                         <table class="table table-bordered table-hover" id="data_table">
                             <thead>
                                 <tr>
+                                    <th><?= __('Belső konzulens') ?></th>
                                     <th><?= __('Téma címe') ?></th>
                                     <th><?= __('Állapot') ?></th>
-                                    <th><?= __('Műveletek') ?></th>
                                 </tr>
                             </thead>
                             <thead>
                                 <tr>
+                                    <th><?= $this->Form->control('internal_consultant_search_text', ['id' => 'internal_consultant_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
                                     <th><?= $this->Form->control('title_search_text', ['id' => 'title_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
                                     <th><?= $this->Form->control('status_search_text', ['id' => 'status_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
-                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach($offeredTopics as $offeredTopic){ ?>
-                                    <tr>
+                                    <tr  class="offeredTopics" data-id="<?= $offeredTopic->id ?>" style="cursor: pointer">
+                                        <td><?= $offeredTopic->has('internal_consultant') ? '<searchable-text>' . h($offeredTopic->internal_consultant->name) . '</searchable-text>' : '' ?></td>
                                         <td><?= '<searchable-text>' . h($offeredTopic->title) . '</searchable-text>' ?></td>
                                         <td>
                                             <?php
                                                 echo '<searchable-text>';
-                                                if($offeredTopic->has('thesis_topic')){
-                                                    echo __('Jelentkezett halgató') . ': ' . h($offeredTopic->thesis_topic->student->name);
-
-                                                    echo '<br/><strong>' . __('Foglalás állapota') . ': ' . '</strong>';
-                                                    if(in_array($offeredTopic->thesis_topic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking'),
-                                                                                                                      \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking')])){
-                                                        if($offeredTopic->thesis_topic->has('thesis_topic_status')) echo h($offeredTopic->thesis_topic->thesis_topic_status->name);
-                                                        echo '<br/>' . $this->Html->link(__('Részletek') . '&nbsp;->', ['controller' => 'OfferedTopics', 'action' => 'details', $offeredTopic->id], ['escape' => false]);
-                                                    }else{
-                                                        echo __('A témafoglalás lezárult.') . ' ' . __('A részleteket a Témák kezelése->Témaengedélyezők menüpont alatt találja meg.');
-                                                    }
-                                                }else echo __('Nincs jelentkezett hallgató');
+                                                    if($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->has('student')) echo __('A témára jelentkeztek.');
+                                                    else echo __('Nincs jelentkezett hallgató');
                                                 echo '</searchable-text>';
-                                            ?>
-                                        </td>
-                                        <td class="text-center">
-                                            <?php
-                                                if(($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking')) || !$offeredTopic->has('thesis_topic')){
-                                                    echo $this->Html->link('<i class="fas fa-edit fa-lg"></i>', ['controller' => 'OfferedTopics', 'action' => 'edit', $offeredTopic->id], ['class' => 'iconBtn editBtn', 'escape' => false, 'title' => __('Szerkesztés')]);
-                                                    echo $this->Html->link('<i class="fas fa-trash fa-lg"></i>', '#', ['escape' => false, 'title' => __('Törlés'), 'class' => 'iconBtn deleteBtn', 'data-id' => $offeredTopic->id]);
-                                                    echo $this->Form->postLink('', ['action' => 'delete', $offeredTopic->id], ['style' => 'display: none', 'id' => 'deleteOfferedTopic_' . $offeredTopic->id]);
-                                                }
                                             ?>
                                         </td>
                                     </tr>
@@ -83,6 +65,12 @@
     $(function(){
         $('#topics_menu_item').addClass('active');
         $('#offered_topics_index_menu_item').addClass('active');
+        
+        //Táblázat sorára kattintáskor az adott téma részleteire ugrás
+        $('.offeredTopics').on('click', function(){
+            var id = $(this).data('id');
+            location.href = '<?= $this->Url->build(['action' => 'details'], true) ?>' + '/' + id;
+        });
         
         //Törléskor confirmation modal a megerősítésre
         $('.deleteBtn').on('click', function(e){
@@ -126,31 +114,39 @@
                       });
         
         //Ha a kereső mezőkbe írunk, akkor újra "rajzoljuk" a tálbázatot
-        $('#title_search_text, #status_search_text').on('keyup', function(){
+        $('#internal_consultant_search_text, #title_search_text, #status_search_text').on('keyup', function(){
             table.draw();
         });
         
         //Táblázat sorainak szűrése a keresendő szövegek alapján
         $.fn.dataTable.ext.search.push(
             function(settings, searchData, index, rowData, counter) {
+                var internal_consultant_search_text = $('#internal_consultant_search_text').val().toLowerCase();
                 var title_search_text = $('#title_search_text').val().toLowerCase();
                 var status_search_text = $('#status_search_text').val().toLowerCase();
                 
-                if(title_search_text  == '' && status_search_text == '') return true;
+                if(internal_consultant_search_text == '' && title_search_text  == '' && status_search_text == '') return true;
                 
                 var ok = true;
                 
-                var first_index_of_title_search_text = rowData[0].indexOf('<searchable-text>');
-                var last_index_of_title_search_text = rowData[0].indexOf('</searchable-text>');
+                var first_index_of_internal_consultant_search_text = rowData[0].indexOf('<searchable-text>');
+                var last_index_of_internal_consultant_search_text = rowData[0].indexOf('</searchable-text>');
+                if(first_index_of_internal_consultant_search_text != -1 && last_index_of_internal_consultant_search_text != -1){
+                    var internal_consultant_searchable_text = rowData[0].substring(first_index_of_internal_consultant_search_text + '<searchable-text>'.length, last_index_of_internal_consultant_search_text);
+                    if(internal_consultant_searchable_text.toLowerCase().indexOf(internal_consultant_search_text) == -1) ok = false;
+                }
+                
+                var first_index_of_title_search_text = rowData[1].indexOf('<searchable-text>');
+                var last_index_of_title_search_text = rowData[1].indexOf('</searchable-text>');
                 if(first_index_of_title_search_text != -1 && last_index_of_title_search_text != -1){
-                    var title_searchable_text = rowData[0].substring(first_index_of_title_search_text + '<searchable-text>'.length, last_index_of_title_search_text);
+                    var title_searchable_text = rowData[1].substring(first_index_of_title_search_text + '<searchable-text>'.length, last_index_of_title_search_text);
                     if(title_searchable_text.toLowerCase().indexOf(title_search_text) == -1) ok = false;
                 }
                 
-                var first_index_of_status_search_text = rowData[1].indexOf('<searchable-text>');
-                var last_index_of_status_search_text = rowData[1].indexOf('</searchable-text>');
+                var first_index_of_status_search_text = rowData[2].indexOf('<searchable-text>');
+                var last_index_of_status_search_text = rowData[2].indexOf('</searchable-text>');
                 if(first_index_of_status_search_text != -1 && last_index_of_status_search_text != -1){
-                    var status_searchable_text = rowData[1].substring(first_index_of_status_search_text + '<searchable-text>'.length, last_index_of_status_search_text);
+                    var status_searchable_text = rowData[2].substring(first_index_of_status_search_text + '<searchable-text>'.length, last_index_of_status_search_text);
                     if(status_searchable_text.toLowerCase().indexOf(status_search_text) == -1) ok = false;
                 }
                 

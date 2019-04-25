@@ -53,25 +53,20 @@ class AppController extends Controller
         
         $this->loadComponent('Auth',[
                     'authorize' => ['Acl.Actions' => ['actionPath' => 'controllers/']],
-                    'loginAction' => [
-                                        'controller' => 'Users',
-                                        'action' => 'login',
-                                        'prefix' => false
-                                    ],
+                    'loginAction' => ['controller' => 'Users',
+                                      'action' => 'login',
+                                      'prefix' => false],
                     'authError' => __('Be kell lépned, ahhoz, hogy ezt az oldalt lásd!'),
                     'authenticate' => [
                         'Form' => [
                             'fields' => ['username' => 'email']
                         ]
                     ],
-                    'loginRedirect' => [
-                                        'controller' => 'Notifications',
-                                        'action' => 'index'
-                                        ],
-                    'logoutRedirect' => [
-                                        'controller' => 'Pages',
-                                        'action' => 'home',
-                                        'prefix' => false],
+                    'loginRedirect' => ['controller' => 'Notifications',
+                                        'action' => 'index'],
+                    'logoutRedirect' => ['controller' => 'Pages',
+                                         'action' => 'home',
+                                         'prefix' => false],
                     'storage' => 'Session']);
         
         /*
@@ -121,7 +116,7 @@ class AppController extends Controller
         }
         
         //Layout beállítása, ha a listában lévő controllerek hívják meg vagy az admin a Users controllert
-        if(in_array($this->getRequest()->getParam('controller'), ['Information', 'ThesisTopics', 'Students', 'Consultations', 'ConsultationOccasions', 'FinalExamSubjects', 'Reviewers',
+        if(in_array($this->getRequest()->getParam('controller'), ['Information', 'ThesisTopics', 'Students', 'Consultations', 'ConsultationOccasions', 'FinalExamSubjects', 'Reviewers', 'Languages',
                                                                   'OfferedTopics', 'Reviews', 'Notifications', 'InternalConsultants', 'Documents', 'Departments', 'CourseLevels', 'CourseTypes', 'Years']) ||
            ($this->getRequest()->getParam('controller') == 'Users' && $this->getRequest()->getParam('prefix') == 'admin')){
             $this->viewBuilder()->setLayout('logged_in_page');
@@ -165,7 +160,7 @@ class AppController extends Controller
      */
     protected function addFileName($file_name = null, $path = null, $ext = null){
         if(empty($file_name) || empty($path)) return false;
-        $trans = $translate = \Transliterator::createFromRules(':: Any-Latin; :: Latin-ASCII; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC;', \Transliterator::FORWARD);
+        $trans = \Transliterator::createFromRules(':: Any-Latin; :: Latin-ASCII; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC;', \Transliterator::FORWARD);
         $file_name = $trans->transliterate(str_replace(' ', '', $file_name));
         
         $files = array_diff(scandir($path), array('..', '.'));

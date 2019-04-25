@@ -58,7 +58,8 @@ class ThesisTopicsController extends AppController
      * @return type
      */
     public function edit($id = null){
-        $thesisTopic = $this->ThesisTopics->find('all', ['contain' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels'],
+        $thesisTopic = $this->ThesisTopics->find('all', ['conditions' => ['ThesisTopics.id' => $id],
+                                                         'contain' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels'],
                                                                        'ThesisTopicStatuses', 'InternalConsultants', 'StartingYears', 'ExpectedEndingYears', 'Languages']])->first();
     
         
@@ -69,8 +70,9 @@ class ThesisTopicsController extends AppController
         
         if($this->request->is(['patch', 'post', 'put'])){
             $thesisTopic = $this->ThesisTopics->patchEntity($thesisTopic, $this->getRequest()->getData());
-            //Hallgató nem módosítható
+            //Hallgató és belső konzulens nem módosítható
             unset($thesisTopic->stundet_id);
+            unset($thesisTopic->internal_consultant_id);
             $has_external_consultant = $this->getRequest()->getData('has_external_consultant');
             
             //Külső konzulensi mezők beállítása
@@ -233,7 +235,9 @@ class ThesisTopicsController extends AppController
 
             if($this->ThesisTopics->save($thesisTopic)) $this->Flash->success($accepted == 0 ? __('Elutasítás sikeres.') : __('Elfogadás sikeres.'));
             else $this->Flash->error(($accepted == 0 ? __('Elutasítás sikertelen.') : __('Elfogadás sikertelen.')) . ' ' . __('Próbálja újra!'));
-        }
+			
+			return $this->redirect(['action' => 'details', $thesisTopic->id]);
+		}
         
         return $this->redirect(['action' => 'index']);
     }
@@ -843,7 +847,7 @@ class ThesisTopicsController extends AppController
         $this->loadModel('Years');
         $year = $this->Years->find('all', ['conditions' => ['id' => $year_id]])->first();
         
-        //Ha paraméterben megadott év nem ad  vissza évet, akkor az aktuális évet lekérjük
+        //Ha paraméterben megadott év nem ad vissza évet, akkor az aktuális évet lekérjük
         if(empty($year)) $year = $this->Years->find('all', ['conditions' => ['year LIKE' => date('Y')]])->first();
         
         //Ha az aktuális év nem létezik, akkor az elsőt az adatbázisból
@@ -851,6 +855,7 @@ class ThesisTopicsController extends AppController
         
         if(empty($year)){
             $this->Flash->error(__('Nincs tanév az adatbázisban!'));
+			return $this->redirect(['action' => 'index']);
         }
         
         //Félév ellenőrzése
@@ -1017,11 +1022,8 @@ class ThesisTopicsController extends AppController
             return $this->redirect(['action' => 'index']);
         }
 
-        if($this->ThesisTopics->delete($thesisTopic)){
-            $this->Flash->success(__('Törlés sikeres.'));
-        }else{
-            $this->Flash->error(__('Törlés sikertelen. Próbálja újra!'));
-        }
+        if($this->ThesisTopics->delete($thesisTopic)) $this->Flash->success(__('Törlés sikeres.'));
+        else $this->Flash->error(__('Törlés sikertelen. Próbálja újra!'));
         
         return $this->redirect(['action' => 'index']);
     }

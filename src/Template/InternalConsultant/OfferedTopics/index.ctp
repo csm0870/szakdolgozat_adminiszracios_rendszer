@@ -23,45 +23,24 @@
                                 <tr>
                                     <th><?= __('Téma címe') ?></th>
                                     <th><?= __('Állapot') ?></th>
-                                    <th><?= __('Műveletek') ?></th>
                                 </tr>
                             </thead>
                             <thead>
                                 <tr>
                                     <th><?= $this->Form->control('title_search_text', ['id' => 'title_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
                                     <th><?= $this->Form->control('status_search_text', ['id' => 'status_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
-                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach($offeredTopics as $offeredTopic){ ?>
-                                    <tr>
+                                    <tr  class="offeredTopics" data-id="<?= $offeredTopic->id ?>" style="cursor: pointer">
                                         <td><?= '<searchable-text>' . h($offeredTopic->title) . '</searchable-text>' ?></td>
                                         <td>
                                             <?php
                                                 echo '<searchable-text>';
-                                                if($offeredTopic->has('thesis_topic')){
-                                                    echo __('Jelentkezett halgató') . ': ' . h($offeredTopic->thesis_topic->student->name);
-
-                                                    echo '<br/><strong>' . __('Foglalás állapota') . ': ' . '</strong>';
-                                                    if(in_array($offeredTopic->thesis_topic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking'),
-                                                                                                                      \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking')])){
-                                                        if($offeredTopic->thesis_topic->has('thesis_topic_status')) echo h($offeredTopic->thesis_topic->thesis_topic_status->name);
-                                                        echo '<br/>' . $this->Html->link(__('Részletek') . '&nbsp;->', ['controller' => 'OfferedTopics', 'action' => 'details', $offeredTopic->id], ['escape' => false]);
-                                                    }else{
-                                                        echo __('A témafoglalás lezárult.') . ' ' . __('A részleteket a leadott témák menüpont alatt találja meg.');
-                                                    }
-                                                }else echo __('Nincs jelentkezett hallgató');
+                                                    if($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->has('student')) echo __('A témára jelentkeztek.');
+                                                    else echo __('Nincs jelentkezett hallgató');
                                                 echo '</searchable-text>';
-                                            ?>
-                                        </td>
-                                        <td class="text-center">
-                                            <?php
-                                                if(($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking')) || !$offeredTopic->has('thesis_topic')){
-                                                    echo $this->Html->link('<i class="fas fa-edit fa-lg"></i>', ['controller' => 'OfferedTopics', 'action' => 'edit', $offeredTopic->id], ['class' => 'iconBtn editBtn', 'escape' => false, 'title' => __('Szerkesztés')]);
-                                                    echo $this->Html->link('<i class="fas fa-trash fa-lg"></i>', '#', ['escape' => false, 'title' => __('Törlés'), 'class' => 'iconBtn deleteBtn', 'data-id' => $offeredTopic->id]);
-                                                    echo $this->Form->postLink('', ['action' => 'delete', $offeredTopic->id], ['style' => 'display: none', 'id' => 'deleteOfferedTopic_' . $offeredTopic->id]);
-                                                }
                                             ?>
                                         </td>
                                     </tr>
@@ -84,24 +63,10 @@
         $('#topics_menu_item').addClass('active');
         $('#offered_topics_index_menu_item').addClass('active');
         
-        //Törléskor confirmation modal a megerősítésre
-        $('.deleteBtn').on('click', function(e){
-            e.preventDefault();
-            
-            $('#confirmationModal .header').text('<?= __('Biztosan törlöd?') ?>');
-            $('#confirmationModal .msg').text('<?= __('Téma törlése.') ?>');
-            $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Törlés') ?>').css('background-color', 'red');
-            //Save gomb eventjeinek resetelése cserével
-            $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());
-                        
-            $('#confirmationModal').modal('show');
-            
+        //Táblázat sorára kattintáskor az adott téma részleteire ugrás
+        $('.offeredTopics').on('click', function(){
             var id = $(this).data('id');
-            $('#confirmationModal .modalBtn.saveBtn').on('click', function(e){
-                e.preventDefault();
-                $('#confirmationModal').modal('hide');
-                $('#deleteOfferedTopic_' + id).trigger('click');
-            });
+            location.href = '<?= $this->Url->build(['action' => 'details'], true) ?>' + '/' + id;
         });
         
         // DataTable

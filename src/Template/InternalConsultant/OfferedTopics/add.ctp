@@ -1,6 +1,6 @@
 <div class="container">
     <div class="row">
-        <div class="col-12 text-center">
+        <div class="col-12 text-center page-title">
             <?= $this->Html->link('<i class="fas fa-arrow-alt-circle-left fa-lg"></i>' . '&nbsp;' . __('Vissza'), ['controller' => 'OfferedTopics', 'action' => 'index'], ['escape' => false, 'class' => 'backBtn float-left border-radius-45px', 'title' => __('Vissza')]) ?>
             <h4><?= __('Új téma hozzáadása') ?></h4>
         </div>

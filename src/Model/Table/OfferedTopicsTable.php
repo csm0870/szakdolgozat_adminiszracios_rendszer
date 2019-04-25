@@ -143,7 +143,7 @@ class OfferedTopicsTable extends Table
         return $rules;
     }
     
-        /**
+    /**
      * Mentés előtti callback
      * 
      * @param type $event

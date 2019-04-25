@@ -29,7 +29,7 @@ class OfferedTopicsController extends AppController
     }
 
     /**
-     * Hozzáadás
+     * Kiírt téma hozzáadása
      *
      * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
      */
@@ -44,7 +44,7 @@ class OfferedTopicsController extends AppController
                 $this->Flash->error(__('Nem belső konzulensként van bejelentkezve.'));
             }else{
                 $offeredTopic->internal_consultant_id = $user->internal_consultant->id;
-                if ($this->OfferedTopics->save($offeredTopic)) {
+                if($this->OfferedTopics->save($offeredTopic)){
                     $this->Flash->success(__('Mentés sikeres.'));
                     return $this->redirect(['action' => 'index']);
                 }
@@ -57,9 +57,9 @@ class OfferedTopicsController extends AppController
     }
 
     /**
-     * Szerkesztés
+     * Kiírt téma szerkesztés
      *
-     * @param string|null $id Offered Topic id.
+     * @param string|null $id Kiírt téma egyedi azonosítója
      * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
@@ -87,6 +87,9 @@ class OfferedTopicsController extends AppController
         if($this->request->is(['patch', 'post', 'put'])){
             $offeredTopic = $this->OfferedTopics->patchEntity($offeredTopic, $this->request->getData());
             
+            //Belső konzulenst nem módosíthat
+            unset($offeredTopic->internal_consultant_id);
+            
             if($this->OfferedTopics->save($offeredTopic)){
                 $this->Flash->success(__('Mentés sikeres.'));
                 return $this->redirect(['action' => 'edit', $offeredTopic->id]);
@@ -99,11 +102,9 @@ class OfferedTopicsController extends AppController
     }
 
     /**
-     * Törlés
+     * Kiírt téma törlése
      *
-     * @param string|null $id Offered Topic id.
-     * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @param string|null $id Kiírt téma egyedi azonosítója
      */
     public function delete($id = null){
         $this->request->allowMethod(['post', 'delete']);
@@ -147,6 +148,12 @@ class OfferedTopicsController extends AppController
         return $this->redirect(['action' => 'index']);
     }
     
+    /**
+     * Kiírt téma részletei
+     * 
+     * @param type $id Kiírt téma egyedi azonosítója
+     * @return type
+     */
     public function details($id = null){
         $offeredTopic = $this->OfferedTopics->find('all', ['conditions' => ['OfferedTopics.id' => $id],
                                                            'contain' => ['Languages', 'ThesisTopics' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels']]]])->first();
@@ -211,11 +218,8 @@ class OfferedTopicsController extends AppController
                 $offeredTopic->thesis_topic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking');
             }
 
-            if($this->OfferedTopics->ThesisTopics->save($offeredTopic->thesis_topic)){
-                $this->Flash->success($accepted == 0 ? __('Elutasítás sikeres.') : __('Elfogadás sikeres.'));
-            }else{
-                $this->Flash->error(($accepted == 0 ? __('Elutasítás sikertelen.') : __('Elfogadás sikertelen.')) . ' ' . __('Próbálja újra!'));
-            }
+            if($this->OfferedTopics->ThesisTopics->save($offeredTopic->thesis_topic)) $this->Flash->success($accepted == 0 ? __('Elutasítás sikeres.') : __('Elfogadás sikeres.'));
+            else $this->Flash->error(($accepted == 0 ? __('Elutasítás sikertelen.') : __('Elfogadás sikertelen.')) . ' ' . __('Próbálja újra!'));
         }
         
         return $this->redirect(['action' => 'index']);
