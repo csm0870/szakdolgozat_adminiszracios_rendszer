@@ -16,7 +16,7 @@ class UsersController extends AppController
 
     public function beforeFilter(Event $event) {
         parent::beforeFilter($event);
-        $this->Auth->allow(['login', 'logout']);
+        $this->Auth->allow(['login', 'logout', 'studentRegistration']);
     }
     
     /**
@@ -35,7 +35,7 @@ class UsersController extends AppController
         if($group_type == 1) $login_text = __('Hallgatói belépés');
         elseif($group_type == 2) $login_text = __('Belépés');
         
-        $this->set(compact('login_text'));
+        $this->set(compact('login_text', 'group_type'));
         
         $this->_doLogin($group_type);
     }
@@ -90,5 +90,36 @@ class UsersController extends AppController
             $this->Flash->error(__('Helytelen email vagy jelszó. Próbálja újra!'));
             $this->Auth->logout();
         }
+    }
+    
+    /**
+     * Hallgatói regisztráció
+     */
+    public function studentRegistration(){
+        $user = $this->Users->newEntity();
+        if($this->request->is('post')){
+            $user = $this->Users->patchEntity($user, $this->request->getData());
+            
+            $password = $this->getRequest()->getData('password');
+            $password_again = $this->getRequest()->getData('password_again');
+            
+            //Ha adott meg jelszót, akkor megnézzük, hogy megadta-e a jelszót újra, illetve megegyeznek-e
+            if(!empty($password)){
+                if(empty($password_again)) $user->setError('password_again', __('Adja meg a jelszót újra!'));
+                elseif($password != $password_again){
+                    $user->setError('password', __('A jelszavak nem egyeznek.'));
+                    $user->setError('password_again', __('A jelszavak nem egyeznek.'));
+                }
+            }
+            
+            $user->group_id = 6;
+            
+            if($this->Users->save($user)){
+                $this->Flash->success(__('Regisztráció sikeres.'));
+                return $this->redirect(['action' => 'login', 1]);
+            }
+            $this->Flash->error(__('Mentés sikertelen. Próbálja újra!'));
+        }
+        $this->set(compact('user'));
     }
 }

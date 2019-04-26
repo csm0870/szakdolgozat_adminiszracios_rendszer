@@ -161,7 +161,7 @@
                                                      $thesisTopic->review->has('reviewer') &&
                                                      $thesisTopic->review->reviewer->has('user')){ ?>
                                                 <p class="mb-1 mt-4">
-                                                    <strong><?= __('Belépési email') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->user->email) ?>
+                                                    <strong><?= __('Belépési felhasználónév') . ': ' ?></strong><?= h($thesisTopic->review->reviewer->user->username) ?>
                                                 </p>
                                                 <p class="mb-1">
                                                     <strong><?= __('Belépési jelszó') . ': ' ?></strong><?= $thesisTopic->review->reviewer->user->has('raw_password') ? h($thesisTopic->review->reviewer->user->raw_password->password) : __('nincs jelszó, újra kell menteni') ?>

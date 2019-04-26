@@ -174,10 +174,16 @@ class UsersController extends AppController
     public function delete($id = null){
         $user = $this->Users->find('all', ['conditions' => ['Users.id' => $id, 'Users.group_id !=' => 6]])->first();
         
+        $ok = true;
         if(empty($user)){
+            $ok = false;
             $this->Flash->error(__('Felhasználói fiók nem törölhető.') . ' ' . __('A felhasználói fiók nem létezik.'));
-            return $this->redirect(['action' => 'index']);
+        }elseif($user->id == $this->Auth->user('id')){
+            $ok = false;
+            $this->Flash->error(__('Felhasználói fiók nem törölhető.') . ' ' . __('Saját magát nem törölheti.'));
         }
+        
+        if($ok === false) return $this->redirect(['action' => 'index']);
         
         if($this->Users->delete($user)) $this->Flash->success(__('Törlés sikeres.'));
         else $this->Flash->error(__('Törlés sikertelen. Próbálja újra!'));

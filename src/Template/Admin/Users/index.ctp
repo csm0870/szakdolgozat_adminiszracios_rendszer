@@ -12,18 +12,21 @@
                             <thead>
                                 <tr>
                                     <th><?= __('Felhasználónév') ?></th>
+                                    <th><?= __('Email') ?></th>
                                     <th><?= __('Felhasználó típusa') ?></th>
                                 </tr>
                             </thead>
                             <thead>
                                 <tr>
                                     <th><?= $this->Form->control('username_search_text', ['id' => 'username_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
+                                    <th><?= $this->Form->control('email_search_text', ['id' => 'email_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
                                     <th><?= $this->Form->control('group_search_text', ['id' => 'group_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach($users as $user){ ?>
                                     <tr class="users" data-id="<?= $user->id ?>" style="cursor: pointer">
+                                        <td><?= '<searchable-text>' . h($user->username) . '</searchable-text>' ?></td>
                                         <td><?= '<searchable-text>' . h($user->email) . '</searchable-text>' ?></td>
                                         <td><?= $user->has('group') ? '<searchable-text>' . h($user->group->name) . '</searchable-text>' : '' ?></td>
                                     </tr>
@@ -74,7 +77,7 @@
                       });
         
         //Ha a kereső mezőkbe írunk, akkor újra "rajzoljuk" a tálbázatot
-        $('#username_search_text, #group_search_text').on('keyup', function(){
+        $('#username_search_text, #email_search_text, #group_search_text').on('keyup', function(){
             table.draw();
         });
         
@@ -82,23 +85,31 @@
         $.fn.dataTable.ext.search.push(
             function(settings, searchData, index, rowData, counter) {
                 var username_search_text = $('#username_search_text').val().toLowerCase();
+                var email_search_text = $('#email_search_text').val().toLowerCase();
                 var group_search_text = $('#group_search_text').val().toLowerCase();
                 
-                if(username_search_text == '' && group_search_text == '') return true;
+                if(username_search_text == '' && email_search_text == '' && group_search_text == '') return true;
                 
                 var ok = true;
                 
-                var first_index_of_username_search_text = rowData[0].indexOf('<searchable-text>');
-                var last_index_of_username_search_text = rowData[0].indexOf('</searchable-text>');
+                var first_index_of_email_search_text = rowData[0].indexOf('<searchable-text>');
+                var last_index_of_email_search_text = rowData[0].indexOf('</searchable-text>');
+                if(first_index_of_email_search_text != -1 && last_index_of_username_search_text != -1){
+                    var email_searchable_text = rowData[0].substring(first_index_of_email_search_text + '<searchable-text>'.length, last_index_of_email_search_text);
+                    if(email_searchable_text.toLowerCase().indexOf(email_search_text) == -1) ok = false;
+                }
+                
+                var first_index_of_username_search_text = rowData[1].indexOf('<searchable-text>');
+                var last_index_of_username_search_text = rowData[1].indexOf('</searchable-text>');
                 if(first_index_of_username_search_text != -1 && last_index_of_username_search_text != -1){
-                    var username_searchable_text = rowData[0].substring(first_index_of_username_search_text + '<searchable-text>'.length, last_index_of_username_search_text);
+                    var username_searchable_text = rowData[1].substring(first_index_of_username_search_text + '<searchable-text>'.length, last_index_of_username_search_text);
                     if(username_searchable_text.toLowerCase().indexOf(username_search_text) == -1) ok = false;
                 }
                 
-                var first_index_of_group_search_text = rowData[1].indexOf('<searchable-text>');
-                var last_index_of_group_search_text = rowData[1].indexOf('</searchable-text>');
+                var first_index_of_group_search_text = rowData[2].indexOf('<searchable-text>');
+                var last_index_of_group_search_text = rowData[2].indexOf('</searchable-text>');
                 if(first_index_of_group_search_text != -1 && last_index_of_group_search_text != -1){
-                    var group_searchable_text = rowData[1].substring(first_index_of_group_search_text + '<searchable-text>'.length, last_index_of_group_search_text);
+                    var group_searchable_text = rowData[2].substring(first_index_of_group_search_text + '<searchable-text>'.length, last_index_of_group_search_text);
                     if(group_searchable_text.toLowerCase().indexOf(group_search_text) == -1) ok = false;
                 }
                 

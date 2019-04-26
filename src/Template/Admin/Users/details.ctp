@@ -11,7 +11,10 @@
                     <fieldset class="border-1-grey p-3 mb-3">
                         <legend class="w-auto"><?= __('Felhasználói fiók adatai') ?></legend>
                         <p class="mb-1">
-                            <strong><?= __('Felhasználónév') . ': ' ?></strong><?= h($user->email) ?>
+                            <strong><?= __('Felhasználónév') . ': ' ?></strong><?= h($user->username) ?>
+                        </p>
+                        <p class="mb-1">
+                            <strong><?= __('Email') . ': ' ?></strong><?= h($user->email) ?>
                         </p>
                         <p class="mb-1">
                             <strong><?= __('Jelszó') . ': ' ?></strong><?= $user->has('raw_password') ? $user->raw_password->password : '' ?>

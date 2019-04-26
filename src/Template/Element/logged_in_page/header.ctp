@@ -9,7 +9,7 @@
                 <span class="title"><?= __('Szakdolgozat adminisztrációs rendszer') ?></span>
             </div>
             <div class="col-12 text-right">
-                <?= __('Bejelentkezve, mint') . ' ' . h($logged_in_user->email) ?>
+                <?= __('Bejelentkezve, mint') . ' ' . h($logged_in_user->username) ?>
             </div>
         </div>
     </div>

@@ -13,7 +13,8 @@
                                            'inputContainerError' => '<div class="form-group">{{content}}{{error}}</div>']);
                 
                 echo $this->Form->create($user, ['id' => 'userEditForm']);
-                echo $this->Form->control('email', ['class' => 'form-control', 'label' => ['text' => __('Felhasználónév (email)')]]);
+                echo $this->Form->control('username', ['class' => 'form-control', 'label' => ['text' => __('Felhasználónév')]]);
+                echo $this->Form->control('email', ['class' => 'form-control', 'label' => ['text' => __('Email')]]);
                 echo $this->Form->control('password', ['class' => 'form-control', 'label' => ['text' => __('Jelszó') . ' (' . __('a titkosított jelszó jelenik meg') . ')']]);
                 echo $this->Form->control('group_id', ['class' => 'form-control', 'id' => 'group_select', 'label' => ['text' => __('Felhasználói csoport')]]);
                 echo $this->Form->control('internal_consultant_id', ['class' => 'form-control', 'label' => ['text' => __('Belső konzulens')], 'value' => $user->has('internal_consultant') ? $user->internal_consultant->id : '',

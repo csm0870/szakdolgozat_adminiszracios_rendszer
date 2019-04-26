@@ -13,7 +13,8 @@
                                            'inputContainerError' => '<div class="form-group">{{content}}{{error}}</div>']);
                 
                 echo $this->Form->create($user, ['id' => 'userAddForm', 'url' => ['action' => 'add']]);
-                echo $this->Form->control('email', ['class' => 'form-control', 'label' => ['text' => __('Felhasználónév (email)')]]);
+                echo $this->Form->control('username', ['class' => 'form-control', 'label' => ['text' => __('Felhasználónév')]]);
+                echo $this->Form->control('email', ['class' => 'form-control', 'label' => ['text' => __('Email')]]);
                 echo $this->Form->control('password', ['class' => 'form-control', 'label' => ['text' => __('Jelszó')]]);
                 echo $this->Form->control('group_id', ['class' => 'form-control', 'id' => 'group_select', 'label' => ['text' => __('Felhasználói csoport')], 'value' => $group_id]);
                 echo $this->Form->control('internal_consultant_id', ['class' => 'form-control', 'label' => ['text' => __('Belső konzulens')], 'value' => $group_id == 2 ? (empty($user_data_id) ? '' : $user_data_id) : '',

@@ -60,7 +60,7 @@ class ReviewsController extends AppController
                 
                 $name = $temp_name = empty($thesisTopic->review->reviewer->name) ? 'biralo' : strtolower($trans->transliterate(str_replace(' ', '', $thesisTopic->review->reviewer->name)));
                 //Email generálás
-                for($i = 0; $this->Reviews->Reviewers->Users->exists(['email' => $temp_name . '@biralo.hu']) === true ;$i++){
+                for($i = 0; $this->Reviews->Reviewers->Users->exists(['username' => $temp_name]) === true; $i++){
                     $temp_name = $name . $i;
                 }
                 $name = $temp_name;
@@ -74,7 +74,8 @@ class ReviewsController extends AppController
                 }
 
                 $reviewer_user = $this->Reviews->Reviewers->Users->newEntity();
-                $reviewer_user->email = $name . "@biralo.hu";
+                $reviewer_user->username = $name;
+                $reviewer_user->email = $thesisTopic->review->reviewer->email;
                 $reviewer_user->password = $pw;
                 $reviewer_user->group_id = 7;
             }

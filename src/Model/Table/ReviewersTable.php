@@ -65,21 +65,25 @@ class ReviewersTable extends Table
         $validator
             ->scalar('name')
             ->maxLength('name', 50)
-            ->notEmpty('name', __('Név megadása kötelező.'));
+            ->notEmpty('name', __('Név megadása kötelező.'))
+            ->requirePresence('name', 'create', __('Név megadása kötelező.'));
 
         $validator
             ->email('email', false, __('Helytelen email formátum.'))
-            ->notEmpty('email', __('Email megadása kötelező.'));
+            ->notEmpty('email', __('Email megadása kötelező.'))
+            ->requirePresence('email', 'create', __('Email megadása kötelező.'));
 
         $validator
             ->scalar('workplace')
             ->maxLength('workplace', 50)
-            ->notEmpty('workplace', __('Munkahely megadása kötelező.'));
+            ->notEmpty('workplace', __('Munkahely megadása kötelező.'))
+            ->requirePresence('workplace', 'create', __('Munkahely megadása kötelező.'));
 
         $validator
             ->scalar('position')
             ->maxLength('position', 255)
-            ->notEmpty('position', __('Pozíció megadása kötelező.'));
+            ->notEmpty('position', __('Pozíció megadása kötelező.'))
+            ->requirePresence('position', 'create', __('Pozíció megadása kötelező.'));
 
         return $validator;
     }

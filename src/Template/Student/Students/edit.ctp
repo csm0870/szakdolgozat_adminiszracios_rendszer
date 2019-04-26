@@ -15,7 +15,8 @@
                 echo $this->Form->control('name', ['class' => 'form-control', 'label' => ['text' => __('Név')], 'readonly' => !$can_modify_data]);
                 echo $this->Form->control('address', ['class' => 'form-control', 'label' => ['text' => __('Cím')], 'readonly' => !$can_modify_data]);
                 echo $this->Form->control('neptun', ['class' => 'form-control', 'label' => ['text' => __('Neptun kód')], 'readonly' => !$can_modify_data]);
-                echo $this->Form->control('email', ['class' => 'form-control', 'label' => ['text' => __('Email cím')], 'readonly' => !$can_modify_data]);
+                echo $this->Form->control('email', ['class' => 'form-control', 'label' => ['text' => __('Email cím')], 'readonly' => !$can_modify_data,
+                                                    'templates' => ['formGroup' => '{{label}}&nbsp;<a href="#" data-toggle="tooltip"  data-placement="right" title="' . __("Nem a felhasználói fiókhoz tartozó, hanem a témaengedélyezőn fog szerepelni.") .'">' . $this->Html->image('blue-icon-question-mark-image_small.png', ['style' => 'width: 18px; height: auto']) . '</a>{{input}}']]);
                 echo $this->Form->control('phone_number', ['class' => 'form-control', 'label' => ['text' => __('Telefonszám')], 'placeholder' => __('+36701234567 formátumban.'), 'readonly' => !$can_modify_data]);
                 echo $this->Form->control('specialisation', ['class' => 'form-control', 'label' => ['text' => __('Specializáció')], 'readonly' => !$can_modify_data]);
                 echo $this->Form->control('course_id', ['options' => $courses, 'class' => 'form-control', 'label' => ['text' => __('Szak')], 'disabled' => !$can_modify_data]);
@@ -31,6 +32,9 @@
 <script>
     $(function(){
         $('#student_data_menu_item').addClass('active');
+        
+        $('[data-toggle="tooltip"]').tooltip();
+        
         <?php if($can_modify_data){ ?>
             /**
             * Confirmation modal megnyitása submit előtt

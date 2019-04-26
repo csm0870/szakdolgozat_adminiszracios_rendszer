@@ -57,11 +57,6 @@ class AppController extends Controller
                                       'action' => 'login',
                                       'prefix' => false],
                     'authError' => __('Be kell lépned, ahhoz, hogy ezt az oldalt lásd!'),
-                    'authenticate' => [
-                        'Form' => [
-                            'fields' => ['username' => 'email']
-                        ]
-                    ],
                     'loginRedirect' => ['controller' => 'Notifications',
                                         'action' => 'index'],
                     'logoutRedirect' => ['controller' => 'Pages',
@@ -82,7 +77,7 @@ class AppController extends Controller
         //Ha nincs belépett user és olyan oldalra történne a kérés, amihez autentikáció kell, akkor a főoldalra dobjuk
         if($this->Auth->user("id") == null &&
            !(($this->getRequest()->getParam('controller') == 'Pages' && $this->getRequest()->getParam('action') == "home") ||
-             ($this->getRequest()->getParam('controller') == 'Users' && $this->getRequest()->getParam('action') == "login") ||
+             ($this->getRequest()->getParam('controller') == 'Users' && ($this->getRequest()->getParam('action') == "login" || $this->getRequest()->getParam('action') == "studentRegistration")) ||
              ($this->getRequest()->getParam('controller') == 'Install' && $this->getRequest()->getParam('action') == "install"))) {
             return $this->redirect(["controller" => "Pages", "action" => "home", 'prefix' => false]);
         }

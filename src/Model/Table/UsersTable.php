@@ -78,6 +78,12 @@ class UsersTable extends Table
         $validator
             ->nonNegativeInteger('id')
             ->allowEmpty('id', 'create');
+        
+        $validator
+            ->scalar('username')
+            ->maxLength('username', 255, __('A felhasználónév maximum 255 karakter lehet.'))
+            ->notEmpty('username', __('Felhasználónév megadása kötelező.'))
+            ->requirePresence('username', 'create', __('Felhasználónév megadása kötelező.'));
 
         $validator
             ->email('email', false, __('Nem megfelelő email formátum.'))
@@ -106,7 +112,8 @@ class UsersTable extends Table
      */
     public function buildRules(RulesChecker $rules)
     {
-        $rules->add($rules->isUnique(['email'], __('Ez az érték már létezik.')));
+        $rules->add($rules->isUnique(['email'], __('Az email már létezik. Válasszon másikat!')));
+        $rules->add($rules->isUnique(['username'], __('A felhasználónév már létezik. Válasszon másikat!')));
         $rules->add($rules->existsIn(['group_id'], 'Groups'));
 
         return $rules;
