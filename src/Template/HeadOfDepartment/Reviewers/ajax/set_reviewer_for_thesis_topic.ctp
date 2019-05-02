@@ -93,7 +93,7 @@
                  */
                 $('.headOfDepartment-setReviewerForThesisTopic .notAcceptBtn').on('click', function(e){
                     e.preventDefault();
-
+					
                     $(this).css('display', 'none');
                     $('#reviewer_select_td').css('display', 'table-cell');
                     showReviewerDetails('<?= $reviewer_id?>');
@@ -129,7 +129,7 @@
                 });
             });
 
-            //consultationOccasionAddForm ajaxform
+            //setReviewerForThesisTopicForm ajaxform
             $('#setReviewerForThesisTopicForm').ajaxForm({
                 replaceTarget: false,
                 target: null,

@@ -208,7 +208,10 @@ class ThesisTopicsController extends AppController
             }else{
                 if($first_thesis_subject_completed == 0){ //Első diplomakurzus sikertelen
                     $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.FirstThesisSubjectFailedWaitingForHeadOfDepartmentDecision'); //Téma elutasítva (első diplomakurzus sikertelen)
-                    $thesisTopic->first_thesis_subject_failed_suggestion = $this->getRequest()->getData('first_thesis_subject_failed_suggestion'); //Elutasítás oka
+                    
+                    $suggestion = $this->getRequest()->getData('first_thesis_subject_failed_suggestion');
+                    if(empty($suggestion)) $thesisTopic->setError('first_thesis_subject_failed_suggestion', __('Az javaslatot kötelező megadni.'));
+                    else $thesisTopic->first_thesis_subject_failed_suggestion = $suggestion;
                 }else{ //Első diplomakurzus sikeres
                     $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.FirstThesisSubjectSucceeded'); //Első diplomakurzus teljesítve
                 }

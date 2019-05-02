@@ -60,11 +60,13 @@ class ConsultationOccasionsTable extends Table
 
         $validator
             ->date('date')
-            ->allowEmpty('date');
+            ->requirePresence('date', 'create', __('Dátum megadása kötelező.'))
+            ->notEmpty('date', __('Dátum megadása kötelező.'));
 
         $validator
             ->scalar('activity')
-            ->allowEmpty('activity');
+            ->requirePresence('activity', 'create', __('Tevékenység megadása kötelező.'))
+            ->notEmpty('activity', __('Tevékenység megadása kötelező.'));
 
         return $validator;
     }

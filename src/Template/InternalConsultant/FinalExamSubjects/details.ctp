@@ -177,7 +177,7 @@
                 //Formvalidáció manuális meghívása
                 if($('#saveFinalExamSubjectsForm')[0].reportValidity() === false) return;
 
-                $('#confirmationModal .header').text('<?= __('Biztosan véglegesítése?') ?>');
+                $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan véglegesítése?') ?>');
                 $('#confirmationModal .msg').text('<?= __('Záróvizsga-tárgyak mentése. Az adatok mentés után már nem módosíthatóak.') ?>');
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Elfogadás') ?>').css('background-color', '#71D0BD');
                 //Save gomb eventjeinek resetelése cserével

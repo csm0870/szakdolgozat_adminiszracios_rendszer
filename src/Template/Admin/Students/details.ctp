@@ -172,7 +172,7 @@
                                 </div>
                             <?php }else{ ?>
                                 <p class="mb-0">
-                                    <strong><?= __('Még nincs záróvizsga-tárgyai') ?></strong>
+                                    <strong><?= __('Még nincsenek záróvizsga-tárgyai') ?></strong>
                                 </p>
                             <?php } ?>
                         </fieldset>
@@ -204,7 +204,7 @@
         $('.admin-students-details .setPassedFinalExamBtn').on('click', function(e){
             e.preventDefault();
 
-            $('#confirmationModal .header').text('<?= __('A hallgató teljesítette a záróvizsgát?') ?>');
+            $('#confirmationModal .confirmation-modal-header').text('<?= __('A hallgató teljesítette a záróvizsgát?') ?>');
             $('#confirmationModal .msg').text('<?= $student->passed_final_exam === true ?  __('A hallgató nem teljesítette a záróvizsgát. Rögzítés után visszavonható.') : __('A hallgató teljesítette a záróvizsgát. Rögzítés után visszavonható.') ?>');
             $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Igen') ?>').css('background-color', '#71D0BD');
             //Save gomb eventjeinek resetelése cserével

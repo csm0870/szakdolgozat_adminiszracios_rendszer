@@ -957,7 +957,7 @@ class ThesisTopicsTable extends Table
             }
         }
         
-        //A belső konzulens rögzíti az "első diplomakurzus teljesítését" és teljesítvét rögzít
+        //A belső konzulens rögzíti az "második diplomakurzus teljesítését" (konzultációs lap véglegesítése "Megfelelt" státusszal)
         if($entity->getOriginal('thesis_topic_status_id') == \Cake\Core\Configure::read('ThesisTopicStatuses.FirstThesisSubjectSucceeded') &&
            $entity->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementUploadable')){
             $student = $this->Students->find('all', ['conditions' => ['Students.id' => $entity->student_id],

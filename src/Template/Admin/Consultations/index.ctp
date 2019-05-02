@@ -33,12 +33,7 @@
                                     <tr>
                                         <td><?= '<searchable-text>' . ($i+1) . '. ' . __('csoport') . '<br/>(' .  ($consultation->current === true ? __('A jelenlegi szakdolgozat verzióhoz tartozik') : __('Régebbi szakdolgozat verzióhoz tartozik')) . ')' . '</searchable-text>' ?></td>
                                         <td>
-                                            <?php
-                                                if($consultation->accepted === null && $consultation->current === true) //Jelenlegi szakdolgozathoz tartozik és még nem véglegesített
-                                                    echo $this->Html->link(__('Alkalmak kezelése'), ['controller' => 'ConsultationOccasions', 'action' => 'index', $consultation->id]);
-                                                else
-                                                    echo '-';
-                                            ?>
+                                            <?= $this->Html->link(__('Alkalmak kezelése'), ['controller' => 'ConsultationOccasions', 'action' => 'index', $consultation->id]) ?>
                                         </td>
                                         <td><?= $consultation->accepted === null ? ('<searchable-text>' .  __('Nem véglegesített') . '</searchable-text>') : ('<searchable-text>' . ($consultation->accepted == true ? __('Megfelelt') : __('Nem felelt meg')) . '</searchable-text>') ?></td>
                                         <td class="text-center">

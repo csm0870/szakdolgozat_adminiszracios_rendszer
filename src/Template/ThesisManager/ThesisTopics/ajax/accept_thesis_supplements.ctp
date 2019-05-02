@@ -50,20 +50,31 @@
              *  accept_thesis_supplements_select select változtatásakor megjelenítjük vagy elrejtjük az okhoz tartozó mezőket
              */
             $('#accept_thesis_supplements_select').on('change', function(){
-               if($(this).val() == 1){
+               setFields();
+            });
+
+            function setFields(){
+                if($('#accept_thesis_supplements_select').val() == 1){
                    $('.rejected_supplements_row').css('display', 'none');
                    //Textarea resetelése
                    $('#cause_of_rejecting_thesis_supplements_input').val('');
-               }else if($(this).val() == 0){
+                   $('#cause_of_rejecting_thesis_supplements_input')[0].required = false;
+               }else if($('#accept_thesis_supplements_select').val() == 0){
                    $('.rejected_supplements_row').css('display', 'table-row');
+                   $('#cause_of_rejecting_thesis_supplements_input')[0].required = true;
                }
-            });
+            }
+            
+            setFields();
 
             /**
              * Confirmation modal megnyitása submit előtt
              */
             $('#acceptThesisSupplements .submitBtn').on('click', function(e){
                 e.preventDefault();
+                
+                //Formvalidáció manuális meghívása
+                if($('#acceptThesisSupplements')[0].reportValidity() === false) return;
 
                 $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan mented?') ?>');
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
@@ -80,7 +91,7 @@
                 });
             });
 
-            //consultationOccasionAddForm ajaxform
+            //acceptThesisSupplements ajaxform
             $('#acceptThesisSupplements').ajaxForm({
                 replaceTarget: false,
                 target: null,

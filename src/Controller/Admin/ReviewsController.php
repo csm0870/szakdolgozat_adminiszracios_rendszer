@@ -460,7 +460,10 @@ class ReviewsController extends AppController
             }else{
                 if($accepted == 0){
                     $thesisTopic->review->review_status = 5; //Eltuasítva
-                    $thesisTopic->review->cause_of_rejecting_review = $this->getRequest()->getData('cause_of_rejecting_review');
+                    
+                    $cause = $this->getRequest()->getData('cause_of_rejecting_review');
+                    if(empty($cause)) $thesisTopic->review->setError('cause_of_rejecting_review', __('Az okot kötelező megadni.'));
+                    else $thesisTopic->review->cause_of_rejecting_review = $cause;
                 }else{
                     $thesisTopic->review->review_status = 6; //Elfogadva
                     $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.Reviewed'); //Bírálva
@@ -600,7 +603,10 @@ class ReviewsController extends AppController
             }else{
                 if($accepted == 0){
                     $thesisTopic->review->confidentiality_contract_status = 3; //Eltuasítva
-                    $thesisTopic->review->cause_of_rejecting_confidentiality_contract = $this->getRequest()->getData('cause_of_rejecting_confidentiality_contract');
+                    
+                    $cause = $this->getRequest()->getData('cause_of_rejecting_confidentiality_contract');
+                    if(empty($cause)) $thesisTopic->review->setError('cause_of_rejecting_confidentiality_contract', __('Az okot kötelező megadni.'));
+                    else $thesisTopic->review->cause_of_rejecting_confidentiality_contract = $cause;
                 }else $thesisTopic->review->confidentiality_contract_status = 4; //Elfogadva
             }
                 

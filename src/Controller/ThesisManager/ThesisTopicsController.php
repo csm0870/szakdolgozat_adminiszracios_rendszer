@@ -111,7 +111,10 @@ class ThesisTopicsController extends AppController
             }else{
                 if($accepted == 0){
                     $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected'); //Elutasítva
-                    $thesisTopic->cause_of_rejecting_thesis_supplements = $this->getRequest()->getData('cause_of_rejecting_thesis_supplements');
+                    
+                    $cause = $this->getRequest()->getData('cause_of_rejecting_thesis_supplements');
+                    if(empty($cause)) $thesisTopic->setError('cause_of_rejecting_thesis_supplements', __('Az okot kötelező megadni.'));
+                    else $thesisTopic->cause_of_rejecting_thesis_supplements = $cause;
                 }else $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant'); //Elfogadva
             }
             

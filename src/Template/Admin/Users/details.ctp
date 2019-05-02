@@ -73,7 +73,7 @@
         $('.admin-users-details .delete-btn').on('click', function(e){
             e.preventDefault();
 
-            $('#confirmationModal .header').text('<?= __('Biztosan törlöd?') ?>');
+            $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan törlöd?') ?>');
             $('#confirmationModal .msg').text('<?= __('Felhasználói fiók végleges törlése. A felhasználói fiók törlés után nem lesz visszaállítható.') ?>');
             $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Törlés') ?>').css('background-color', 'red');
             //Save gomb eventjeinek resetelése cserével

@@ -91,7 +91,7 @@
                 /**
                  * Másik bíráló választása
                  */
-                $('.headOfDepartment-setReviewerForThesisTopic .notAcceptBtn').on('click', function(e){
+                $('.admin-setReviewerForThesisTopic .notAcceptBtn').on('click', function(e){
                     e.preventDefault();
 
                     $(this).css('display', 'none');
@@ -129,7 +129,7 @@
                 });
             });
 
-            //consultationOccasionAddForm ajaxform
+            //setReviewerForThesisTopicForm ajaxform
             $('#setReviewerForThesisTopicForm').ajaxForm({
                 replaceTarget: false,
                 target: null,

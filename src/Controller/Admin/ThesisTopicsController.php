@@ -434,7 +434,10 @@ class ThesisTopicsController extends AppController
             }else{
                 if($first_thesis_subject_completed == 0){ //Első diplomakurzus sikertelen
                     $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.FirstThesisSubjectFailedWaitingForHeadOfDepartmentDecision'); //Téma elutasítva (első diplomakurzus sikertelen)
-                    $thesisTopic->first_thesis_subject_failed_suggestion = $this->getRequest()->getData('first_thesis_subject_failed_suggestion'); //Elutasítás oka
+                    
+                    $suggestion = $this->getRequest()->getData('first_thesis_subject_failed_suggestion');
+                    if(empty($suggestion)) $thesisTopic->setError('first_thesis_subject_failed_suggestion', __('Az javaslatot kötelező megadni.'));
+                    else $thesisTopic->first_thesis_subject_failed_suggestion = $suggestion;
                 }else{ //Első diplomakurzus sikeres
                     $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.FirstThesisSubjectSucceeded'); //Első diplomakurzus teljesítve
                 }
@@ -672,7 +675,10 @@ class ThesisTopicsController extends AppController
             }else{
                 if($accepted == 0){
                     $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisSupplementsRejected'); //Elutasítva
-                    $thesisTopic->cause_of_rejecting_thesis_supplements = $this->getRequest()->getData('cause_of_rejecting_thesis_supplements');
+                    
+                    $cause = $this->getRequest()->getData('cause_of_rejecting_thesis_supplements');
+                    if(empty($cause)) $thesisTopic->setError('cause_of_rejecting_thesis_supplements', __('Az okot kötelező megadni.'));
+                    else $thesisTopic->cause_of_rejecting_thesis_supplements = $cause;
                 }else $thesisTopic->thesis_topic_status_id = \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForDesignationOfReviewerByInternalConsultant'); //Elfogadva
             }
             

@@ -1,7 +1,7 @@
 <div class="form-modal admin-sendToReviewAgain">
     <?= $ok === true ? $this->Form->create(null, ['id' => 'sendToReviewAgainForm']) : '' ?>
     <div class="form-header text-center">
-        <?= __('Bírálatra küldés') ?>
+        <?= __('Újboli bírálatra küldés') ?>
     </div>
     <div class="form-body text-justify">
         <?php if($ok === true){ ?>

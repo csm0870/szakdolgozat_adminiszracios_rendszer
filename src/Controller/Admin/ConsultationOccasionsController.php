@@ -74,12 +74,6 @@ class ConsultationOccasionsController extends AppController
         if(empty($consultation)){ //Ha nem létezik a konzultációs csoport
             $error_msg = __('A konzultációs alkalom nem adható hozzá.') . ' ' . __('A konzultációs csoport, amihez tartozik nem létezik.');
             $ok = false;
-        }elseif($consultation->accepted !== null){ //Már véglegesített
-            $error_msg = __('A konzultációs alkalom nem adható hozzá.') . ' ' . __('A konzultációs csoport, amihez tartozik már véglegesített.');
-            $ok = false;
-        }elseif($consultation->current === false){ //Régi szakdolgozathoz tartozik
-            $error_msg = __('A konzultációs alkalom nem adható hozzá.') . ' ' . __('A konzultációs csoport, amihez tartozik régebbi dolgozathoz tartozik.');
-            $ok = false;
         }
         
         if(!$ok){

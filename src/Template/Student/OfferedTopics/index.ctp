@@ -49,7 +49,7 @@
         $('.deleteBtn').on('click', function(e){
             e.preventDefault();
             
-            $('#confirmationModal .header').text('<?= __('Biztosan törlöd?') ?>');
+            $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan törlöd?') ?>');
             $('#confirmationModal .msg').text('<?= __('Téma törlése.') ?>');
             $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Törlés') ?>').css('background-color', 'red');
             //Save gomb eventjeinek resetelése cserével

@@ -1,7 +1,7 @@
 <div class="form-modal admin-setThesisGrade">
     <?= $ok ? $this->Form->create($thesisTopic, ['id' => 'setThesisGradeForm']) : '' ?>
     <div class="form-header text-center">
-        <?= __('Dolgozat értékelése') ?>
+        <?= __('Dolgozat értékelése') . ' (' . 'belső konzulens jegye' . ')' ?>
     </div>
     <div class="form-body">
         <?php if($ok === false){ ?>

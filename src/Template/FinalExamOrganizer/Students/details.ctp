@@ -103,7 +103,7 @@
         $('.finalExamOrganizer-students-details .setPassedFinalExamBtn').on('click', function(e){
             e.preventDefault();
 
-            $('#confirmationModal .header').text('<?= __('A hallgató teljesítette a záróvizsgát?') ?>');
+            $('#confirmationModal .confirmation-modal-header').text('<?= __('A hallgató teljesítette a záróvizsgát?') ?>');
             $('#confirmationModal .msg').text('<?= __('A hallgató teljesítette a záróvizsgát. Rögzítés után a hallgató kikerül a hallgatók listájából.') ?>');
             $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Igen') ?>').css('background-color', '#71D0BD');
             //Save gomb eventjeinek resetelése cserével

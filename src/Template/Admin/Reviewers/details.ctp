@@ -65,7 +65,7 @@
         $('.admin-reviewers-details .delete-btn').on('click', function(e){
             e.preventDefault();
 
-            $('#confirmationModal .header').text('<?= __('Biztosan törlöd?') ?>');
+            $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan törlöd?') ?>');
             $('#confirmationModal .msg').text('<?= __('Bíráló végleges törlése. A bíráló törlés után nem lesz visszaállítható.') ?>');
             $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Törlés') ?>').css('background-color', 'red');
             //Save gomb eventjeinek resetelése cserével

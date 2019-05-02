@@ -62,7 +62,7 @@
         $('.admin-internalConsultants-details .delete-btn').on('click', function(e){
             e.preventDefault();
 
-            $('#confirmationModal .header').text('<?= __('Biztosan törlöd?') ?>');
+            $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan törlöd?') ?>');
             $('#confirmationModal .msg').text('<?= __('Belső konzulens végleges törlése. A belső konzulens  törlés után nem lesz visszaállítható.') ?>');
             $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Törlés') ?>').css('background-color', 'red');
             //Save gomb eventjeinek resetelése cserével

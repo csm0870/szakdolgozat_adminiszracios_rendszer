@@ -63,7 +63,7 @@
                 e.preventDefault();
 
                 //Formvalidáció manuális meghívása
-                if($('#consultationOccasionAddForm')[0].reportValidity() === false) return;
+                if($('#consultationOccasionEditForm')[0].reportValidity() === false) return;
 
                 $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan mented?') ?>');
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');

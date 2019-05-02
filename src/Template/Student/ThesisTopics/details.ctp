@@ -173,10 +173,10 @@
                                                                        \Cake\Core\Configure::read('ThesisTopicStatuses.ProposalForAmendmentOfThesisTopicAddedByHeadOfDepartment')])){
                         //Ha kitöltési időszak van, csak akkor lehet véglegesíteni
                         if(!empty($can_fill_in_topic) && $can_fill_in_topic === true){
-                            echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary border-radius-45px mb-2']) . '<br/>';
+                            echo $this->Html->link(__('Téma módosítása'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary border-radius-45px mb-2']) . '<br/>';
                             echo $this->Html->link(__('Téma véglegesítése/leadása'), '#', ['class' => 'btn btn-success finalize-thesis-topic-btn border-radius-45px mb-2']) . '<br/>';
                         }else
-                            echo $this->Html->link(__('Módosítás'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary border-radius-45px mb-2']) . '<br/>';
+                            echo $this->Html->link(__('Téma módosítása'), ['controller' => 'ThesisTopics', 'action' => 'edit', $thesisTopic->id], ['class' => 'btn btn-primary border-radius-45px mb-2']) . '<br/>';
 
 
                         if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking'))

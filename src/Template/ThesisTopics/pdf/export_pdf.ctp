@@ -110,11 +110,17 @@
                 <tr>
                     <td><div class="signature"></div></td>
                     <td><div class="signature"></div></td>
-                    <td><div class="signature"></div></td>
+					<!-- Ha van külső konzulens -->
+					<?php if($thesisTopic->cause_of_no_external_consultant === null){ ?> 
+						<td><div class="signature"></div></td>
+					<?php } ?>
                 </tr>
                 <tr>
                     <td>Belső konzulens</td>
-                    <td>Külső konzulens</td>
+					<!-- Ha van külső konzulens -->
+					<?php if($thesisTopic->cause_of_no_external_consultant === null){ ?> 
+						<td>Külső konzulens</td>
+					<?php } ?>
                     <td>Tanszékvezető</td>
                 </tr>
             </table>

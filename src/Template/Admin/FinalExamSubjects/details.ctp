@@ -170,7 +170,7 @@
             //Formvalidáció manuális meghívása
             if($('#saveFinalExamSubjectsForm')[0].reportValidity() === false) return;
 
-            $('#confirmationModal .header').text('<?= __('Biztosan mented?') ?>');
+            $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan mented?') ?>');
             $('#confirmationModal .msg').text('<?= __('Záróvizsga-tárgyak mentése. Az adatok mentés után is módosíthatóak.') ?>');
             $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Mentés') ?>').css('background-color', '#71D0BD');
             //Save gomb eventjeinek resetelése cserével
@@ -195,7 +195,7 @@
                 //Formvalidáció manuális meghívása
                 if($('#saveFinalExamSubjectsForm')[0].reportValidity() === false) return;
 
-                $('#confirmationModal .header').text('<?= __('Biztosan véglegesítése?') ?>');
+                $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan véglegesítése?') ?>');
                 $('#confirmationModal .msg').text('<?= __('Záróvizsga-tárgyak elfogadása. Az adatok mentés után is módosíthatóak.') ?>');
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Elfogadás') ?>').css('background-color', '#71D0BD');
                 //Save gomb eventjeinek resetelése cserével

@@ -131,7 +131,7 @@
             $('.btn-accept').on('click', function(e){
                 e.preventDefault();
 
-                $('#confirmationModal .header').text('<?= __('Biztosan elfogadod?') ?>');
+                $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan elfogadod?') ?>');
                 $('#confirmationModal .msg').text('<?= __('Foglalás elfogadása. Elfogadás után a téma adatai már nem módosíthatók.') ?>');
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Elfogadás') ?>').css('background-color', '#71D0BD');
                 //Save gomb eventjeinek resetelése cserével
@@ -150,7 +150,7 @@
             $('.btn-reject').on('click', function(e){
                 e.preventDefault();
 
-                $('#confirmationModal .header').text('<?= __('Biztosan elutasítod?') ?>');
+                $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan elutasítod?') ?>');
                 $('#confirmationModal .msg').text('<?= __('Foglalás elutasítása. Elutasítás után a téma újra foglalható lesz a hallgatóknak.') ?>');
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Elutasítás') ?>').css('background-color', 'red');
                 //Save gomb eventjeinek resetelése cserével
@@ -171,7 +171,7 @@
             $('.delete-btn').on('click', function(e){
                 e.preventDefault();
 
-                $('#confirmationModal .header').text('<?= __('Biztosan törlöd?') ?>');
+                $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan törlöd?') ?>');
                 $('#confirmationModal .msg').text('<?= __('Téma törlése.') ?>');
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Törlés') ?>').css('background-color', 'red');
                 //Save gomb eventjeinek resetelése cserével

@@ -192,6 +192,10 @@ class ThesisTopicsController extends AppController
                 }
             }
             
+            //Ha a tanszékvezető módosítási javaslatot adott
+            if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ProposalForAmendmentOfThesisTopicAddedByHeadOfDepartment'))
+                unset($request_data['internal_consultant_id']);
+            
             $thesisTopic = $this->ThesisTopics->patchEntity($thesisTopic, $request_data);
             $thesisTopic->student_id = $data['student_id'];
             $has_external_consultant = $this->getRequest()->getData('has_external_consultant');

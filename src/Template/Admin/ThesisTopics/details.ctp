@@ -71,7 +71,7 @@
                         <?php //Adatok felvitele a Neptun rendszerbe
                             if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted')){
                                 if($thesisTopic->accepted_thesis_data_applyed_to_neptun !== true){
-                                    echo '(' . __('Az elfogadott dolgozat adatait nincsenek rögzítve a Neptun rendszerbe.') . ')';
+                                    echo '(' . __('Az elfogadott dolgozat adatai nincsenek rögzítve a Neptun rendszerbe.') . ')';
                                     echo '<br/>';
                                     echo $this->Html->link(__('Adatok felvitele') . ' ->', '#', ['id' => 'applyAcceptedThesisDataBtn', 'style' => 'display: inline-block']);
                                 }else{
@@ -651,7 +651,7 @@
             $('#acceptBookingForm .btn-accept').on('click', function(e){
                 e.preventDefault();
 
-                $('#confirmationModal .header').text('<?= __('Biztosan elfogadod?') ?>');
+                $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan elfogadod?') ?>');
                 $('#confirmationModal .msg').html('<?= __('Foglalás elfogadása.') . '<br/><br/>' .__('Művelet végrehajtója') . ': ' . __('belső konzulens') ?>');
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Elfogadás') ?>').css('background-color', '#71D0BD');
                 //Save gomb eventjeinek resetelése cserével
@@ -670,7 +670,7 @@
             $('#rejectBookingForm .btn-reject').on('click', function(e){
                 e.preventDefault();
 
-                $('#confirmationModal .header').text('<?= __('Biztosan elutasítod?') ?>');
+                $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan elutasítod?') ?>');
                 $('#confirmationModal .msg').html('<?= __('Foglalás elutasítása. Elutasítás után a téma újra foglalható lesz a hallgatóknak.') . '<br/><br/>' .__('Művelet végrehajtója') . ': ' . __('belső konzulens') ?>');
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Elutasítás') ?>').css('background-color', 'red');
                 //Save gomb eventjeinek resetelése cserével
@@ -685,7 +685,6 @@
                 });
             });
         <?php } ?>
-        
         
         <?php if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForStudentFinalizingOfThesisTopicBooking')){ ?>
             //Témafoglalás visszanása (hallgatói művelet)
@@ -712,7 +711,6 @@
             });
         <?php } ?>
         
-        
         <?php if(in_array($thesisTopic->thesis_topic_status_id, [\Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopic'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForHeadOfDepartmentAcceptingOfThesisTopic'),
                                                                  \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForCheckingExternalConsultantSignatureOfThesisTopic')])){ ?>
@@ -730,7 +728,7 @@
             $('#acceptThesisTopicForm .btn-accept').on('click', function(e){
                 e.preventDefault();
                 
-                $('#confirmationModal .header').text('<?= __('Biztosan elfogadod?') ?>');
+                $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan elfogadod?') ?>');
                 $('#confirmationModal .msg').html('<?= __('Téma elfogadása.') . '<br/><br/>' .__('Művelet végrehajtója') . ': ' . $user_type ?>');
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Elfogadás') ?>').css('background-color', '#71D0BD');
                 //Save gomb eventjeinek resetelése cserével
@@ -749,7 +747,7 @@
             $('#rejectThesisTopicForm .btn-reject').on('click', function(e){
                 e.preventDefault();
 
-                $('#confirmationModal .header').text('<?= __('Biztosan elutasítod?') ?>');
+                $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan elutasítod?') ?>');
                 $('#confirmationModal .msg').html('<?= __('Téma elutasítása.') .
                                                        ($thesisTopic->has('offered_topic') && $thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopic') ? ' ' . __('Visszautasítás után a kiírt témák listájához visszakerül a téma, amire a hallgatók ismét jelentkezhetnek.') : '') .
                                                        '<br/><br/>' .__('Művelet végrehajtója') . ': ' . $user_type ?>');
@@ -888,7 +886,6 @@
                 cache: false
             })
             .done(function(response){
-                console.log(response);
                 $('#send_to_review_again_container').html(response.content);
             });
 
@@ -1000,7 +997,7 @@
         $('.admin-thesisTopics-details .delete-btn').on('click', function(e){
             e.preventDefault();
 
-            $('#confirmationModal .header').text('<?= __('Biztosan törlöd?') ?>');
+            $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan törlöd?') ?>');
             $('#confirmationModal .msg').text('<?= __('Téma végleges törlése. A téma törlés után nem lesz visszaállítható.') ?>');
             $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Törlés') ?>').css('background-color', 'red');
             //Save gomb eventjeinek resetelése cserével

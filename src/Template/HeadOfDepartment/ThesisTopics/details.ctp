@@ -466,7 +466,7 @@
             $('.headOfDepartment-thesisTopics-details .btn-accept').on('click', function(e){
                 e.preventDefault();
 
-                $('#confirmationModal .header').text('<?= __('Biztosan elfogadod?') ?>');
+                $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan elfogadod?') ?>');
                 $('#confirmationModal .msg').text('<?= __('Téma elfogadása.') ?>');
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Elfogadás') ?>').css('background-color', '#71D0BD');
                 //Save gomb eventjeinek resetelése cserével
@@ -485,7 +485,7 @@
             $('.headOfDepartment-thesisTopics-details .btn-reject').on('click', function(e){
                 e.preventDefault();
 
-                $('#confirmationModal .header').text('<?= __('Biztosan elutasítod?') ?>');
+                $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan elutasítod?') ?>');
                 $('#confirmationModal .msg').text('<?= __('Téma elutasítása.') ?>');
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Elutasítás') ?>').css('background-color', 'red');
                 //Save gomb eventjeinek resetelése cserével
