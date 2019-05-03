@@ -177,8 +177,8 @@
                 //Formvalidáció manuális meghívása
                 if($('#saveFinalExamSubjectsForm')[0].reportValidity() === false) return;
 
-                $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan véglegesítése?') ?>');
-                $('#confirmationModal .msg').text('<?= __('Záróvizsga-tárgyak mentése. Az adatok mentés után már nem módosíthatóak.') ?>');
+                $('#confirmationModal .confirmation-modal-header').text('<?= __('Biztosan véglegesítési?') ?>');
+                $('#confirmationModal .msg').text('<?= __('Záróvizsga-tárgyak mentése/elfogadása. Az adatok mentés után már nem módosíthatóak.') ?>');
                 $('#confirmationModal .modalBtn.saveBtn').text('<?= __('Elfogadás') ?>').css('background-color', '#71D0BD');
                 //Save gomb eventjeinek resetelése cserével
                 $('#confirmationModal .modalBtn.saveBtn').replaceWith($('#confirmationModal .modalBtn.saveBtn').first().clone());

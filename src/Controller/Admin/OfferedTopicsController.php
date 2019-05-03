@@ -143,7 +143,7 @@ class OfferedTopicsController extends AppController
      */
     public function details($id = null){
         $offeredTopic = $this->OfferedTopics->find('all', ['conditions' => ['OfferedTopics.id' => $id],
-                                                           'contain' => ['Languages', 'ThesisTopics' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels']],
+                                                           'contain' => ['Languages', 'ThesisTopics' => ['Students' => ['Courses', 'CourseTypes', 'CourseLevels'], 'ThesisTopicStatuses'],
                                                                          'InternalConsultants']])->first();
         
         $ok = true;

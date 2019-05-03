@@ -84,7 +84,7 @@
                       });
         
         //Ha a kereső mezőkbe írunk, akkor újra "rajzoljuk" a tálbázatot
-        $('#title_search_text, #internal_consultant_search_text, #student_search_text, #status_search_text').on('keyup', function(){
+        $('#title_search_text, #student_search_text, #status_search_text').on('keyup', function(){
             table.draw();
         });
         

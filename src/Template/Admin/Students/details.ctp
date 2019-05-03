@@ -182,7 +182,11 @@
                     <fieldset class="border-1-grey p-3 text-center">
                         <legend class="w-auto"><?= __('Műveletek') ?></legend>
                         <?php
-                            echo $this->Html->link($student->passed_final_exam === true ? __('A hallgató még nem teljesítette a záróvizsgát') : __('A hallgató teljesítette a záróvizsgát'), '#', ['class' => 'btn btn-secondary border-radius-45px setPassedFinalExamBtn mb-2']) . '<br/>';
+                            if($student->passed_final_exam === true) //Ha már teljesítette a ZV-t
+                                echo $this->Html->link(__('A hallgató még nem teljesítette a záróvizsgát'), '#', ['class' => 'btn btn-secondary border-radius-45px setPassedFinalExamBtn mb-2']) . '<br/>';
+                            elseif($can_go_to_final_exam === true){ //Ha mehet ZV-ra (és persze még nem teljesítette)
+                                echo $this->Html->link(__('A hallgató teljesítette a záróvizsgát'), '#', ['class' => 'btn btn-secondary border-radius-45px setPassedFinalExamBtn mb-2']) . '<br/>';
+                            }
                             
                             echo $this->Html->link(__('Hallgató adatainak módosítása'), ['action' => 'edit', $student->id], ['class' => 'btn btn-secondary border-radius-45px mb-2']) . '<br/>';
                             

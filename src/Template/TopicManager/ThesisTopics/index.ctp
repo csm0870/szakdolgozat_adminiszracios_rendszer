@@ -1,7 +1,17 @@
 <div class="container thesisTopics-index topicManager-thesisTopics-index">
     <div class="row">
         <div class="col-12 text-center page-title">
-            <h4><?= __('Témák kezelése') ?></h4>
+            <h4>
+				<?= __('Témák kezelése') ?><br/>
+                <?php if(!empty($information) && !empty($information->filling_in_topic_form_begin_date) && !empty($information->filling_in_topic_form_end_date)){ ?>
+                    <small class="text-muted">
+                        <?= __('Témaleadási időszak') . ': ' .
+                            $this->Time->format($information->filling_in_topic_form_begin_date, 'yyyy.MM.dd.') . ' - '  .
+                            $this->Time->format($information->filling_in_topic_form_end_date, 'yyyy.MM.dd.')
+                        ?>
+                    </small>
+                <?php } ?>
+			</h4>
         </div>
         <?= $this->Flash->render() ?>
         <div class="col-12">

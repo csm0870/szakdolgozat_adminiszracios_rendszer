@@ -93,15 +93,15 @@
                             if($offeredTopic->has('thesis_topic') && $offeredTopic->thesis_topic->has('student') &&
                                $offeredTopic->thesis_topic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.WaitingForInternalConsultantAcceptingOfThesisTopicBooking')){
                             
-                                 echo $this->Form->create(null, ['id' => 'acceptBookingForm', 'class' => 'mb-2', 'style' => 'display: inline-block', 'url' => ['action' => 'acceptBooking']]);
+                                 echo $this->Form->create(null, ['id' => 'acceptBookingForm', 'class' => 'mb-2', 'style' => 'display: inline-block', 'url' => ['controller' => 'ThesisTopics', 'action' => 'acceptBooking']]);
                                     echo $this->Form->button(__('Foglalás elfogadása'), ['type' => 'submit', 'class' => 'btn btn-success btn-accept border-radius-45px']);
-                                    echo $this->Form->input('offered_topic_id', ['type' => 'hidden', 'value' => $offeredTopic->id]);
+                                    echo $this->Form->input('thesis_topic_id', ['type' => 'hidden', 'value' => $offeredTopic->thesis_topic->id]);
                                     echo $this->Form->input('accepted', ['type' => 'hidden', 'value' => 1]);
                                     echo $this->Form->end();
                                     
-                                    echo $this->Form->create(null, ['id' => 'rejectBookingForm', 'style' => 'display: inline-block', 'url' => ['action' => 'acceptBooking']]);
+                                    echo $this->Form->create(null, ['id' => 'rejectBookingForm', 'style' => 'display: inline-block', 'url' => ['controller' => 'ThesisTopics', 'action' => 'acceptBooking']]);
                                     echo $this->Form->button(__('Foglalás elutasítása'), ['type' => 'submit', 'class' => 'btn btn-danger btn-reject border-radius-45px']);
-                                    echo $this->Form->input('offered_topic_id', ['type' => 'hidden', 'value' => $offeredTopic->id]);
+                                    echo $this->Form->input('thesis_topic_id', ['type' => 'hidden', 'value' => $offeredTopic->thesis_topic->id]);
                                     echo $this->Form->input('accepted', ['type' => 'hidden', 'value' => 0]);
                                     echo $this->Form->end();
                                     echo "<br/>";

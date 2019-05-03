@@ -87,7 +87,7 @@ class UsersController extends AppController
                 return $this->redirect($this->Auth->redirectUrl());
             }
             
-            $this->Flash->error(__('Helytelen email vagy jelszó. Próbálja újra!'));
+            $this->Flash->error(__('Helytelen felhasználónév vagy jelszó. Próbálja újra!'));
             $this->Auth->logout();
         }
     }

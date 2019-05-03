@@ -8,24 +8,37 @@
             <div class="row thesisTopics-index-body">
                     <div class="col-12">
                         <div class="table-responsive">
-                            <table class="table table-bordered table-hover topics-table">
-                                <tr>
-                                    <th><?= __('Hallgató neve') ?></th>
-                                    <th><?= __('Neptun kód') ?></th>
-                                    <th><?= __('Állapot') ?></th>
-                                </tr>
-                                <?php foreach($students as $student){ ?>
-                                    <tr class="students" data-id="<?= $student->id ?>" style="cursor: pointer">
-                                        <td><?= h($student->name) ?></td>
-                                        <td><?= h($student->neptun) ?></td>
-                                        <td>
-                                            <?php
-                                                if($student->final_exam_subjects_status === 2) echo __('Hallgató véglegesítette. Ellenőrzésre vár.');
-                                                elseif($student->final_exam_subjects_status === 3) echo __('Elfogadva.');
-                                            ?>
-                                        </td>
+                            <table class="table table-bordered table-hover topics-table" id="data_table">
+                                <thead>
+                                    <tr>
+                                        <th><?= __('Hallgató neve') ?></th>
+                                        <th><?= __('Neptun kód') ?></th>
+                                        <th><?= __('Állapot') ?></th>
                                     </tr>
-                                <?php } ?>
+                                </thead>
+                                <thead>
+                                    <tr>
+                                        <th><?= $this->Form->control('student_name_search_text', ['id' => 'student_name_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
+                                        <th><?= $this->Form->control('neptun_search_text', ['id' => 'neptun_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
+                                        <th><?= $this->Form->control('status_search_text', ['id' => 'status_search_text', 'type' => 'text', 'placeholder' => __('Keresés...'), 'label' => false]) ?></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach($students as $student){ ?>
+                                        <tr class="students" data-id="<?= $student->id ?>" style="cursor: pointer">
+                                            <td><?= '<searchable-text>' . h($student->name) . '</searchable-text>' ?></td>
+                                            <td><?= '<searchable-text>' . h($student->neptun) . '</searchable-text>' ?></td>
+                                            <td>
+                                                <?php
+                                                    echo '<searchable-text>';
+                                                    if($student->final_exam_subjects_status === 2) echo __('Hallgató véglegesítette. Ellenőrzésre vár.');
+                                                    elseif($student->final_exam_subjects_status === 3) echo __('Elfogadva.');
+                                                    echo '</searchable-text>';
+                                                ?>
+                                            </td>
+                                        </tr>
+                                    <?php } ?>
+                                <tbody>
                             </table>
                         </div>
                     </div>
@@ -42,5 +55,67 @@
             var id = $(this).data('id');
             location.href = '<?= $this->Url->build(['action' => 'details'], true) ?>' + '/' + id;
         });
+        
+        // DataTable
+        var table = $('#data_table').DataTable({
+                        pageLength : 10,
+                        "dom" : 'tp',
+                        "oLanguage": {
+                          "oPaginate": {
+                            "sNext": "<?= __('Következő') ?>",
+                            "sPrevious" : "<?= _('Előző') ?>",
+                          },
+                          "sEmptyTable": "<?= __('Nincs megjeleníthető tartalom') ?>",
+                          "sInfoEmpty": "<?= __('Nincs megjeleníthető tartalom') ?>",
+                          "sLengthMenu": "_MENU_ <?= __('rekord megjelenítése') ?>",
+                          "sZeroRecords" : "<?= __('Nem található a keresésnek megfelelő elem') ?>"
+                        },
+                        drawCallback: function(settings){
+                            //Pagination elrejtése, ha nincs rá szükség
+                            var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+                            pagination.toggle(this.api().page.info().pages > 1);
+                        }
+                      });
+        
+        //Ha a kereső mezőkbe írunk, akkor újra "rajzoljuk" a tálbázatot
+        $('#student_name_search_text, #neptun_search_text, #status_search_text').on('keyup', function(){
+            table.draw();
+        });
+        
+        //Táblázat sorainak szűrése a keresendő szövegek alapján
+        $.fn.dataTable.ext.search.push(
+            function(settings, searchData, index, rowData, counter) {
+                var student_name_search_text = $('#student_name_search_text').val().toLowerCase();
+                var neptun_search_text = $('#neptun_search_text').val().toLowerCase();
+                var status_search_text = $('#status_search_text').val().toLowerCase();
+                
+                if(student_name_search_text == '' && neptun_search_text == '' && status_search_text == '') return true;
+                
+                var ok = true;
+                
+                var first_index_of_student_name_search_text = rowData[0].indexOf('<searchable-text>');
+                var last_index_of_student_name_search_text = rowData[0].indexOf('</searchable-text>');
+                if(first_index_of_student_name_search_text != -1 && last_index_of_student_name_search_text != -1){
+                    var student_name_searchable_text = rowData[0].substring(first_index_of_student_name_search_text + '<searchable-text>'.length, last_index_of_student_name_search_text);
+                    if(student_name_searchable_text.toLowerCase().indexOf(student_name_search_text) == -1) ok = false;
+                }
+                
+                var first_index_of_neptun_search_text = rowData[1].indexOf('<searchable-text>');
+                var last_index_of_neptun_search_text = rowData[1].indexOf('</searchable-text>');
+                if(first_index_of_neptun_search_text != -1 && last_index_of_neptun_search_text != -1){
+                    var neptun_searchable_text = rowData[1].substring(first_index_of_neptun_search_text + '<searchable-text>'.length, last_index_of_neptun_search_text);
+                    if(neptun_searchable_text.toLowerCase().indexOf(neptun_search_text) == -1) ok = false;
+                }
+                
+                var first_index_of_status_search_text = rowData[2].indexOf('<searchable-text>');
+                var last_index_of_status_search_text = rowData[2].indexOf('</searchable-text>');
+                if(first_index_of_status_search_text != -1 && last_index_of_status_search_text != -1){
+                    var status_searchable_text = rowData[2].substring(first_index_of_status_search_text + '<searchable-text>'.length, last_index_of_status_search_text);
+                    if(status_searchable_text.toLowerCase().indexOf(status_search_text) == -1) ok = false;
+                }
+                
+                return ok;
+            }
+        );
     });
 </script>

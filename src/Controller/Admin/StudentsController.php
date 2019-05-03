@@ -66,9 +66,28 @@ class StudentsController extends AppController
             return $this->redirect(['action' => 'index']);
         }
         
+        $can_go_to_final_exam = true;
+        if($student->course_id == 1 && $student->final_exam_subjects_status != 3) //Még nincsenek kiválasztva a ZV tárgyak
+            $can_go_to_final_exam = false;
+        
+        if($can_go_to_final_exam === true){
+            $has_appropriate_thesis = false;
+            foreach($student->thesis_topics as $thesisTopic){
+                //Ha a téma el van fogadva (a dolgozat), nincs törölve, és fel vannak vive az adatok a Neptun rendszerbe
+                if($thesisTopic->thesis_topic_status_id == \Cake\Core\Configure::read('ThesisTopicStatuses.ThesisAccepted') &&
+                   $thesisTopic->deleted !== true &&
+                   $thesisTopic->accepted_thesis_data_applyed_to_neptun === true){
+                    $has_appropriate_thesis = true;
+                    break;
+                }
+            }
+            
+            if($has_appropriate_thesis === false) $can_go_to_final_exam = false;
+        }
+        
         $this->loadModel('Years');
         $years = $this->Years->find('list');
-        $this->set(compact('student', 'years'));
+        $this->set(compact('student', 'years', 'can_go_to_final_exam'));
     }
     
     /**
@@ -115,6 +134,6 @@ class StudentsController extends AppController
         if($this->Students->save($student)) $this->Flash->success(__('Mentés sikeres.'));
         else $this->Flash->error(__('Mentés sikertelen. Próbálja újra!'));
         
-        return $this->redirect(['action' => 'index']);
+        return $this->redirect(['action' => 'details', $student->id]);
     }
 }
