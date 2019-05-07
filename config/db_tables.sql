@@ -698,7 +698,7 @@ CREATE TABLE `documents` (
 
 INSERT INTO `documents` (`id`, `name`, `file`, `created`, `modified`) VALUES
 (1, 'Útmutató szakdolgozat bírálathoz', 'utmutato_szakdolgozat_biralatahoz.pdf', '2019-03-08 18:16:00', '2019-04-01 00:00:00'),
-(2, 'Útmutató diplomamunka bírálathoz', 'utmutato_diplomamunka_biralatahoz-1.pdf', '2019-03-08 18:16:00', '2019-04-18 17:51:35');
+(2, 'Útmutató diplomamunka bírálathoz', 'utmutato_diplomamunka_biralatahoz.pdf', '2019-03-08 18:16:00', '2019-04-18 17:51:35');
 
 -- --------------------------------------------------------
 

@@ -75,7 +75,7 @@ class ThesisTopicsController extends AppController
                 ]
             ]
         ]);
-
+        
         $this->set(compact('thesisTopic'));
     }
     
